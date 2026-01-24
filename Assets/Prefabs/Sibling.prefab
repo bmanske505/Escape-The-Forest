@@ -14,7 +14,8 @@ GameObject:
   - component: {fileID: 4664627087387401583}
   - component: {fileID: 7890401912534985558}
   - component: {fileID: 4869246842245288964}
-  m_Layer: 0
+  - component: {fileID: 6929796537867617710}
+  m_Layer: 6
   m_Name: Sibling
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -155,5 +156,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9782a594a677a426aa2c01235d84aa02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Sibling
-  speed: 1.5
-  distance: 2
+  lostTimeThreshold: 3
+--- !u!195 &6929796537867617710
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7096211616557163575}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 1
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 1
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 1
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4

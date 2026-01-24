@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3768731294126381439}
   - component: {fileID: 3444770197291515429}
   - component: {fileID: 1995142831096090429}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Stalker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -155,3 +155,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 5
   mouseSensitivity: 100
+  cameraPivot: {fileID: 0}
+  minPitch: -80
+  maxPitch: 80
+  siblingPrefab: {fileID: 0}
+  siblingSpawnOffset: {x: 0, y: 0, z: 0}

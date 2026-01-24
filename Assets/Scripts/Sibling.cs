@@ -1,66 +1,56 @@
 using UnityEngine;
+using UnityEngine.AI;
 
-[RequireComponent(typeof(Collider))]
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(NavMeshAgent))]
 public class Sibling : MonoBehaviour
 {
-  public float speed = 3f;
-  public float distance = 2f;
-  public float obstacleAvoidDistance = 1f;
-  public float lostTimeThreshold = 3f;
+  public float lostTimeThreshold = 3f;   // Time stuck before hiding
 
   private Transform player;
-  private Rigidbody rb;
+  private NavMeshAgent agent;
 
   private Vector3 lastPosition;
   private float stuckTimer;
 
+  private bool isHiding = false;         // To handle Hide() state
+
   void Start()
   {
-    rb = GetComponent<Rigidbody>();
-    rb.isKinematic = true; // So it moves via script but still collides
-    rb.constraints = RigidbodyConstraints.FreezeRotation;
+    agent = GetComponent<NavMeshAgent>();
 
     GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-
     if (playerObj == null)
     {
       Debug.LogError("Sibling: No GameObject with tag 'Player' found in the scene.");
       enabled = false;
       return;
     }
-
     player = playerObj.transform;
+
     lastPosition = transform.position;
     stuckTimer = 0f;
   }
 
   void Update()
   {
-    if (player == null)
+    if (player == null || isHiding)
       return;
 
     float currentDistance = Vector3.Distance(transform.position, player.position);
 
-    if (currentDistance <= distance)
-      return;
-
-    Vector3 direction = (player.position - transform.position).normalized;
-
-    // --- Simple obstacle avoidance ---
-    if (Physics.Raycast(transform.position, direction, out RaycastHit hit, obstacleAvoidDistance))
+    // Only move if farther than stopping distance
+    if (currentDistance > agent.stoppingDistance)
     {
-      // Hit something in front
-      // Steer slightly left or right
-      Vector3 avoidDir = Vector3.Cross(hit.normal, Vector3.up).normalized;
-      direction = (direction + avoidDir).normalized;
+      agent.SetDestination(player.position);
+    }
+    else
+    {
+      // Player is within follow distance, stop moving
+      agent.ResetPath();
     }
 
-    // Move using Rigidbody
-    rb.MovePosition(transform.position + direction * speed * Time.deltaTime);
-
     // --- Check if stuck ---
-    if ((transform.position - lastPosition).magnitude < 0.01f)
+    if ((transform.position - lastPosition).magnitude < 0.01f && !agent.pathPending)
     {
       stuckTimer += Time.deltaTime;
       if (stuckTimer >= lostTimeThreshold)
@@ -79,11 +69,17 @@ public class Sibling : MonoBehaviour
 
   private void Hide()
   {
-    // TODO: pick a random hiding spot in the maze and move there
+    isHiding = true;
+    agent.ResetPath();
+
     Debug.Log("Sibling is lost! Calling Hide().");
-    /*
-    This function should choose a random HidingSpot node in the map (these should be added!!) and place the Sibling there
-    - May need a boolean value IsHiding or something so that sibling will only follow the player if not hiding...
-    */
+
+    // TODO: move to a random hiding spot
+    // Example:
+    // Transform spot = GetRandomHidingSpot();
+    // agent.Warp(spot.position);
   }
+
+  // Optional helper
+  // private Transform GetRandomHidingSpot() { ... }
 }
