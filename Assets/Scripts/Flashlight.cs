@@ -1,0 +1,38 @@
+using UnityEngine;
+
+public class Flashlight : MonoBehaviour
+{
+  [Header("Light Settings")]
+  public float range = 15f;
+  public float spotAngle = 45f;
+  public float intensity = 2f;
+
+  private Light lightSource;
+
+  public void AttachTo(Transform parent)
+  {
+    GameObject lightObj = new GameObject("Flashlight");
+    lightObj.transform.SetParent(parent);
+    lightObj.transform.localPosition = Vector3.zero;
+    lightObj.transform.localRotation = Quaternion.identity;
+
+    lightSource = lightObj.AddComponent<Light>();
+    lightSource.type = LightType.Spot;
+    lightSource.range = range;
+    lightSource.spotAngle = spotAngle;
+    lightSource.intensity = intensity;
+    lightSource.enabled = false;
+  }
+
+  public void On()
+  {
+    if (lightSource != null)
+      lightSource.enabled = true;
+  }
+
+  public void Off()
+  {
+    if (lightSource != null)
+      lightSource.enabled = false;
+  }
+}
