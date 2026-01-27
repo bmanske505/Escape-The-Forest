@@ -13,16 +13,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-Editor::MazeGenerator/Settings
   templateScene: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
-  characterMap:
-  - character: 35
-    prefab: {fileID: 4401335628489640003, guid: 1d12e5065266f4b70aa585a1cc697192, type: 3}
-  - character: 68
-    prefab: {fileID: 5905721682012628479, guid: 3abfd5b7b7f5342c093bdb5297317320, type: 3}
-  - character: 80
-    prefab: {fileID: 8866867285940232212, guid: 636bc430ca9c14d9cb795070249b36d6, type: 3}
-  - character: 66
-    prefab: {fileID: 5209874468414407373, guid: fae1895f759764c2585b99e42dce5987, type: 3}
-  - character: 46
-    prefab: {fileID: 8263324757489701871, guid: a6dade1ee30654574bfd5dedab589446, type: 3}
-  - character: 83
-    prefab: {fileID: 257191205974048813, guid: 91e564da69a434837b17df944b587575, type: 3}
+  characterMap: []

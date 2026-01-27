@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -5,18 +6,21 @@ using UnityEngine.AI;
 public class Sibling : MonoBehaviour
 {
   public float lostTimeThreshold = 3f;   // Time stuck before hiding
+  public float followRadius = 5f; // The distance within which the sibling is considered "following" the player
 
   private Transform player;
   private NavMeshAgent agent;
+  private Collectible collectible;
 
   private Vector3 lastPosition;
-  private float stuckTimer;
-
+  private float lostTimer = 0f;
   private bool isHiding = false;         // To handle Hide() state
+  private Vector3[] hidingSpots;
 
   void Start()
   {
     agent = GetComponent<NavMeshAgent>();
+    collectible = GetComponentInChildren<Collectible>();
 
     GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
     if (playerObj == null)
@@ -28,7 +32,7 @@ public class Sibling : MonoBehaviour
     player = playerObj.transform;
 
     lastPosition = transform.position;
-    stuckTimer = 0f;
+    hidingSpots = Array.ConvertAll(GameObject.FindGameObjectsWithTag("HidingSpot"), obj => obj.transform.position);
   }
 
   void Update()
@@ -49,37 +53,39 @@ public class Sibling : MonoBehaviour
       agent.ResetPath();
     }
 
-    // --- Check if stuck ---
-    if ((transform.position - lastPosition).magnitude < 0.01f && !agent.pathPending)
+    // --- Check if stuck or sufficiently far from player
+    if ((transform.position - player.position).magnitude > followRadius || ((transform.position - lastPosition).magnitude < 0.01f && !agent.pathPending))
     {
-      stuckTimer += Time.deltaTime;
-      if (stuckTimer >= lostTimeThreshold)
+      lostTimer += Time.deltaTime;
+      if (lostTimer >= lostTimeThreshold)
       {
         Hide();
-        stuckTimer = 0f;
+        lostTimer = 0f;
       }
     }
     else
     {
-      stuckTimer = 0f;
+      lostTimer = 0f;
     }
 
     lastPosition = transform.position;
   }
 
-  private void Hide()
+  public void Hide()
   {
-    isHiding = true;
+    Vector3 spot = hidingSpots[UnityEngine.Random.Range(0, hidingSpots.Length)];
+    agent.Warp(spot);
     agent.ResetPath();
 
-    Debug.Log("Sibling is lost! Calling Hide().");
+    isHiding = true;
+    collectible.SetActive(true); // can now be picked up by player
 
-    // TODO: move to a random hiding spot
-    // Example:
-    // Transform spot = GetRandomHidingSpot();
-    // agent.Warp(spot.position);
+    Debug.Log("Sibling is lost!");
   }
 
-  // Optional helper
-  // private Transform GetRandomHidingSpot() { ... }
+  public void Unhide()
+  {
+    isHiding = false;
+    collectible.SetActive(false);
+  }
 }

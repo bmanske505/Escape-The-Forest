@@ -1,7 +1,6 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.IO;
 
@@ -54,33 +53,6 @@ public class MazeGenerator : EditorWindow
         }
     };
 
-  // ================= SETTINGS (GUI-PERSISTED) =================
-  [System.Serializable]
-  public class CharacterPrefabPair
-  {
-    public char character; // single char
-    public GameObject prefab;
-  }
-
-  [FilePath("ProjectSettings/MazeGeneratorSettings.asset", FilePathAttribute.Location.ProjectFolder)]
-  public class Settings : ScriptableSingleton<Settings>
-  {
-    [Header("Template Scene")]
-    public SceneAsset templateScene;
-
-    [Header("Character Map")]
-    public List<CharacterPrefabPair> characterMap = new();
-
-    public GameObject GetPrefab(char c)
-    {
-      foreach (var entry in characterMap)
-        if (entry.character == c) return entry.prefab;
-      return null;
-    }
-
-    public void SaveSettings() => Save(true);
-  }
-
   // ================= WINDOW =================
   Vector2 scroll;
 
@@ -89,7 +61,7 @@ public class MazeGenerator : EditorWindow
 
   void OnGUI()
   {
-    var settings = Settings.instance;
+    var settings = MazeGeneratorSettings.instance;
     SerializedObject so = new SerializedObject(settings);
 
     scroll = EditorGUILayout.BeginScrollView(scroll);
@@ -132,7 +104,7 @@ public class MazeGenerator : EditorWindow
   // ================= GENERATION =================
   const string LEVEL_FOLDER = "Assets/Levels";
 
-  static bool ValidateCharacterMap(Settings settings)
+  static bool ValidateCharacterMap(MazeGeneratorSettings settings)
   {
     var set = new HashSet<char>();
     foreach (var entry in settings.characterMap)
@@ -149,7 +121,7 @@ public class MazeGenerator : EditorWindow
     return true;
   }
 
-  static void GenerateScenes(Settings settings)
+  static void GenerateScenes(MazeGeneratorSettings settings)
   {
     if (!ValidateCharacterMap(settings))
       return;
@@ -198,7 +170,7 @@ public class MazeGenerator : EditorWindow
     EditorUtility.DisplayDialog("Done", "Maze scenes generated!", "OK");
   }
 
-  static void BuildScene(Level level, string scenePath, Settings settings, string templatePath)
+  static void BuildScene(Level level, string scenePath, MazeGeneratorSettings settings, string templatePath)
   {
     var scene = EditorSceneManager.OpenScene(templatePath, OpenSceneMode.Single);
 
