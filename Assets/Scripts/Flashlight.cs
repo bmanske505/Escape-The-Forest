@@ -8,6 +8,7 @@ public class Flashlight : MonoBehaviour
   public float intensity = 2f;
 
   private Light lightSource;
+  private bool isOn;
 
   public void AttachTo(Transform parent)
   {
@@ -24,14 +25,33 @@ public class Flashlight : MonoBehaviour
     lightSource.enabled = false;
   }
 
-  public void On()
+  public bool IsOn()
   {
+    return isOn;
+  }
+
+  public void Toggle()
+  {
+    if (IsOn())
+    {
+      Off();
+    }
+    else
+    {
+      On();
+    }
+  }
+
+  private void On()
+  {
+    Debug.Log("Flashlight On!");
     if (lightSource != null)
       lightSource.enabled = true;
   }
 
-  public void Off()
+  private void Off()
   {
+    Debug.Log("Flashlight Off!");
     if (lightSource != null)
       lightSource.enabled = false;
   }
