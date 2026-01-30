@@ -22,6 +22,9 @@
 *.booproj
 *.svd
 
+# Editor Settings
+*.dwlt
+
 # Unity Asset Store
 [Aa]ssets/AssetStoreTools*
 

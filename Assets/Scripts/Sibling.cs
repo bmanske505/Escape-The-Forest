@@ -54,7 +54,7 @@ public class Sibling : MonoBehaviour
     }
 
     // --- Check if stuck or sufficiently far from player
-    if ((transform.position - player.position).magnitude > followRadius || ((transform.position - lastPosition).magnitude < 0.01f && !agent.pathPending))
+    if ((transform.position - player.position).magnitude > followRadius)
     {
       lostTimer += Time.deltaTime;
       if (lostTimer >= lostTimeThreshold)

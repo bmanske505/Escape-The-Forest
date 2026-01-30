@@ -17,7 +17,6 @@ public class Collectible : MonoBehaviour
 
   void OnTriggerStay(Collider other)
   {
-    Debug.Log(other);
     if (other.CompareTag("Player"))
     {
       onCollect.Invoke();

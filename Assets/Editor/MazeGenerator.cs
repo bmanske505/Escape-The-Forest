@@ -3,6 +3,8 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using Unity.AI.Navigation;
+using UnityEngine.AI; // required for NavMeshSurface
 
 public class MazeGenerator : EditorWindow
 {
@@ -183,6 +185,10 @@ public class MazeGenerator : EditorWindow
         .Replace("\r\n", "\n")
         .Split('\n', System.StringSplitOptions.RemoveEmptyEntries);
 
+    int width = lines[0].Length;
+    int depth = lines.Length;
+
+    // --- Instantiate prefabs ---
     for (int z = 0; z < lines.Length; z++)
     {
       for (int x = 0; x < lines[z].Length; x++)
@@ -208,7 +214,31 @@ public class MazeGenerator : EditorWindow
       }
     }
 
-    // Future: use level.light to adjust lighting
+    // --- Find and resize Ground ---
+    var ground = GameObject.Find("Ground");
+    if (ground != null)
+    {
+      var renderer = ground.GetComponent<Renderer>();
+      if (renderer != null)
+      {
+        // Assume plane pivot at center
+        ground.transform.localScale = new Vector3(width * 0.1f, 1f, depth * 0.1f);
+        ground.transform.position = new Vector3((width - 1) * 0.5f, ground.transform.position.y, -(depth - 1) * 0.5f);
+      }
+      else
+      {
+        Debug.LogWarning("Ground object does not have a Renderer. Cannot size it automatically.");
+      }
+    }
+    else
+    {
+      Debug.LogWarning("Ground object not found in the scene. Place a GameObject named 'Ground'.");
+    }
+
+    // --- NavMesh baking ---
+    var nav = GameObject.Find("NavMesh Surface");
+    var surface = nav.GetComponent<NavMeshSurface>();
+    surface.BuildNavMesh();
 
     EditorSceneManager.SaveScene(scene, scenePath);
   }

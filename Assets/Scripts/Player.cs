@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(CharacterController))]
 public class Player : MonoBehaviour
 {
   [Header("Movement")]
@@ -16,21 +15,21 @@ public class Player : MonoBehaviour
   [Header("Sibling")]
   public GameObject siblingPrefab;
   public Vector3 siblingSpawnOffset = new Vector3(0f, 0f, 0f);
-
-
-  private CharacterController controller;
   private Flashlight flashlight;
 
+  // Movement
+  private CharacterController controller;
+  private Vector3 velocity;
+  private float pitch;
+
+
   // Input Actions
-  private PlayerInput input;
   private Vector2 moveInput;
   private Vector2 lookInput;
 
-  private float pitch;
-
   void Awake()
   {
-    input = GetComponent<PlayerInput>();
+    controller = GetComponent<CharacterController>();
   }
 
   void Start()
@@ -60,52 +59,61 @@ public class Player : MonoBehaviour
     }
   }
 
-  public void OnMove(InputAction.CallbackContext context)
+  public void OnMove(InputValue value)
   {
-    moveInput = context.ReadValue<Vector2>();
+    moveInput = value.Get<Vector2>();
   }
 
-  public void OnLook(InputAction.CallbackContext context)
+  public void OnLook(InputValue value)
   {
-    lookInput = context.ReadValue<Vector2>();
+    lookInput = value.Get<Vector2>();
   }
 
-  public void OnFlashlight(InputAction.CallbackContext context)
+  public void OnFlashlight(InputValue value)
   {
-    if (!context.started)
-    {
-      return;
-    }
+    Debug.Log(value);
     flashlight.Toggle();
   }
 
   void Update()
   {
     HandleLook();
+  }
+
+  void FixedUpdate()
+  {
     HandleMovement();
   }
 
+
   void HandleMovement()
   {
-    Vector2 input = moveInput;
+    Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
+    move = Vector3.ClampMagnitude(move, 1f);
 
-    Vector3 move =
-        transform.right * input.x +
-        transform.forward * input.y;
+    Vector3 worldMove = transform.TransformDirection(move);
 
-    controller.Move(move * moveSpeed * Time.deltaTime);
+    // Apply gravity
+    if (controller.isGrounded && velocity.y < 0)
+      velocity.y = 0f;
+
+    velocity.y += Physics.gravity.y * Time.fixedDeltaTime;
+
+    Vector3 delta = worldMove * moveSpeed * Time.fixedDeltaTime;
+    delta.y = velocity.y * Time.fixedDeltaTime;
+
+    controller.Move(delta);
   }
+
+
 
   void HandleLook()
   {
-    Vector2 mouseDelta = lookInput * mouseSensitivity * Time.deltaTime;
-
-    // Horizontal look (player body)
-    transform.Rotate(Vector3.up * mouseDelta.x);
-
-    // Vertical look (camera)
-    pitch -= mouseDelta.y;
+    pitch -= lookInput.y * mouseSensitivity * Time.deltaTime;
     pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
     cameraPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+
+    float yaw = lookInput.x * mouseSensitivity * Time.deltaTime;
+    transform.Rotate(0f, yaw, 0f, Space.World);
   }
 }
