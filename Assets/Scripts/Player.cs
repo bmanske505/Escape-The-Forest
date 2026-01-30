@@ -22,35 +22,15 @@ public class Player : MonoBehaviour
   private Flashlight flashlight;
 
   // Input Actions
-  private InputAction moveAction;
-  private InputAction lookAction;
-  private InputAction flashlightAction;
+  private PlayerInput input;
+  private Vector2 moveInput;
+  private Vector2 lookInput;
 
   private float pitch;
 
   void Awake()
   {
-    controller = GetComponent<CharacterController>();
-
-    // ================= INPUT SETUP =================
-    moveAction = new InputAction("Move", InputActionType.Value);
-    moveAction.AddCompositeBinding("2DVector")
-        .With("Up", "<Keyboard>/w")
-        .With("Down", "<Keyboard>/s")
-        .With("Left", "<Keyboard>/a")
-        .With("Right", "<Keyboard>/d");
-
-    moveAction.AddCompositeBinding("2DVector")
-        .With("Up", "<Keyboard>/upArrow")
-        .With("Down", "<Keyboard>/downArrow")
-        .With("Left", "<Keyboard>/leftArrow")
-        .With("Right", "<Keyboard>/rightArrow");
-
-    lookAction = new InputAction("Look", InputActionType.Value);
-    lookAction.AddBinding("<Mouse>/delta");
-
-    flashlightAction = new InputAction("Flashlight", InputActionType.Button);
-    flashlightAction.AddBinding("<Keyboard>/space");
+    input = GetComponent<PlayerInput>();
   }
 
   void Start()
@@ -80,31 +60,34 @@ public class Player : MonoBehaviour
     }
   }
 
-
-  void OnEnable()
+  public void OnMove(InputAction.CallbackContext context)
   {
-    moveAction.Enable();
-    lookAction.Enable();
-    flashlightAction.Enable();
+    moveInput = context.ReadValue<Vector2>();
   }
 
-  void OnDisable()
+  public void OnLook(InputAction.CallbackContext context)
   {
-    moveAction.Disable();
-    lookAction.Disable();
-    flashlightAction.Disable();
+    lookInput = context.ReadValue<Vector2>();
+  }
+
+  public void OnFlashlight(InputAction.CallbackContext context)
+  {
+    if (!context.started)
+    {
+      return;
+    }
+    flashlight.Toggle();
   }
 
   void Update()
   {
     HandleLook();
     HandleMovement();
-    HandleFlashlight();
   }
 
   void HandleMovement()
   {
-    Vector2 input = moveAction.ReadValue<Vector2>();
+    Vector2 input = moveInput;
 
     Vector3 move =
         transform.right * input.x +
@@ -115,7 +98,7 @@ public class Player : MonoBehaviour
 
   void HandleLook()
   {
-    Vector2 mouseDelta = lookAction.ReadValue<Vector2>() * mouseSensitivity * Time.deltaTime;
+    Vector2 mouseDelta = lookInput * mouseSensitivity * Time.deltaTime;
 
     // Horizontal look (player body)
     transform.Rotate(Vector3.up * mouseDelta.x);
@@ -124,13 +107,5 @@ public class Player : MonoBehaviour
     pitch -= mouseDelta.y;
     pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
     cameraPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
-  }
-
-  void HandleFlashlight()
-  {
-    if (flashlightAction.IsPressed())
-      flashlight.On();
-    else
-      flashlight.Off();
   }
 }
