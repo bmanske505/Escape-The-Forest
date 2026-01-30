@@ -32,13 +32,14 @@ public class Flashlight : MonoBehaviour
 
   public void Toggle()
   {
+    isOn = !isOn;
     if (IsOn())
     {
-      Off();
+      On();
     }
     else
     {
-      On();
+      Off();
     }
   }
 
@@ -47,7 +48,6 @@ public class Flashlight : MonoBehaviour
     Debug.Log("Flashlight On!");
     if (lightSource != null)
       lightSource.enabled = true;
-    isOn = true;
   }
 
   private void Off()
@@ -55,6 +55,5 @@ public class Flashlight : MonoBehaviour
     Debug.Log("Flashlight Off!");
     if (lightSource != null)
       lightSource.enabled = false;
-    isOn = false;
   }
 }

@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 6929796537867617710}
   m_Layer: 6
   m_Name: Sibling
-  m_TagString: Untagged
+  m_TagString: Sibling
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -238,8 +238,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9782a594a677a426aa2c01235d84aa02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Sibling
-  lostTimeThreshold: 3
-  followRadius: 5
+  lostRadius: 5
+  lostTimeMax: 3
+  hideRange: {x: 8, y: 12}
 --- !u!195 &6929796537867617710
 NavMeshAgent:
   m_ObjectHideFlags: 0

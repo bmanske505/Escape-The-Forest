@@ -5,8 +5,9 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class Sibling : MonoBehaviour
 {
-  public float lostTimeThreshold = 3f;   // Time stuck before hiding
-  public float followRadius = 5f; // The distance within which the sibling is considered "following" the player
+  public float lostRadius = 5f; // The max distance the player can stray from sibling before being considered "abandoned"
+  public float lostTimeMax = 3f;   // Seconds between sibling getting abandoned and going into hiding
+  public Vector2 hideRange = new Vector2(0, 10); // Min and max for hiding
 
   private Transform player;
   private NavMeshAgent agent;
@@ -15,7 +16,6 @@ public class Sibling : MonoBehaviour
   private Vector3 lastPosition;
   private float lostTimer = 0f;
   private bool isHiding = false;         // To handle Hide() state
-  private Vector3[] hidingSpots;
 
   void Start()
   {
@@ -32,7 +32,6 @@ public class Sibling : MonoBehaviour
     player = playerObj.transform;
 
     lastPosition = transform.position;
-    hidingSpots = Array.ConvertAll(GameObject.FindGameObjectsWithTag("HidingSpot"), obj => obj.transform.position);
   }
 
   void Update()
@@ -54,10 +53,10 @@ public class Sibling : MonoBehaviour
     }
 
     // --- Check if stuck or sufficiently far from player
-    if ((transform.position - player.position).magnitude > followRadius)
+    if ((transform.position - player.position).magnitude > lostRadius)
     {
       lostTimer += Time.deltaTime;
-      if (lostTimer >= lostTimeThreshold)
+      if (lostTimer >= lostTimeMax)
       {
         Hide();
         lostTimer = 0f;
@@ -73,7 +72,7 @@ public class Sibling : MonoBehaviour
 
   public void Hide()
   {
-    Vector3 spot = hidingSpots[UnityEngine.Random.Range(0, hidingSpots.Length)];
+    Vector3 spot = Utilities.RandomNavSphere(player.transform.position, hideRange);
     agent.Warp(spot);
     agent.ResetPath();
 

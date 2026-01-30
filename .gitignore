@@ -28,8 +28,16 @@
 # Unity Asset Store
 [Aa]ssets/AssetStoreTools*
 
-# Unity Cloud Build
+# Temp assets
+*.asset
+*.meta
+*.prefab
+
+# Build info
 /[Cc]ache/
+*.apk
+*.aab
+*.ipa
 
 # OS generated files
 .DS_Store
@@ -55,5 +63,20 @@ Desktop.ini
 # Crash reports
 crash.log
 
-# Uncomment if using Node for builds
-# node_modules/
+# Unity caches
+[Ll]ightmap-*.exr
+[Ll]ightmap-*.png
+[Ll]ightmap-*.tga
+[Ll]ightmap-*.hdr
+[Ll]ightmap-*.asset
+[Ll]ightProbes*
+[Nn]avigation*
+
+# Mac / Linux temporary files
+*.swp
+*.swo
+
+# Windows temporary files
+*.bak
+*.old
+*.log

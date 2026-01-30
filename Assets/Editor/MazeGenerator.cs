@@ -4,7 +4,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 using Unity.AI.Navigation;
-using UnityEngine.AI; // required for NavMeshSurface
 
 public class MazeGenerator : EditorWindow
 {
@@ -104,7 +103,7 @@ public class MazeGenerator : EditorWindow
   }
 
   // ================= GENERATION =================
-  const string LEVEL_FOLDER = "Assets/Levels";
+  const string LEVEL_FOLDER = "Assets/Scenes/Levels";
 
   static bool ValidateCharacterMap(MazeGeneratorSettings settings)
   {
@@ -141,7 +140,8 @@ public class MazeGenerator : EditorWindow
       return;
     }
 
-    Directory.CreateDirectory(LEVEL_FOLDER);
+    Utilities.EnsureFolderPath(LEVEL_FOLDER);
+
 
     foreach (var level in LEVELS)
     {
