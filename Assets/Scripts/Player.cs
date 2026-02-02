@@ -71,7 +71,6 @@ public class Player : MonoBehaviour
 
   public void OnFlashlight(InputValue value)
   {
-    Debug.Log(value);
     flashlight.Toggle();
   }
 

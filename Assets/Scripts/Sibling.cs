@@ -15,7 +15,7 @@ public class Sibling : MonoBehaviour
 
   private Vector3 lastPosition;
   private float lostTimer = 0f;
-  private bool isHiding = false;         // To handle Hide() state
+  public bool IsHiding { get; private set; } = false;
 
   void Start()
   {
@@ -36,7 +36,7 @@ public class Sibling : MonoBehaviour
 
   void Update()
   {
-    if (player == null || isHiding)
+    if (player == null || IsHiding)
       return;
 
     float currentDistance = Vector3.Distance(transform.position, player.position);
@@ -76,15 +76,15 @@ public class Sibling : MonoBehaviour
     agent.Warp(spot);
     agent.ResetPath();
 
-    isHiding = true;
+    IsHiding = true;
     collectible.SetActive(true); // can now be picked up by player
 
-    Debug.Log("Sibling is lost!");
+    UIMaster.Instance.ShowBanner("Your sibling got scared and ran away! You need to find them.");
   }
 
   public void Unhide()
   {
-    isHiding = false;
+    IsHiding = false;
     collectible.SetActive(false);
   }
 }

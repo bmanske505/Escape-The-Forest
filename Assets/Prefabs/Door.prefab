@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7712191793153406804}
   - component: {fileID: 5039129359783936916}
   - component: {fileID: 6767008772206769492}
+  - component: {fileID: 1786806563339781230}
   m_Layer: 0
   m_Name: Door
   m_TagString: Untagged
@@ -107,7 +108,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -129,3 +130,15 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &1786806563339781230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5905721682012628479}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 417fd796a685b42f682b75985b2bc262, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Door

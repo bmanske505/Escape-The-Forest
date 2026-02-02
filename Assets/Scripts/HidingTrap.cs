@@ -2,10 +2,13 @@ using UnityEngine;
 
 public class HidingTrap : MonoBehaviour
 {
+  bool triggered = false;
+
   void OnTriggerEnter(Collider other)
   {
-    if (other.CompareTag("Player"))
+    if (!triggered && other.CompareTag("Player"))
     {
+      triggered = true;
       Sibling sib = FindFirstObjectByType<Sibling>();
       sib.Hide();
     }

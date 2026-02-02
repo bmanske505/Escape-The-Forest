@@ -72,6 +72,7 @@ public class Stalker : MonoBehaviour
 
   void ChasePlayer()
   {
+    UIMaster.Instance.ShowBanner("RUN");
     agent.speed = chaseSpeed;
     agent.SetDestination(player.position);
 
@@ -134,11 +135,12 @@ public class Stalker : MonoBehaviour
   {
     if (other.CompareTag("Player"))
     {
-      SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+      UIMaster.Instance.ShowBanner("YOU DIED");
+      LevelMaster.Instance.ReplayLevel();
     }
     else if (other.CompareTag("Sibling"))
     {
-      Debug.Log("The stalker made the sibling hide!");
+      Debug.Log("The stalker caused the sibling to hide.");
       other.GetComponent<Sibling>().Hide();
     }
   }
