@@ -25,6 +25,9 @@
 # Unity Asset Store
 [Aa]ssets/AssetStoreTools*
 
+# Unity editor
+*.dwlt
+
 # Unity Cloud Build
 /[Cc]ache/
 
