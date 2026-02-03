@@ -28,6 +28,9 @@
 # Unity Asset Store
 [Aa]ssets/AssetStoreTools*
 
+# Unity editor
+*.dwlt
+
 # Temp assets
 *.asset
 *.meta
