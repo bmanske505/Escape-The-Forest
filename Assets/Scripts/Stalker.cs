@@ -1,13 +1,11 @@
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Diagnostics;
-using UnityEngine.SceneManagement;
 
 public class Stalker : MonoBehaviour
 {
 
   [Header("Movement")]
-  public float wanderSpeed = 3.5f;
+  private float wanderSpeed; // pulled from navmesh
   public float chaseSpeed = 6f;
   public Vector2 wanderRange;
   public float wanderInterval = 3f;
@@ -33,7 +31,7 @@ public class Stalker : MonoBehaviour
 
     currentState = State.Wandering;
     wanderTimer = wanderInterval;
-    agent.speed = wanderSpeed;
+    wanderSpeed = agent.speed;
   }
 
   void Update()
@@ -64,7 +62,7 @@ public class Stalker : MonoBehaviour
 
     if (wanderTimer >= wanderInterval)
     {
-      Vector3 newPos = Utilities.RandomNavSphere(transform.position, wanderRange);
+      Vector3 newPos = Utilities.GetNavTarget(transform.position, wanderRange, agent);
       agent.SetDestination(newPos);
       wanderTimer = 0f;
     }
@@ -103,6 +101,7 @@ public class Stalker : MonoBehaviour
   {
     if (CanSeePlayer())
     {
+      UIMaster.Instance.ShowBanner("RUN");
       currentState = State.Chasing;
       lastKnownPlayerPosition = player.position;
     }

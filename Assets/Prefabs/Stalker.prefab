@@ -128,9 +128,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21be0975dfdb44b3d94fd95c07d47f87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stalker
-  wanderSpeed: 2
+  wanderSpeed: 1
   chaseSpeed: 6
-  wanderRange: {x: 8, y: 12}
+  wanderRange: {x: 3, y: 100}
   wanderInterval: 5
   viewDistance: 15
   viewAngle: 90

@@ -240,7 +240,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Sibling
   lostRadius: 5
   lostTimeMax: 3
-  hideRange: {x: 8, y: 12}
+  hideRange: {x: 3, y: 100}
 --- !u!195 &6929796537867617710
 NavMeshAgent:
   m_ObjectHideFlags: 0

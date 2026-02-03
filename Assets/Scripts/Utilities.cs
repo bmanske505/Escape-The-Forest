@@ -4,37 +4,56 @@ using UnityEngine.AI;
 
 public static class Utilities
 {
-  public static Vector3 RandomNavSphere(Vector3 origin, Vector2 distRange, int layermask = NavMesh.AllAreas, int maxAttempts = 30)
+
+  private static float CalculatePathLength(NavMeshPath path)
   {
-    if (distRange.y < distRange.x)
-    {
-      Debug.LogWarning("RandomNavSphere: Max distance is smaller than min distance. Swapping values.");
-      distRange = new Vector2(distRange.y, distRange.x);
-    }
+    float length = 0f;
+    Vector3[] corners = path.corners;
+
+    for (int i = 1; i < corners.Length; i++)
+      length += Vector3.Distance(corners[i - 1], corners[i]);
+
+    return length;
+  }
+
+  public static Vector3 GetNavTarget(
+    Vector3 origin,
+    Vector2 pathRange,
+    NavMeshAgent agent,
+    int maxAttempts = 200)
+  {
+    NavMeshPath path = new NavMeshPath();
 
     for (int i = 0; i < maxAttempts; i++)
     {
-      // Pick a random direction
-      Vector3 randDirection = Random.insideUnitSphere.normalized * Random.Range(distRange.x, distRange.y);
-      randDirection += origin;
+      Debug.Log("Finding new target: Iteration #" + i);
+      // Pick a direction and overshoot slightly to help in mazes
+      Vector3 dir = Random.insideUnitSphere;
+      dir.y = 0f;
+      dir.Normalize();
 
-      // Sample NavMesh
-      if (NavMesh.SamplePosition(randDirection, out NavMeshHit navHit, distRange.y, layermask))
-      {
-        float distance = Vector3.Distance(origin, navHit.position);
+      float approxDist = Random.Range(pathRange.x, pathRange.y);
+      Vector3 candidate = origin + dir * approxDist;
 
-        // Check if it is within the min-max range
-        if (distance >= distRange.x && distance <= distRange.y)
-        {
-          return navHit.position;
-        }
-      }
+      if (!NavMesh.SamplePosition(candidate, out NavMeshHit hit, 3f, NavMesh.AllAreas))
+        continue;
+
+      if (!agent.CalculatePath(hit.position, path))
+        continue;
+
+      if (path.status != NavMeshPathStatus.PathComplete)
+        continue;
+
+      float length = CalculatePathLength(path);
+
+      if (length >= pathRange.x && length <= pathRange.y)
+        return hit.position;
     }
 
-    // If all attempts fail, return origin as fallback
-    Debug.LogWarning("RandomNavSphere: Could not find valid point within range. Returning origin.");
+    Debug.LogWarning("Failed to find NavMesh point by path distance.");
     return origin;
   }
+
 
   public static void EnsureFolderPath(string path)
   {

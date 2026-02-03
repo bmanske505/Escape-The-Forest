@@ -72,15 +72,22 @@ public class Sibling : MonoBehaviour
 
   public void Hide()
   {
-    Vector3 spot = Utilities.RandomNavSphere(player.transform.position, hideRange);
+    Vector3 spot = Utilities.GetNavTarget(player.transform.position, hideRange, agent);
+
+    // Warp FIRST so no accidental pickup
     agent.Warp(spot);
     agent.ResetPath();
 
     IsHiding = true;
-    collectible.SetActive(true); // can now be picked up by player
 
-    UIMaster.Instance.ShowBanner("Your sibling got scared and ran away! You need to find them.");
+    // Now it’s safe to be collectible again
+    collectible.SetActive(true);
+
+    UIMaster.Instance.ShowBanner(
+        "Your sibling got scared and ran away! You need to find them."
+    );
   }
+
 
   public void Unhide()
   {
