@@ -10,7 +10,6 @@ public class UIMaster : KeepOldSingleton<UIMaster>
 
   [Header("Timing")]
   [SerializeField] private float fadeDuration = 0.25f;
-  [SerializeField] private float visibleDuration = 2f;
 
   private Coroutine bannerRoutine;
 
@@ -33,19 +32,19 @@ public class UIMaster : KeepOldSingleton<UIMaster>
   /// <summary>
   /// Shows a banner message temporarily.
   /// </summary>
-  public void ShowBanner(string message)
+  public void ShowBanner(string message, float duration = 2f)
   {
     if (bannerRoutine != null)
       StopCoroutine(bannerRoutine);
 
-    bannerRoutine = StartCoroutine(BannerRoutine(message));
+    bannerRoutine = StartCoroutine(BannerRoutine(message, duration));
   }
 
   /* =======================
    * Coroutine Logic
    * ======================= */
 
-  private IEnumerator BannerRoutine(string message)
+  private IEnumerator BannerRoutine(string message, float duration)
   {
     bannerText.text = message;
     bannerGroup.gameObject.SetActive(true);
@@ -54,7 +53,7 @@ public class UIMaster : KeepOldSingleton<UIMaster>
     yield return Fade(0f, 1f);
 
     // Stay visible
-    yield return new WaitForSeconds(visibleDuration);
+    yield return new WaitForSeconds(duration);
 
     // Fade out
     yield return Fade(1f, 0f);

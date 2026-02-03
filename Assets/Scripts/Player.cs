@@ -38,8 +38,7 @@ public class Player : MonoBehaviour
     Cursor.visible = false;
 
     // Create flashlight
-    flashlight = gameObject.AddComponent<Flashlight>();
-    flashlight.AttachTo(cameraPivot);
+    flashlight = gameObject.GetComponentInChildren<Flashlight>();
 
     // Spawn sibling prefab as a sibling (same parent)
     if (siblingPrefab != null)

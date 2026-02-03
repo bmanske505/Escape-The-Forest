@@ -6,6 +6,7 @@ TagManager:
   tags:
   - HidingSpot
   - Sibling
+  - StalkerEye
   layers:
   - Default
   - TransparentFX
