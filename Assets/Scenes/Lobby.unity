@@ -202,7 +202,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1749285737}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: LevelMaster, Assembly-CSharp
         m_MethodName: LoadLevel
         m_Mode: 3
@@ -400,8 +400,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 657685327}
-  - component: {fileID: 657685326}
   - component: {fileID: 657685325}
+  - component: {fileID: 657685329}
+  - component: {fileID: 657685328}
   m_Layer: 0
   m_Name: UIMaster
   m_TagString: Untagged
@@ -432,22 +433,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 10
   m_TargetDisplay: 0
---- !u!114 &657685326
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 657685324}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67db950bff9184fa18afaf30bc36eae6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIMaster
-  bannerGroup: {fileID: 1100595212}
-  bannerText: {fileID: 1537740211}
-  fadeDuration: 0.25
-  visibleDuration: 2
 --- !u!224 &657685327
 RectTransform:
   m_ObjectHideFlags: 0
@@ -468,6 +453,35 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &657685328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657685324}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 437b108da811345549ae0a4577d1cfdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaminaUI
+  playerMovement: {fileID: 0}
+  staminaSlider: {fileID: 0}
+--- !u!114 &657685329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657685324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 507e8d16e0987458c9bd8fbc2dc7e55a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIMaster
+  bannerGroup: {fileID: 0}
+  bannerText: {fileID: 0}
+  fadeDuration: 0.25
 --- !u!1 &1100595208
 GameObject:
   m_ObjectHideFlags: 0
@@ -884,7 +898,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1749285738}
-  - component: {fileID: 1749285737}
+  - component: {fileID: 1749285739}
   m_Layer: 0
   m_Name: LevelMaster
   m_TagString: Untagged
@@ -892,25 +906,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1749285737
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1749285736}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f2fb98d1a8e047d2b4ce17f351d94c9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LevelMaster
-  levels:
-  - {fileID: 102900000, guid: f0dca590b8c324c2c8d96d8dff5dac9a, type: 3}
-  - {fileID: 102900000, guid: c3eb90596654f430c99ff2bbda691416, type: 3}
-  scenes:
-  - Level 1
-  - Level 2
-  index: 0
 --- !u!4 &1749285738
 Transform:
   m_ObjectHideFlags: 0
@@ -926,6 +921,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1749285739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1749285736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98f6cde2ba26d464e87ef8ab70cf348c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelMaster
+  levels: []
+  scenes: []
+  index: 0
 --- !u!1 &2023188951
 GameObject:
   m_ObjectHideFlags: 0
