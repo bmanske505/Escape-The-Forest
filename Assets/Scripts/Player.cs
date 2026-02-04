@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
   [Header("Movement")]
   public float moveSpeed = 5f;
   public float mouseSensitivity = 120f;
+  public float sprintSpeed = 5f;
 
   [Header("Look")]
   public Transform cameraPivot;
@@ -17,20 +18,13 @@ public class Player : MonoBehaviour
   public Vector3 siblingSpawnOffset = new Vector3(0f, 0f, 0f);
   private Flashlight flashlight;
 
-  // Movement
-  private CharacterController controller;
-  private Vector3 velocity;
   private float pitch;
-
 
   // Input Actions
   private Vector2 moveInput;
   private Vector2 lookInput;
 
-  void Awake()
-  {
-    controller = GetComponent<CharacterController>();
-  }
+  public Vector2 MoveInput => moveInput;
 
   void Start()
   {
@@ -74,37 +68,16 @@ public class Player : MonoBehaviour
     flashlight.Toggle();
   }
 
+  public void OnSprint(InputValue value)
+  {
+      GetComponent<PlayerMovement>()
+          .SetSprinting(value.isPressed);
+  }
+
   void Update()
   {
     HandleLook();
   }
-
-  void FixedUpdate()
-  {
-    HandleMovement();
-  }
-
-
-  void HandleMovement()
-  {
-    Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
-    move = Vector3.ClampMagnitude(move, 1f);
-
-    Vector3 worldMove = transform.TransformDirection(move);
-
-    // Apply gravity
-    if (controller.isGrounded && velocity.y < 0)
-      velocity.y = 0f;
-
-    velocity.y += Physics.gravity.y * Time.fixedDeltaTime;
-
-    Vector3 delta = worldMove * moveSpeed * Time.fixedDeltaTime;
-    delta.y = velocity.y * Time.fixedDeltaTime;
-
-    controller.Move(delta);
-  }
-
-
 
   void HandleLook()
   {
