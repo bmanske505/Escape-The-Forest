@@ -101,7 +101,7 @@ public class Stalker : MonoBehaviour
   {
     if (CanSeePlayer())
     {
-      UIMaster.Instance.ShowBanner("\"RUN\"");
+      GameUI.Instance.ShowBanner("\"RUN\"");
       currentState = State.Chasing;
       lastKnownPlayerPosition = player.position;
     }
@@ -135,7 +135,7 @@ public class Stalker : MonoBehaviour
     if (currentState == State.Stunned) return;
     if (other.CompareTag("Player"))
     {
-      UIMaster.Instance.ShowBanner("YOU DIED");
+      GameUI.Instance.ShowBanner("YOU DIED");
       LevelMaster.Instance.ReplayLevel();
     }
     else if (other.CompareTag("Sibling"))

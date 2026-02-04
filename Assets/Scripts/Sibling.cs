@@ -8,14 +8,19 @@ public class Sibling : MonoBehaviour
   public float lostRadius = 5f; // The max distance the player can stray from sibling before being considered "abandoned"
   public float lostTimeMax = 3f;   // Seconds between sibling getting abandoned and going into hiding
   public Vector2 hideRange = new Vector2(0, 10); // Min and max for hiding
+  public static Sibling Instance;
 
   private Transform player;
   private NavMeshAgent agent;
   private Collectible collectible;
 
-  private Vector3 lastPosition;
   private float lostTimer = 0f;
   public bool IsHiding { get; private set; } = false;
+
+  void Awake()
+  {
+    Instance = this;
+  }
 
   void Start()
   {
@@ -30,8 +35,6 @@ public class Sibling : MonoBehaviour
       return;
     }
     player = playerObj.transform;
-
-    lastPosition = transform.position;
   }
 
   void Update()
@@ -66,8 +69,6 @@ public class Sibling : MonoBehaviour
     {
       lostTimer = 0f;
     }
-
-    lastPosition = transform.position;
   }
 
   public void Hide()
@@ -83,13 +84,13 @@ public class Sibling : MonoBehaviour
     // Now it’s safe to be collectible again
     collectible.SetActive(true);
 
-    UIMaster.Instance.ShowBanner("\"Playing hide and seek again? Where did you go, little sibling?\"");
+    GameUI.Instance.ShowBanner("\"Playing hide and seek again? Where did you go, little sibling?\"");
   }
 
 
   public void Unhide()
   {
-    UIMaster.Instance.ShowBanner("\"There you are! Don't go running off again, you hear me?\"");
+    GameUI.Instance.ShowBanner("\"There you are! Don't go running off again, you hear me?\"");
     IsHiding = false;
     collectible.SetActive(false);
   }
