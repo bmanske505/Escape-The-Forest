@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -21,7 +22,7 @@ public class Stalker : MonoBehaviour
   private Vector3 lastKnownPlayerPosition;
   private float wanderTimer;
 
-  private enum State { Wandering, Chasing, Searching }
+  private enum State { Wandering, Chasing, Searching, Stunned }
   private State currentState;
 
   void Start()
@@ -70,7 +71,6 @@ public class Stalker : MonoBehaviour
 
   void ChasePlayer()
   {
-    UIMaster.Instance.ShowBanner("RUN");
     agent.speed = chaseSpeed;
     agent.SetDestination(player.position);
 
@@ -101,7 +101,7 @@ public class Stalker : MonoBehaviour
   {
     if (CanSeePlayer())
     {
-      UIMaster.Instance.ShowBanner("RUN");
+      UIMaster.Instance.ShowBanner("\"RUN\"");
       currentState = State.Chasing;
       lastKnownPlayerPosition = player.position;
     }
@@ -132,6 +132,7 @@ public class Stalker : MonoBehaviour
 
   void OnTriggerEnter(Collider other)
   {
+    if (currentState == State.Stunned) return;
     if (other.CompareTag("Player"))
     {
       UIMaster.Instance.ShowBanner("YOU DIED");
@@ -142,5 +143,22 @@ public class Stalker : MonoBehaviour
       Debug.Log("The stalker caused the sibling to hide.");
       other.GetComponent<Sibling>().Hide();
     }
+  }
+
+  public void Stun(float duration)
+  {
+    if (currentState == State.Stunned) return; // prevent chain stuns
+    StartCoroutine(StunRoutine(duration));
+  }
+
+  private IEnumerator StunRoutine(float duration)
+  {
+    currentState = State.Stunned;
+    agent.isStopped = true;
+    agent.ResetPath(); // optional: immediately clear current destination
+
+    yield return new WaitForSeconds(duration);
+    currentState = State.Wandering;
+    agent.isStopped = false;
   }
 }

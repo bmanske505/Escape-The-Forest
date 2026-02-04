@@ -83,14 +83,13 @@ public class Sibling : MonoBehaviour
     // Now it’s safe to be collectible again
     collectible.SetActive(true);
 
-    UIMaster.Instance.ShowBanner(
-        "Your sibling got scared and ran away! You need to find them."
-    );
+    UIMaster.Instance.ShowBanner("\"Playing hide and seek again? Where did you go, little sibling?\"");
   }
 
 
   public void Unhide()
   {
+    UIMaster.Instance.ShowBanner("\"There you are! Don't go running off again, you hear me?\"");
     IsHiding = false;
     collectible.SetActive(false);
   }

@@ -1,57 +1,117 @@
+using System;
 using UnityEngine;
 
 public class Flashlight : MonoBehaviour
 {
-  [Header("Light Settings")]
-  public float range = 15f;
-  public float spotAngle = 45f;
-  public float intensity = 2f;
 
-  private Light lightSource;
-  private bool isOn;
+  [Header("Charge Settings")]
+  public float lifespan = 10f; // in seconds
 
-  public void AttachTo(Transform parent)
+  [Header("Stun Settings")]
+  public float stunRange = 5f;
+  public float stunDuration = 5f;
+  public LayerMask detectionMask; // Stalker + environment
+
+  private float charge = 1f;
+
+  private Light beam;
+
+  public void Awake()
   {
-    GameObject lightObj = new GameObject("Flashlight");
-    lightObj.transform.SetParent(parent);
-    lightObj.transform.localPosition = Vector3.zero;
-    lightObj.transform.localRotation = Quaternion.identity;
+    beam = GetComponent<Light>();
+  }
 
-    lightSource = lightObj.AddComponent<Light>();
-    lightSource.type = LightType.Spot;
-    lightSource.range = range;
-    lightSource.spotAngle = spotAngle;
-    lightSource.intensity = intensity;
-    lightSource.enabled = false;
+  public void Start()
+  {
+    beam.enabled = false;
+  }
+
+  public void Update()
+  {
+    if (charge == 0f)
+    {
+      if (IsOn())
+      {
+        Off();
+        UIMaster.Instance.ShowBanner("\"Crap.\"");
+      }
+    }
+    if (IsOn())
+    {
+
+      if (IsHittingStalkerEyes(out Stalker stalker))
+      {
+        UIMaster.Instance.ShowBanner($"\"Aha! How do you like being stunned for {stunDuration} seconds? 😎\"", stunDuration);
+        stalker.Stun(stunDuration);
+      }
+      charge = Mathf.Clamp01(charge - Time.deltaTime / lifespan);
+    }
   }
 
   public bool IsOn()
   {
-    return isOn;
+    return beam.enabled;
   }
 
   public void Toggle()
   {
-    isOn = !isOn;
     if (IsOn())
     {
-      On();
+      Off();
     }
     else
     {
-      Off();
+      On();
     }
   }
 
   private void On()
   {
-    if (lightSource != null)
-      lightSource.enabled = true;
+    if (charge > 0f)
+    {
+      beam.enabled = true;
+    }
+    else
+    {
+      UIMaster.Instance.ShowBanner("\"Dead... I wonder if there's any batteries lying around.\"");
+    }
   }
 
   private void Off()
   {
-    if (lightSource != null)
-      lightSource.enabled = false;
+    beam.enabled = false;
   }
+
+  public bool IsHittingStalkerEyes(out Stalker stalker)
+  {
+    stalker = null;
+
+    if (!IsOn())
+      return false;
+
+    Ray ray = new Ray(transform.position, transform.forward);
+
+    if (Physics.Raycast(ray, out RaycastHit hit, stunRange, detectionMask))
+    {
+      // Check if we hit an eye
+      if (hit.collider.CompareTag("StalkerEye"))
+      {
+        stalker = hit.collider.GetComponentInParent<Stalker>();
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  public float GetCharge()
+  {
+    return charge;
+  }
+
+  public void Charge(float amount)
+  {
+    charge = Mathf.Clamp01(charge + amount);
+  }
+
 }
