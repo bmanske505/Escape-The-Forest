@@ -9,8 +9,7 @@ public class HidingTrap : MonoBehaviour
     if (!triggered && other.CompareTag("Player"))
     {
       triggered = true;
-      Sibling sib = FindFirstObjectByType<Sibling>();
-      sib.Hide();
+      Sibling.Instance.Hide();
     }
   }
 }

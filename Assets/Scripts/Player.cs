@@ -26,6 +26,13 @@ public class Player : MonoBehaviour
 
   public Vector2 MoveInput => moveInput;
 
+  public static Player Instance;
+
+  void Awake()
+  {
+    Instance = this;
+  }
+
   void Start()
   {
     Cursor.lockState = CursorLockMode.Locked;

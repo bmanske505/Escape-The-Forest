@@ -1,21 +1,27 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using Unity.AppUI.UI;
+using UnityEngine.UI;
 
-public class UIMaster : KeepOldSingleton<UIMaster>
+public class GameUI : MonoBehaviour
 {
   [Header("Banner UI")]
   [SerializeField] private CanvasGroup bannerGroup;
   [SerializeField] private TMP_Text bannerText;
-
-  [Header("Timing")]
   [SerializeField] private float fadeDuration = 0.25f;
 
-  private Coroutine bannerRoutine;
+  [Header("Stat Bars")]
+  [SerializeField] private Slider flashlightBar;
+  [SerializeField] private Slider staminaBar;
+  [SerializeField] private TextMeshProUGUI levelText;
 
-  protected override void Awake()
+  private Coroutine bannerRoutine;
+  public static GameUI Instance;
+
+  void Awake()
   {
-    base.Awake();
+    Instance = this;
 
     // Ensure banner starts hidden
     if (bannerGroup != null)
@@ -25,9 +31,52 @@ public class UIMaster : KeepOldSingleton<UIMaster>
     }
   }
 
-  /* =======================
-   * Public API
-   * ======================= */
+  void Start()
+  {
+    UpdateUI();
+  }
+
+  public void UpdateUI()
+  {
+    UpdateLevelBar();
+    UpdateStaminaBar();
+    UpdateFlashlightBar();
+  }
+
+  public void UpdateLevelBar()
+  {
+    levelText.text = "Progress: " + LevelMaster.Instance.GetProgress() * 100 + "%";
+  }
+
+  public void UpdateStaminaBar()
+  {
+    float value = Player.Instance.GetComponent<PlayerMovement>().CurrentStamina;
+    UpdateStaminaBar(value);
+  }
+
+  public void UpdateStaminaBar(float value)
+  {
+    staminaBar.value = value;
+  }
+
+  public void UpdateFlashlightBar()
+  {
+    bool obtained = Flashlight.Instance;
+    UpdateFlashlightBar(obtained? Flashlight.Instance.GetCharge() : -1);
+  }
+
+  public void UpdateFlashlightBar(float value)
+  {
+    if (value < 0)
+    {
+      flashlightBar.gameObject.SetActive(false);
+    }
+    else
+    {
+      flashlightBar.gameObject.SetActive(true);
+      flashlightBar.value = value;
+    }
+  }
 
   /// <summary>
   /// Shows a banner message temporarily.
@@ -40,9 +89,6 @@ public class UIMaster : KeepOldSingleton<UIMaster>
     bannerRoutine = StartCoroutine(BannerRoutine(message, duration));
   }
 
-  /* =======================
-   * Coroutine Logic
-   * ======================= */
 
   private IEnumerator BannerRoutine(string message, float duration)
   {

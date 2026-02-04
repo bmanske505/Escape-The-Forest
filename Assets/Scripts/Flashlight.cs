@@ -11,6 +11,7 @@ public class Flashlight : MonoBehaviour
   public float stunRange = 5f;
   public float stunDuration = 5f;
   public LayerMask detectionMask; // Stalker + environment
+  public static Flashlight Instance;
 
   private float charge = 1f;
 
@@ -19,6 +20,7 @@ public class Flashlight : MonoBehaviour
   public void Awake()
   {
     beam = GetComponent<Light>();
+    Instance = this;
   }
 
   public void Start()
@@ -33,7 +35,7 @@ public class Flashlight : MonoBehaviour
       if (IsOn())
       {
         Off();
-        UIMaster.Instance.ShowBanner("\"Crap.\"");
+        GameUI.Instance.ShowBanner("\"Crap.\"");
       }
     }
     if (IsOn())
@@ -41,10 +43,11 @@ public class Flashlight : MonoBehaviour
 
       if (IsHittingStalkerEyes(out Stalker stalker))
       {
-        UIMaster.Instance.ShowBanner($"\"Aha! How do you like being stunned for {stunDuration} seconds? 😎\"", stunDuration);
+        GameUI.Instance.ShowBanner($"\"Aha! How do you like being stunned for {stunDuration} seconds? 😎\"", stunDuration);
         stalker.Stun(stunDuration);
       }
       charge = Mathf.Clamp01(charge - Time.deltaTime / lifespan);
+      GameUI.Instance.UpdateFlashlightBar(charge);
     }
   }
 
@@ -73,7 +76,7 @@ public class Flashlight : MonoBehaviour
     }
     else
     {
-      UIMaster.Instance.ShowBanner("\"Dead... I wonder if there's any batteries lying around.\"");
+      GameUI.Instance.ShowBanner("\"Dead... I wonder if there's any batteries lying around.\"");
     }
   }
 

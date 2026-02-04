@@ -2,11 +2,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-public class LevelMaster : KeepOldSingleton<LevelMaster>
+public class LevelMaster : Singleton<LevelMaster>
 {
   [Header("Level Flow")]
 
@@ -18,7 +19,7 @@ public class LevelMaster : KeepOldSingleton<LevelMaster>
   [SerializeField, HideInInspector]
   private string[] scenes;
 
-  [SerializeField] private int index = 0;
+  private int index = 0;
 
   private bool isLoading = false;
 
@@ -65,6 +66,11 @@ public class LevelMaster : KeepOldSingleton<LevelMaster>
 
     index = newIndex;
     StartCoroutine(LoadSceneAsync(index));
+  }
+
+  public float GetProgress()
+  {
+    return (float) index / levels.Length;
   }
 
   /* =======================

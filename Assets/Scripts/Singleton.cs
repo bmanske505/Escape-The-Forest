@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class KeepOldSingleton<T> : MonoBehaviour where T : MonoBehaviour
+public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
   public static T Instance { get; private set; }
 
