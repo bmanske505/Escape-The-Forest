@@ -300,6 +300,7 @@ GameObject:
   - component: {fileID: 7835355136358966370}
   - component: {fileID: 8367274131291062452}
   - component: {fileID: 2985320388267937513}
+  - component: {fileID: 5059244319087152493}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -469,6 +470,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 2
   mouseSensitivity: 100
+  sprintSpeed: 4
   cameraPivot: {fileID: 34324232110295040}
   minPitch: -40
   maxPitch: 40
@@ -504,3 +506,19 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &5059244319087152493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8866867285940232212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23c1eca24d5014564a7caa532669847d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  maxStamina: 100
+  staminaDrainPerSecond: 25
+  staminaRegenPerSecond: 15
+  regenDelay: 1.5
