@@ -31,10 +31,7 @@
 # Unity editor
 *.dwlt
 
-# Temp assets
 *.asset
-*.meta
-*.prefab
 
 # Build info
 /[Cc]ache/
