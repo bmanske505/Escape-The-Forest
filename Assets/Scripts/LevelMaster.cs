@@ -73,6 +73,11 @@ public class LevelMaster : Singleton<LevelMaster>
     return (float) index / levels.Length;
   }
 
+  public int GetLevelIndex()
+  {
+    return index;
+  }
+
   /* =======================
    * Async Loading
    * ======================= */
