@@ -300,7 +300,7 @@ GameObject:
   - component: {fileID: 7835355136358966370}
   - component: {fileID: 8367274131291062452}
   - component: {fileID: 2985320388267937513}
-  - component: {fileID: 5988316148030955813}
+  - component: {fileID: 4407824951123204299}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -506,7 +506,7 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &5988316148030955813
+--- !u!114 &4407824951123204299
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -515,7 +515,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8866867285940232212}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e42467c8826b4095a436d7b683b4e01, type: 3}
+  m_Script: {fileID: 11500000, guid: 23c1eca24d5014564a7caa532669847d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   maxStamina: 100
