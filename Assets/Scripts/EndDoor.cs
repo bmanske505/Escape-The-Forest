@@ -1,7 +1,8 @@
 using UnityEngine;
 
-public class Door : MonoBehaviour
+public class EndDoor : MonoBehaviour
 {
+  
   void OnTriggerEnter(Collider other)
   {
     if (other.CompareTag("Player"))
@@ -11,6 +12,7 @@ public class Door : MonoBehaviour
         GameUI.Instance.ShowBanner("\"I need to find my little sibling first!\"");
       } else
       {
+        Player.Instance.gameObject.SetActive(false);
         LevelMaster.Instance.PlayNextLevel();
       }
     }
