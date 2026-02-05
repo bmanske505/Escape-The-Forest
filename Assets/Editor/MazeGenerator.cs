@@ -55,7 +55,7 @@ public class MazeGenerator : EditorWindow
 
         new Level
         {
-          
+
             name = "Level 3",
             light = 0.5f,
             maze =
@@ -78,7 +78,7 @@ public class MazeGenerator : EditorWindow
         {
             name = "Level 4",
             light = 0.25f,
-            maze = 
+            maze =
 @"
 ###################D#
 #P______###______.#_#
@@ -215,8 +215,20 @@ public class MazeGenerator : EditorWindow
     EditorUtility.DisplayDialog("Done", "Maze scenes generated!", "OK");
   }
 
-  static void BuildScene(Level level, string scenePath, MazeGeneratorSettings settings, string templatePath)
+  static void BuildScene(
+  Level level,
+  string scenePath,
+  MazeGeneratorSettings settings,
+  string templatePath
+)
   {
+    // --- Prevent overwriting an existing scene ---
+    if (System.IO.File.Exists(scenePath))
+    {
+      Debug.LogWarning($"Scene already exists at path, skipping build:\n{scenePath}");
+      return;
+    }
+
     var scene = EditorSceneManager.OpenScene(templatePath, OpenSceneMode.Single);
 
     var root = new GameObject("Maze");
@@ -240,10 +252,8 @@ public class MazeGenerator : EditorWindow
         var prefab = settings.GetPrefab(c);
         if (!prefab) continue;
 
-        // Decide parent name (pluralized prefab name)
         string parentName = prefab.name + "s";
 
-        // Get or create parent
         if (!parentMap.TryGetValue(parentName, out var parent))
         {
           parent = new GameObject(parentName);
@@ -264,9 +274,15 @@ public class MazeGenerator : EditorWindow
       var renderer = ground.GetComponent<Renderer>();
       if (renderer != null)
       {
-        // Assume plane pivot at center
-        ground.transform.localScale = new Vector3(width * 0.1f, 1f, depth * 0.1f);
-        ground.transform.position = new Vector3((width - 1) * 0.5f, ground.transform.position.y, -(depth - 1) * 0.5f);
+        ground.transform.localScale =
+          new Vector3(width * 0.1f, 1f, depth * 0.1f);
+
+        ground.transform.position =
+          new Vector3(
+            (width - 1) * 0.5f,
+            ground.transform.position.y,
+            -(depth - 1) * 0.5f
+          );
       }
       else
       {
@@ -280,10 +296,17 @@ public class MazeGenerator : EditorWindow
 
     // --- NavMesh baking ---
     var nav = GameObject.Find("NavMesh Surface");
-    var surface = nav.GetComponent<NavMeshSurface>();
-    surface.BuildNavMesh();
+    if (nav != null && nav.TryGetComponent(out NavMeshSurface surface))
+    {
+      surface.BuildNavMesh();
+    }
+    else
+    {
+      Debug.LogWarning("NavMesh Surface not found or missing NavMeshSurface component.");
+    }
 
     EditorSceneManager.SaveScene(scene, scenePath);
   }
+
 
 }

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player : MonoBehaviour
+public class Player : Singleton<Player>
 {
   [Header("Movement")]
   public float moveSpeed = 5f;
@@ -26,14 +26,7 @@ public class Player : MonoBehaviour
 
   public Vector2 MoveInput => moveInput;
 
-  public static Player Instance;
-
-  void Awake()
-  {
-    Instance = this;
-  }
-
-  void Start()
+  void OnEnable()
   {
     Cursor.lockState = CursorLockMode.Locked;
     Cursor.visible = false;
@@ -46,17 +39,29 @@ public class Player : MonoBehaviour
     {
       Vector3 spawnPos = transform.position + siblingSpawnOffset;
 
-      Instantiate(
+      if (Sibling.Instance)
+      {
+        Sibling.Instance.transform.position = spawnPos;
+      } else
+      {
+        Instantiate(
           siblingPrefab,
           spawnPos,
           Quaternion.identity,
           transform.parent   // 👈 THIS is what makes it a sibling
       );
+      }
     }
     else
     {
       Debug.LogWarning("Player: No siblingPrefab assigned.");
     }
+  }
+
+  void OnDisable()
+  {
+    Cursor.lockState = CursorLockMode.None;
+    Cursor.visible = true;
   }
 
   public void OnMove(InputValue value)
