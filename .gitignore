@@ -34,7 +34,6 @@
 # Temp assets
 *.asset
 *.meta
-*.prefab
 
 # Build info
 /[Cc]ache/
