@@ -31,9 +31,7 @@
 # Unity editor
 *.dwlt
 
-# Temp assets
 *.asset
-*.meta
 
 # Build info
 /[Cc]ache/
