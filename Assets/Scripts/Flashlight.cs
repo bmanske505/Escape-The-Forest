@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Flashlight : MonoBehaviour
 {
@@ -49,6 +50,11 @@ public class Flashlight : MonoBehaviour
       charge = Mathf.Clamp01(charge - Time.deltaTime / lifespan);
       GameUI.Instance.UpdateFlashlightBar(charge);
     }
+  }
+
+  public void OnUse(InputValue value)
+  {
+    Toggle();
   }
 
   public bool IsOn()

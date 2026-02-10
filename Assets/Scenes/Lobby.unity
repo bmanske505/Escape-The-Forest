@@ -595,6 +595,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: LevelMaster
       objectReference: {fileID: 0}
+    - target: {fileID: 5107478823291264694, guid: b27e28691361146b28be9b21ef0e8a45, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8813462390454073462, guid: b27e28691361146b28be9b21ef0e8a45, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.40846

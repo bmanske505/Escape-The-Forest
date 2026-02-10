@@ -74,11 +74,6 @@ public class Player : Singleton<Player>
     lookInput = value.Get<Vector2>();
   }
 
-  public void OnFlashlight(InputValue value)
-  {
-    flashlight.Toggle();
-  }
-
   public void OnSprint(InputValue value)
   {
       GetComponent<PlayerMovement>()

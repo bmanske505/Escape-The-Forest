@@ -13,6 +13,7 @@ public class Sibling : MonoBehaviour
   private Transform player;
   private NavMeshAgent agent;
   private Collectible collectible;
+  private AudioSource audioSrc;
 
   private float lostTimer = 0f;
   public bool IsHiding { get; private set; } = false;
@@ -20,11 +21,12 @@ public class Sibling : MonoBehaviour
   void Awake()
   {
     Instance = this;
+    agent = GetComponent<NavMeshAgent>();
+    audioSrc = GetComponent<AudioSource>();
   }
 
   void Start()
   {
-    agent = GetComponent<NavMeshAgent>();
     collectible = GetComponentInChildren<Collectible>();
 
     GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -93,5 +95,11 @@ public class Sibling : MonoBehaviour
     GameUI.Instance.ShowBanner("\"There you are! Don't go running off again, you hear me?\"");
     IsHiding = false;
     collectible.SetActive(false);
+  }
+
+  public void Respond()
+  {
+    audioSrc.Play();
+    print("Responding!");
   }
 }
