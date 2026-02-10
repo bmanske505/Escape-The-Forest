@@ -9,6 +9,7 @@ public class StartDoor : MonoBehaviour
   {
     Vector3 spawnPosition =
       transform.position + transform.forward * tileSize;
+    spawnPosition.y = 0f;
     Quaternion spawnRotation = Quaternion.LookRotation(
       transform.forward,
       Vector3.up

@@ -6,7 +6,7 @@ public class HidingTrap : MonoBehaviour
 
   void OnTriggerEnter(Collider other)
   {
-    if (!triggered && other.CompareTag("Player"))
+    if (!triggered && other.CompareTag("Player") && !Sibling.Instance.IsHiding)
     {
       triggered = true;
       Sibling.Instance.Hide();
