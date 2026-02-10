@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 2129228940390701914}
   - component: {fileID: 177073370865388520}
   - component: {fileID: 1169251047541405751}
-  - component: {fileID: 6832547333501727675}
+  - component: {fileID: 6392844486050395431}
   m_Layer: 0
   m_Name: Trigger
   m_TagString: Untagged
@@ -242,7 +242,7 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!114 &6832547333501727675
+--- !u!114 &6392844486050395431
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -251,7 +251,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3461534632247286144}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45bfa0a69bacf47c4ae3d1d39d0013d2, type: 3}
+  m_Script: {fileID: 11500000, guid: 417fd796a685b42f682b75985b2bc262, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EndDoor
 --- !u!1 &5905721682012628479
@@ -264,6 +264,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4887266550987383469}
   - component: {fileID: 6767008772206769492}
+  - component: {fileID: 185788736067475992}
   m_Layer: 0
   m_Name: EndDoor
   m_TagString: Untagged
@@ -304,3 +305,15 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &185788736067475992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5905721682012628479}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 417fd796a685b42f682b75985b2bc262, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EndDoor
