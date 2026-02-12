@@ -1,9 +1,11 @@
-using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
-public class PickupItem<T> : MonoBehaviour where T : Component
+public class PickupItem : MonoBehaviour
 {
   public string onPickupMessage;
+  [Tooltip("Script type to enable on the player")]
+  public MonoScript componentScript;
   private Collider col;
 
   void Awake()
@@ -13,12 +15,33 @@ public class PickupItem<T> : MonoBehaviour where T : Component
 
   void OnTriggerStay(Collider other)
   {
-    if (other.CompareTag("Player"))
+
+    if (!other.CompareTag("Player")) return;
+
+    if (componentScript == null)
     {
-      GameObject item = other.gameObject.GetComponentInChildren<T>().gameObject;
-      if (!item) { Debug.LogError("This item isn't on the player..."); }
-      other.gameObject.GetComponentInChildren<T>().gameObject.SetActive(true);
-      GameUI.Instance.ShowBanner(onPickupMessage); // replace with popup window later
+      Debug.LogError("No script assigned to PickupItem");
+      return;
     }
+
+    System.Type type = componentScript.GetClass();
+
+    if (type == null || !typeof(Component).IsAssignableFrom(type))
+    {
+      Debug.LogError("Assigned script is not a Component");
+      return;
+    }
+
+    Component comp = other.GetComponentInChildren(type, true);
+
+    if (!comp)
+    {
+      Debug.LogError($"Player does not have component of type {type.Name}");
+      return;
+    }
+
+    comp.gameObject.SetActive(true);
+    GameUI.Instance.ShowBanner(onPickupMessage); // replace with popup window later
+    Destroy(gameObject);
   }
 }
