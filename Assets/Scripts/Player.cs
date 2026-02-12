@@ -4,9 +4,9 @@ using UnityEngine.InputSystem;
 public class Player : Singleton<Player>
 {
   [Header("Movement")]
-  public float moveSpeed = 5f;
+  public float moveSpeed = 2f;
   public float mouseSensitivity = 120f;
-  public float sprintSpeed = 5f;
+  public float sprintSpeed = 4f;
 
   [Header("Look")]
   public Transform cameraPivot;
@@ -30,6 +30,10 @@ public class Player : Singleton<Player>
   {
     Cursor.lockState = CursorLockMode.Locked;
     Cursor.visible = false;
+
+    // Reset player speed and sprinting state
+    GetComponent<PlayerMovement>().SetSprinting(false);
+    GetComponent<PlayerMovement>().SetSpeed();
 
     // Create flashlight
     flashlight = gameObject.GetComponentInChildren<Flashlight>();
