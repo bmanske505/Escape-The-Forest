@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -70,7 +71,7 @@ public class LevelMaster : Singleton<LevelMaster>
 
   public float GetProgress()
   {
-    return (float) index / levels.Length;
+    return (float)index / levels.Length;
   }
 
   public int GetLevelIndex()

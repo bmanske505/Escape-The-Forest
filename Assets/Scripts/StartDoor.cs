@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class StartDoor : MonoBehaviour
 {
@@ -18,18 +19,20 @@ public class StartDoor : MonoBehaviour
     if (Player.Instance == null)
     {
       Instantiate(playerPrefab, spawnPosition, spawnRotation);
-    } else
+    }
+    else
     {
       Transform player = Player.Instance.transform;
       player.position = spawnPosition;
       player.rotation = spawnRotation;
     }
-    Player.Instance.gameObject.SetActive(true);
   }
 
   void Start()
   {
+    Player.Instance.gameObject.SetActive(true);
     GameUI.Instance.ShowBanner("I need to go home...");
+    InputSystem.actions.Enable();
   }
 
   void OnTriggerEnter(Collider other)

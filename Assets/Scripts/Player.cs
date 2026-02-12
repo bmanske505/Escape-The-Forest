@@ -42,7 +42,8 @@ public class Player : Singleton<Player>
       if (Sibling.Instance)
       {
         Sibling.Instance.transform.position = spawnPos;
-      } else
+      }
+      else
       {
         Instantiate(
           siblingPrefab,
@@ -74,10 +75,18 @@ public class Player : Singleton<Player>
     lookInput = value.Get<Vector2>();
   }
 
-  public void OnSprint(InputValue value)
+  public void OnSprintOn(InputValue value)
   {
-      GetComponent<PlayerMovement>()
-          .SetSprinting(value.isPressed);
+    Debug.Log("Sprint activate");
+    GetComponent<PlayerMovement>()
+        .SetSprinting(true);
+  }
+
+  public void OnSprintOff(InputValue value)
+  {
+    Debug.Log("Sprint deactivate");
+    GetComponent<PlayerMovement>()
+        .SetSprinting(false);
   }
 
   void Update()
