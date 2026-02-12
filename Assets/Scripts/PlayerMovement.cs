@@ -18,7 +18,7 @@ public class PlayerMovement : MonoBehaviour
 
   private Vector3 velocity;
   private float regenTimer;
-  private bool isSprinting;
+  private bool isSprinting = false;
 
   void Awake()
   {
@@ -58,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
     controller.Move(delta);
   }
 
-  void HandleStamina()
+  public void HandleStamina()
   {
     if (isSprinting && CurrentStamina > 0f)
     {
@@ -93,6 +93,12 @@ public class PlayerMovement : MonoBehaviour
       return;
 
     isSprinting = value;
+  }
+
+  // Reset player movement speed
+  public void SetSpeed()
+  {
+    player.moveSpeed = 2f;
   }
 
   Vector2 GetMoveInput()
