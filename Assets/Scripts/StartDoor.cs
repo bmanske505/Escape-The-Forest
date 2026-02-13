@@ -30,9 +30,7 @@ public class StartDoor : MonoBehaviour
 
   void Start()
   {
-    Player.Instance.gameObject.SetActive(true);
     GameUI.Instance.ShowBanner("I need to go home...");
-    InputSystem.actions.Enable();
   }
 
   void OnTriggerEnter(Collider other)

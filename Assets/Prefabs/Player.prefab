@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 8453032957453775992}
   - component: {fileID: 9146946583856349234}
   - component: {fileID: 7693316661792817468}
-  - component: {fileID: 758362364276923302}
   m_Layer: 0
   m_Name: Flashlight
   m_TagString: Untagged
@@ -147,36 +146,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!114 &758362364276923302
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6884558966341252590}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
-  m_Actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: Flashlight
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!1 &7606177018779917280
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,7 +157,6 @@ GameObject:
   - component: {fileID: 6159702723962423390}
   - component: {fileID: 6578402595189713039}
   - component: {fileID: 1009865627911964156}
-  - component: {fileID: 4310722412436072280}
   m_Layer: 6
   m_Name: Echo
   m_TagString: Untagged
@@ -320,36 +288,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &4310722412436072280
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7606177018779917280}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
-  m_Actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: Echo
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!1 &8711823549261042073
 GameObject:
   m_ObjectHideFlags: 0
@@ -504,7 +442,6 @@ GameObject:
   - component: {fileID: 7835355136358966370}
   - component: {fileID: 8367274131291062452}
   - component: {fileID: 5732395994972137818}
-  - component: {fileID: 2985320388267937513}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -673,10 +610,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4278ead6e1c184cd9935eb099e7b79bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  moveSpeed: 2
-  mouseSensitivity: 100
-  sprintSpeed: 4
   cameraPivot: {fileID: 34324232110295040}
+  mouseSensitivity: 100
   minPitch: -40
   maxPitch: 40
   siblingPrefab: {fileID: 7096211616557163575, guid: 5ecf42d14cac04963bbaaf185bc1eb1c, type: 3}
@@ -693,37 +628,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e42467c8826b4095a436d7b683b4e01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  walkSpeed: 2
+  sprintSpeed: 4
   maxStamina: 100
   staminaDrainPerSecond: 25
   staminaRegenPerSecond: 15
   regenDelay: 1.5
---- !u!114 &2985320388267937513
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8866867285940232212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
-  m_Actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: Player
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}

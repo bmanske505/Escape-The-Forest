@@ -14,13 +14,7 @@ public class EndDoor : MonoBehaviour
       }
       else
       {
-        Player.Instance.GetComponentInChildren<PlayerMovement>().SetSprinting(false);
-        InputSystem.actions.Disable();
-        Player.Instance.gameObject.SetActive(false);
         LevelMaster.Instance.PlayNextLevel();
-        //Player.Instance.GetComponent<PlayerInput>().actions["Sprint"].Enable();
-        Player.Instance.GetComponent<PlayerMovement>().SetSprinting(false);
-        Player.Instance.GetComponent<PlayerMovement>().SetSpeed();
       }
     }
   }

@@ -3,40 +3,32 @@ using UnityEngine.InputSystem;
 
 public class Player : Singleton<Player>
 {
-  [Header("Movement")]
-  public float moveSpeed = 2f;
-  public float mouseSensitivity = 120f;
-  public float sprintSpeed = 4f;
 
   [Header("Look")]
   public Transform cameraPivot;
+  public float mouseSensitivity = 120f;
   public float minPitch = -80f;
   public float maxPitch = 80f;
 
   [Header("Sibling")]
   public GameObject siblingPrefab;
   public Vector3 siblingSpawnOffset = new Vector3(0f, 0f, 0f);
-  private Flashlight flashlight;
 
   private float pitch;
 
-  // Input Actions
-  private Vector2 moveInput;
+  private InputAction lookAction;
   private Vector2 lookInput;
 
-  public Vector2 MoveInput => moveInput;
+  protected override void Awake()
+  {
+    base.Awake();
+    lookAction = InputSystem.actions.FindAction("Look");
+  }
 
   void OnEnable()
   {
     Cursor.lockState = CursorLockMode.Locked;
     Cursor.visible = false;
-
-    // Reset player speed and sprinting state
-    GetComponent<PlayerMovement>().SetSprinting(false);
-    GetComponent<PlayerMovement>().SetSpeed();
-
-    // Create flashlight
-    flashlight = gameObject.GetComponentInChildren<Flashlight>();
 
     // Spawn sibling prefab as a sibling (same parent)
     if (siblingPrefab != null)
@@ -61,36 +53,23 @@ public class Player : Singleton<Player>
     {
       Debug.LogWarning("Player: No siblingPrefab assigned.");
     }
+
+    lookAction.performed += OnLook;
+    lookAction.canceled += OnLook;
   }
 
   void OnDisable()
   {
     Cursor.lockState = CursorLockMode.None;
     Cursor.visible = true;
+
+    lookAction.performed -= OnLook;
+    lookAction.canceled -= OnLook;
   }
 
-  public void OnMove(InputValue value)
+  private void OnLook(InputAction.CallbackContext context)
   {
-    moveInput = value.Get<Vector2>();
-  }
-
-  public void OnLook(InputValue value)
-  {
-    lookInput = value.Get<Vector2>();
-  }
-
-  public void OnSprintOn(InputValue value)
-  {
-    Debug.Log("Sprint activate");
-    GetComponent<PlayerMovement>()
-        .SetSprinting(true);
-  }
-
-  public void OnSprintOff(InputValue value)
-  {
-    Debug.Log("Sprint deactivate");
-    GetComponent<PlayerMovement>()
-        .SetSprinting(false);
+    lookInput = context.ReadValue<Vector2>();
   }
 
   void Update()

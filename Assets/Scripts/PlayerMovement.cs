@@ -1,35 +1,82 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputAction;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Player))]
 public class PlayerMovement : MonoBehaviour
 {
   [Header("Stamina")]
+
+  public float walkSpeed = 2f;
+  public float sprintSpeed = 4f;
+
   public float maxStamina = 100f;
   public float staminaDrainPerSecond = 25f;
   public float staminaRegenPerSecond = 15f;
   public float regenDelay = 1.5f;
 
-  public float CurrentStamina { get; private set; }
-  public bool IsSprinting => isSprinting;
-
-  private Player player;
   private CharacterController controller;
+  private float stamina;
 
-  private Vector3 velocity;
   private float regenTimer;
-  private bool isSprinting = false;
+
+  [Header("Input")]
+
+  private InputAction sprintAction;
+  bool sprinting;
+
+  private InputAction moveAction;
 
   void Awake()
   {
-    player = GetComponent<Player>();
     controller = GetComponent<CharacterController>();
-    CurrentStamina = maxStamina;
+    stamina = maxStamina;
+
+    sprintAction = InputSystem.actions.FindAction("Sprint");
+    moveAction = InputSystem.actions.FindAction("Move");
   }
+
+  /**
+  void OnEnable()
+  {
+    sprintAction.started += OnSprint;
+    sprintAction.canceled += OnSprint;
+    moveAction.performed += OnMove;
+    moveAction.canceled += OnMove;
+  }
+
+  void OnDisable()
+  {
+    sprintAction.started -= OnSprint;
+    sprintAction.canceled -= OnSprint;
+    moveAction.performed -= OnMove;
+    moveAction.canceled += OnMove;
+  }
+
+  private void OnSprint(CallbackContext context)
+  {
+    if (context.started)
+    {
+      SetSprinting(true);
+    }
+    else if (context.canceled)
+    {
+      SetSprinting(false);
+    }
+  }
+
+  private void OnMove(CallbackContext context)
+  {
+    moveInput = context.ReadValue<Vector2>();
+  }
+  */
 
   void Update()
   {
     HandleStamina();
+    Debug.Log(sprintAction.IsPressed());
+    SetSprint(sprintAction.IsPressed());
   }
 
   void FixedUpdate()
@@ -39,36 +86,28 @@ public class PlayerMovement : MonoBehaviour
 
   void HandleMovement()
   {
-    Vector2 input = GetMoveInput();
-    Vector3 move = new Vector3(input.x, 0f, input.y);
-    move = Vector3.ClampMagnitude(move, 1f);
+    Vector2 moveInput = moveAction.ReadValue<Vector2>();
+    Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
     Vector3 worldMove = transform.TransformDirection(move);
 
-    // Ground check
-    if (controller.isGrounded && velocity.y < 0f)
-      velocity.y = 0f;
-
-    velocity.y += Physics.gravity.y * Time.fixedDeltaTime;
-
-    float speed = isSprinting ? player.sprintSpeed : player.moveSpeed;
+    float speed = sprinting ? sprintSpeed : walkSpeed;
 
     Vector3 delta = worldMove * speed * Time.fixedDeltaTime;
-    delta.y = velocity.y * Time.fixedDeltaTime;
 
     controller.Move(delta);
   }
 
   public void HandleStamina()
   {
-    if (isSprinting && CurrentStamina > 0f)
+    if (sprinting && stamina > 0f)
     {
-      CurrentStamina -= staminaDrainPerSecond * Time.deltaTime;
+      stamina -= staminaDrainPerSecond * Time.deltaTime;
       regenTimer = regenDelay;
 
-      if (CurrentStamina <= 0f)
+      if (stamina <= 0f)
       {
-        CurrentStamina = 0f;
-        isSprinting = false;
+        stamina = 0f;
+        sprinting = false;
       }
     }
     else
@@ -79,32 +118,18 @@ public class PlayerMovement : MonoBehaviour
       }
       else
       {
-        CurrentStamina += staminaRegenPerSecond * Time.deltaTime;
-        CurrentStamina = Mathf.Min(CurrentStamina, maxStamina);
+        stamina += staminaRegenPerSecond * Time.deltaTime;
+        stamina = Mathf.Min(stamina, maxStamina);
       }
     }
-    GameUI.Instance.UpdateStaminaBar(CurrentStamina);
+    GameUI.Instance.UpdateStaminaBar(stamina);
   }
 
-  // Called by Player.cs (via sprint input)
-  public void SetSprinting(bool value)
+  public void SetSprint(bool value)
   {
-    if (value && CurrentStamina <= 0f)
+    if (value && stamina <= 0f)
       return;
 
-    isSprinting = value;
-  }
-
-  // Reset player movement speed
-  public void SetSpeed()
-  {
-    player.moveSpeed = 2f;
-  }
-
-  Vector2 GetMoveInput()
-  {
-    // Access private moveInput using reflection-safe method
-    // Cleaner alternative: expose a getter in Player if you want
-    return player.MoveInput;
+    sprinting = value;
   }
 }

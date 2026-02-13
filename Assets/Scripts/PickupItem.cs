@@ -40,7 +40,7 @@ public class PickupItem : MonoBehaviour
       return;
     }
 
-    comp.gameObject.SetActive(true);
+    comp.gameObject.SetActive(true); // enable the item on the player
     GameUI.Instance.ShowBanner(onPickupMessage); // replace with popup window later
     Destroy(gameObject);
   }

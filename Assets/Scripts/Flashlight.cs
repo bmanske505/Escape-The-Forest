@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputAction;
 
 public class Flashlight : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class Flashlight : MonoBehaviour
   public LayerMask detectionMask; // Stalker + environment
   public static Flashlight Instance;
 
+  [Header("Input")]
+  InputAction flashInput;
+
   private float charge = 1f;
 
   private Light beam;
@@ -22,14 +26,25 @@ public class Flashlight : MonoBehaviour
   {
     beam = GetComponent<Light>();
     Instance = this;
+    flashInput = InputSystem.actions.FindAction("Flash");
   }
 
-  public void Start()
+  void OnEnable()
+  {
+    flashInput.performed += OnFlash;
+  }
+
+  void OnDisable()
+  {
+    flashInput.performed -= OnFlash;
+  }
+
+  void Start()
   {
     beam.enabled = false;
   }
 
-  public void Update()
+  void Update()
   {
     if (charge == 0f)
     {
@@ -52,7 +67,7 @@ public class Flashlight : MonoBehaviour
     }
   }
 
-  public void OnUse(InputValue value)
+  private void OnFlash(CallbackContext context)
   {
     Toggle();
   }

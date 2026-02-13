@@ -2,23 +2,37 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputAction;
 
 public class Echo : MonoBehaviour
 {
   private AudioSource audioSrc;
   private float delay = 1f;
 
+  private InputAction echoAction;
+
   void Awake()
   {
     audioSrc = GetComponent<AudioSource>();
+    echoAction = InputSystem.actions.FindAction("Echo");
   }
 
-  public void OnUse(InputValue value)
+  void OnEnable()
+  {
+    echoAction.performed += OnEcho;
+  }
+
+  void OnDisable()
+  {
+    echoAction.performed -= OnEcho;
+  }
+
+  void OnEcho(CallbackContext context)
   {
     StartCoroutine(CallForSibling());
   }
 
-  private IEnumerator CallForSibling()
+  IEnumerator CallForSibling()
   {
     audioSrc.Play();
     print("Calling!");

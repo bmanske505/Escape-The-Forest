@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
-using Unity.AppUI.UI;
 using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour
@@ -31,38 +30,14 @@ public class GameUI : MonoBehaviour
     }
   }
 
-  void Start()
-  {
-    UpdateUI();
-  }
-
-  public void UpdateUI()
-  {
-    UpdateLevelBar();
-    UpdateStaminaBar();
-    UpdateFlashlightBar();
-  }
-
   public void UpdateLevelBar()
   {
     levelText.text = "Progress: " + LevelMaster.Instance.GetProgress() * 100 + "%";
   }
 
-  public void UpdateStaminaBar()
-  {
-    float value = Player.Instance.GetComponent<PlayerMovement>().CurrentStamina;
-    UpdateStaminaBar(value);
-  }
-
   public void UpdateStaminaBar(float value)
   {
     staminaBar.value = value;
-  }
-
-  public void UpdateFlashlightBar()
-  {
-    bool obtained = Flashlight.Instance;
-    UpdateFlashlightBar(obtained? Flashlight.Instance.GetCharge() : -1);
   }
 
   public void UpdateFlashlightBar(float value)
