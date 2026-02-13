@@ -16,16 +16,7 @@ public class StartDoor : MonoBehaviour
       Vector3.up
     );
 
-    if (Player.Instance == null)
-    {
-      Instantiate(playerPrefab, spawnPosition, spawnRotation);
-    }
-    else
-    {
-      Transform player = Player.Instance.transform;
-      player.position = spawnPosition;
-      player.rotation = spawnRotation;
-    }
+    Instantiate(playerPrefab, spawnPosition, spawnRotation);
   }
 
   void Start()

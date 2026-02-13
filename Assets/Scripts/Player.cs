@@ -1,8 +1,12 @@
+using System.Collections.Generic;
+using NUnit.Compatibility;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player : Singleton<Player>
+public class Player : MonoBehaviour
 {
+  public static Player Instance;
 
   [Header("Look")]
   public Transform cameraPivot;
@@ -14,15 +18,19 @@ public class Player : Singleton<Player>
   public GameObject siblingPrefab;
   public Vector3 siblingSpawnOffset = new Vector3(0f, 0f, 0f);
 
+  [Header("Inventory")]
+  static List<string> inventory = new List<string>();
+
   private float pitch;
 
   private InputAction lookAction;
   private Vector2 lookInput;
 
-  protected override void Awake()
+  void Awake()
   {
-    base.Awake();
+    Instance = this;
     lookAction = InputSystem.actions.FindAction("Look");
+    PopulateInventory();
   }
 
   void OnEnable()
@@ -31,28 +39,15 @@ public class Player : Singleton<Player>
     Cursor.visible = false;
 
     // Spawn sibling prefab as a sibling (same parent)
-    if (siblingPrefab != null)
-    {
-      Vector3 spawnPos = transform.position + siblingSpawnOffset;
 
-      if (Sibling.Instance)
-      {
-        Sibling.Instance.transform.position = spawnPos;
-      }
-      else
-      {
-        Instantiate(
-          siblingPrefab,
-          spawnPos,
-          Quaternion.identity,
-          transform.parent   // 👈 THIS is what makes it a sibling
-      );
-      }
-    }
-    else
-    {
-      Debug.LogWarning("Player: No siblingPrefab assigned.");
-    }
+    Vector3 spawnPos = transform.position + siblingSpawnOffset;
+
+    Instantiate(
+      siblingPrefab,
+      spawnPos,
+      Quaternion.identity,
+      transform.parent   // 👈 THIS is what makes it a sibling
+    );
 
     lookAction.performed += OnLook;
     lookAction.canceled += OnLook;
@@ -85,5 +80,51 @@ public class Player : Singleton<Player>
 
     float yaw = lookInput.x * mouseSensitivity * Time.deltaTime;
     transform.Rotate(0f, yaw, 0f, Space.World);
+  }
+
+  void PopulateInventory()
+  {
+    foreach (string item in inventory)
+    {
+
+      // Check if component already exists
+      EnableComponent(item);
+    }
+  }
+
+  public void AddToInventory(string name)
+  {
+    inventory.Add(name);
+    EnableComponent(name);
+  }
+
+  private void EnableComponent(string name)
+  {
+
+    // Get the Type from the string
+    System.Type type = System.Type.GetType(name);
+    if (type == null)
+    {
+      Debug.LogError($"Type '{name}' not found!");
+      return;
+    }
+
+    if (!typeof(Component).IsAssignableFrom(type))
+    {
+      Debug.LogError($"Type '{name}' is not a Component!");
+      return;
+    }
+
+    // Add the component if player doesn't already have it
+    Component comp = GetComponentInChildren(type, true);
+    if (comp == null)
+    {
+      gameObject.AddComponent(type);
+    }
+    else if (comp is MonoBehaviour mb)
+    {
+      mb.enabled = true;
+      comp.gameObject.SetActive(true);
+    }
   }
 }

@@ -42,6 +42,7 @@ public class Flashlight : MonoBehaviour
   void Start()
   {
     beam.enabled = false;
+    GameUI.Instance.UpdateFlashlightBar(charge);
   }
 
   void Update()

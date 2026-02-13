@@ -129,8 +129,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c96f3c453afd44a8a488104b1f13281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupItem
-  onPickupMessage: I found a flashlight!
-  componentScript: {fileID: 11500000, guid: ff298d71aff364cd2bfa473a234e22a7, type: 3}
+  onPickupMessage: I found a flashlight! I can use this with MOUSE CLICK
+  toAdd: Flashlight
 --- !u!1 &7977615078329141912
 GameObject:
   m_ObjectHideFlags: 0

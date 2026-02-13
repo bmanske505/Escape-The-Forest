@@ -265,7 +265,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4887266550987383469}
   - component: {fileID: 6767008772206769492}
-  - component: {fileID: 1353554424209245842}
   m_Layer: 0
   m_Name: StartDoor
   m_TagString: Untagged
@@ -306,16 +305,3 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!114 &1353554424209245842
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5905721682012628479}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81ac281ee74cd4b07954fbecc7ee6254, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::StartDoor
-  playerPrefab: {fileID: 8866867285940232212, guid: 636bc430ca9c14d9cb795070249b36d6, type: 3}

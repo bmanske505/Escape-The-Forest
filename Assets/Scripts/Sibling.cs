@@ -5,15 +5,19 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class Sibling : MonoBehaviour
 {
+  public static Sibling Instance;
+
   public float lostRadius = 5f; // The max distance the player can stray from sibling before being considered "abandoned"
   public float lostTimeMax = 3f;   // Seconds between sibling getting abandoned and going into hiding
   public Vector2 hideRange = new Vector2(0, 10); // Min and max for hiding
-  public static Sibling Instance;
 
   private Transform player;
   private NavMeshAgent agent;
   private Collectible collectible;
   private AudioSource audioSrc;
+
+  // Data
+  static int numberTimesLost = 0;
 
   private float lostTimer = 0f;
   public bool IsHiding { get; private set; } = false;
@@ -87,6 +91,13 @@ public class Sibling : MonoBehaviour
     collectible.SetActive(true);
 
     GameUI.Instance.ShowBanner("\"Playing hide and seek again? Where did you go, little sibling?\"");
+
+    numberTimesLost += 1;
+    if (numberTimesLost == 2) // this is the second time they've lost sibling, let them echo!
+    {
+      GameUI.Instance.ShowBanner("\"I keep losing you! Let me try calling for you with the SPACEBAR\"");
+      Player.Instance.AddToInventory("Echo");
+    }
   }
 
 

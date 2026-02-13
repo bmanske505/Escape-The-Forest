@@ -30,6 +30,11 @@ public class GameUI : MonoBehaviour
     }
   }
 
+  void Start()
+  {
+    UpdateLevelBar();
+  }
+
   public void UpdateLevelBar()
   {
     levelText.text = "Progress: " + LevelMaster.Instance.GetProgress() * 100 + "%";
@@ -37,7 +42,14 @@ public class GameUI : MonoBehaviour
 
   public void UpdateStaminaBar(float value)
   {
-    staminaBar.value = value;
+    if (value < 0)
+    {
+      staminaBar.gameObject.SetActive(false);
+    } else
+    {
+      staminaBar.gameObject.SetActive(true);
+      staminaBar.value = value;
+    }
   }
 
   public void UpdateFlashlightBar(float value)

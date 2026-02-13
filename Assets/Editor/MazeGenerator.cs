@@ -13,7 +13,8 @@ public class MazeGenerator : EditorWindow
   {
     public string name;        // scene name
     public string maze;        // ASCII maze
-    public float light;        // unused for now
+    public Color lightColor = Color.white;
+    public float light = 1f; // [0,1] normalized
   }
 
   // Hard-coded levels
@@ -22,15 +23,16 @@ public class MazeGenerator : EditorWindow
         new Level
         {
             name = "Level 1",
-            light = 1.0f,
+            light = 1f,
+            lightColor = Color.white,
             maze =
 @"
 #########
 #_____#_#
 #_##_##_#
-#__|____#
+#__|*___#
 ######_##
-#_______#
+#*______#
 #E#######
 "
         },
@@ -39,16 +41,17 @@ public class MazeGenerator : EditorWindow
         {
             name = "Level 2",
             light = 0.75f,
+            lightColor = Color.orange,
             maze =
 @"
 #|###########
-#_#_____#___#
+#*#_____#___#
 #_#_###_###_#
 #___#___#___#
 #_#####.###_#
 #___###_____#
 #######_#####
-#___________E
+#__________*E
 #############
 "
         },
@@ -58,16 +61,17 @@ public class MazeGenerator : EditorWindow
 
             name = "Level 3",
             light = 0.5f,
+            lightColor = Color.blue,
             maze =
 @"
 #################
-|______#________#
+|*_____#________#
 ######_#_###_##_#
 #________###_##_#
 #_##_###______###
 ####_############
 #_##.______#___##
-#____#####___#__E
+#____#####___#_*E
 ####_#___########
 ###____#_______##
 #################
@@ -78,10 +82,11 @@ public class MazeGenerator : EditorWindow
         {
             name = "Level 4",
             light = 0.25f,
+            lightColor = Color.purple,
             maze =
 @"
 ###################E#
-|_______###______.#_#
+|*______###______.#*#
 ##_####_#B__#####_#_#
 ##_####_###_##____#_#
 #__####________#_##_#
@@ -99,11 +104,12 @@ public class MazeGenerator : EditorWindow
         new Level
         {
             name = "Level 5",
-            light = 0.13f,
+            light = 0f,
+            lightColor = Color.black,
             maze =
 @"
 #########################
-#____________######_____|
+#____________######____*|
 #_###_######_____##_###_#
 #_#__________###_##___#_#
 #B#_############____###_#
@@ -113,7 +119,7 @@ public class MazeGenerator : EditorWindow
 ###.#_#_###_#.##________#
 ###_#_#__B#_#_#########B#
 ###_#_#####_#_#____###_##
-###_#_______#___##______E
+###_#_______#___##_____*E
 ###_#########_##_#####_##
 ###___________##___S___##
 #########################
@@ -255,6 +261,25 @@ public class MazeGenerator : EditorWindow
 
     var scene = EditorSceneManager.OpenScene(templatePath, OpenSceneMode.Single);
 
+    // Set lighting
+    RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
+    RenderSettings.ambientLight = level.lightColor;
+
+
+    RenderSettings.fog = true;
+    RenderSettings.fogMode = FogMode.ExponentialSquared;
+    RenderSettings.fogDensity = 1 - level.light;
+    RenderSettings.fogColor = level.lightColor;
+
+
+    var sun = RenderSettings.sun;
+    if (sun != null)
+    {
+      sun.color = level.lightColor;
+    }
+
+    // Build the maze
+
     var root = new GameObject("Maze");
 
     // Map: prefab name -> parent GameObject (e.g. "Wall" -> Walls)
@@ -328,6 +353,54 @@ public class MazeGenerator : EditorWindow
     {
       Debug.LogWarning("NavMesh Surface not found or missing NavMeshSurface component.");
     }
+
+    // --- Rotate doors to face nearest DoorMagnet ---
+
+    GameObject magnetsParent = GameObject.Find("DoorMagnets");
+
+    void RotateDoor(Transform door)
+    {
+      Transform closest = null;
+      float minDist = float.MaxValue;
+
+      foreach (Transform child in magnetsParent.transform)
+      {
+        GameObject magnet = child.gameObject;
+        float d = Vector3.SqrMagnitude(
+            magnet.transform.position - door.position
+        );
+
+        if (d < minDist)
+        {
+          minDist = d;
+          closest = magnet.transform;
+        }
+      }
+
+      if (closest != null)
+      {
+        Vector3 dir = closest.position - door.position;
+        dir.y = 0f; // keep doors upright
+
+        if (dir.sqrMagnitude > 0.001f)
+        {
+          door.rotation = Quaternion.LookRotation(dir, Vector3.up);
+        }
+      }
+    }
+
+    foreach (Transform door in GameObject.Find("StartDoors").transform)
+    {
+      RotateDoor(door);
+    }
+
+    foreach (Transform door in GameObject.Find("EndDoors").transform)
+    {
+      RotateDoor(door);
+    }
+
+    DestroyImmediate(magnetsParent);
+
 
     EditorSceneManager.SaveScene(scene, scenePath);
   }
