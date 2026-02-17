@@ -37,7 +37,7 @@ public class LevelMaster : Singleton<LevelMaster>
   public void ReplayLevel()
   {
     if (isLoading) return;
-    StartCoroutine(LoadSceneAsync(index));
+    LoadLevel(index);
   }
 
   public void PlayNextLevel()
@@ -47,12 +47,11 @@ public class LevelMaster : Singleton<LevelMaster>
     int nextIndex = index + 1;
     if (nextIndex >= scenes.Length)
     {
-      Debug.LogWarning("GameMaster: No more scenes to load.");
+      LoadScene("Win");
       return;
     }
 
-    index = nextIndex;
-    StartCoroutine(LoadSceneAsync(index));
+    LoadLevel(nextIndex);
   }
 
   public void LoadLevel(int newIndex)
@@ -66,7 +65,13 @@ public class LevelMaster : Singleton<LevelMaster>
     }
 
     index = newIndex;
-    StartCoroutine(LoadSceneAsync(index));
+    LoadScene(scenes[index]);
+  }
+
+  public void LoadScene(string name)
+  {
+    if (isLoading) return;
+    StartCoroutine(LoadSceneAsync(name));
   }
 
   public float GetProgress()
@@ -83,11 +88,11 @@ public class LevelMaster : Singleton<LevelMaster>
    * Async Loading
    * ======================= */
 
-  private IEnumerator LoadSceneAsync(int index)
+  private IEnumerator LoadSceneAsync(string name)
   {
     isLoading = true;
 
-    AsyncOperation loadOp = SceneManager.LoadSceneAsync(scenes[index]);
+    AsyncOperation loadOp = SceneManager.LoadSceneAsync(name);
 
     while (!loadOp.isDone)
       yield return null;
