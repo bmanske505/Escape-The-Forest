@@ -15,7 +15,12 @@ public class GameUI : MonoBehaviour
   [SerializeField] private Slider staminaBar;
   [SerializeField] private TextMeshProUGUI levelText;
 
-  private Coroutine bannerRoutine;
+  [Header("Popup UI")]
+  [SerializeField] private CanvasGroup popupGroup;
+  [SerializeField] private TMP_Text popupTitle;
+  [SerializeField] private TMP_Text popupMessage;
+
+  private Coroutine activeRoutine;
   public static GameUI Instance;
 
   void Awake()
@@ -45,7 +50,8 @@ public class GameUI : MonoBehaviour
     if (value < 0)
     {
       staminaBar.gameObject.SetActive(false);
-    } else
+    }
+    else
     {
       staminaBar.gameObject.SetActive(true);
       staminaBar.value = value;
@@ -70,10 +76,34 @@ public class GameUI : MonoBehaviour
   /// </summary>
   public void ShowBanner(string message, float duration = 2f)
   {
-    if (bannerRoutine != null)
-      StopCoroutine(bannerRoutine);
+    if (activeRoutine != null)
+      StopCoroutine(activeRoutine);
 
-    bannerRoutine = StartCoroutine(BannerRoutine(message, duration));
+    activeRoutine = StartCoroutine(BannerRoutine(message, duration));
+  }
+
+  public void ShowPopup(string title, string message)
+  {
+    if (activeRoutine != null)
+      StopCoroutine(activeRoutine);
+
+    Time.timeScale = 0f;
+    popupTitle.text = title;
+    popupMessage.text = message;
+    popupGroup.gameObject.SetActive(true);
+
+    Cursor.lockState = CursorLockMode.None;
+    Cursor.visible = true;
+  }
+
+  public void HidePopup()
+  {
+    popupGroup.gameObject.SetActive(false);
+
+    Cursor.lockState = CursorLockMode.Locked;
+    Cursor.visible = false;
+
+    Time.timeScale = 1f;
   }
 
 
@@ -92,7 +122,7 @@ public class GameUI : MonoBehaviour
     yield return Fade(1f, 0f);
 
     bannerGroup.gameObject.SetActive(false);
-    bannerRoutine = null;
+    activeRoutine = null;
   }
 
   private IEnumerator Fade(float from, float to)

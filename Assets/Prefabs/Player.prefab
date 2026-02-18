@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff298d71aff364cd2bfa473a234e22a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Flashlight
-  lifespan: 10
+  lifespan: 20
   stunRange: 5
   stunDuration: 5
   detectionMask:
@@ -610,7 +610,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4278ead6e1c184cd9935eb099e7b79bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  data: {fileID: 11400000, guid: 4eac7896d0fae41b99d2c51c4a387af3, type: 2}
   cameraPivot: {fileID: 34324232110295040}
   mouseSensitivity: 100
   minPitch: -40
