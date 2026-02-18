@@ -7,7 +7,7 @@ public class Stalker : MonoBehaviour
 
   [Header("Movement")]
   private float wanderSpeed; // pulled from navmesh
-  public float chaseSpeed = 6f;
+  public float chaseSpeed = 3f;
   public Vector2 wanderRange;
   public float wanderInterval = 3f;
 
@@ -135,6 +135,7 @@ public class Stalker : MonoBehaviour
     if (currentState == State.Stunned) return;
     if (other.CompareTag("Player"))
     {
+      // Change so that player spawns at the start of the maze and the stalker resets
       GameUI.Instance.ShowBanner("YOU DIED");
       LevelMaster.Instance.ReplayLevel();
     }
@@ -156,8 +157,13 @@ public class Stalker : MonoBehaviour
     currentState = State.Stunned;
     agent.isStopped = true;
     agent.ResetPath(); // optional: immediately clear current destination
+        
+    // Teleport to random location after stun
+    Vector3 randomPos = Utilities.GetNavTarget(transform.position, wanderRange, agent);
+    agent.Warp(randomPos);
 
     yield return new WaitForSeconds(duration);
+
     currentState = State.Wandering;
     agent.isStopped = false;
   }

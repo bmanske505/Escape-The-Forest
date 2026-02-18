@@ -15,7 +15,7 @@ MonoBehaviour:
   m_PixelRect:
     serializedVersion: 2
     x: 0
-    y: 58
+    y: 61
     width: 1440
     height: 784
   m_ShowMode: 4
@@ -1711,14 +1711,7 @@ MonoBehaviour:
     - m_Data: 53728
     m_LastClickedID:
       m_Data: 53728
-    m_ExpandedIDs:
-    - m_Data: 0
-    - m_Data: 53064
-    - m_Data: 53066
-    - m_Data: 53068
-    - m_Data: 53070
-    - m_Data: 53072
-    - m_Data: 53074
+    m_ExpandedIDs: []
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1749,14 +1742,7 @@ MonoBehaviour:
     m_SelectedIDs: []
     m_LastClickedID:
       m_Data: 0
-    m_ExpandedIDs:
-    - m_Data: 0
-    - m_Data: 53064
-    - m_Data: 53066
-    - m_Data: 53068
-    - m_Data: 53070
-    - m_Data: 53072
-    - m_Data: 53074
+    m_ExpandedIDs: []
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 

@@ -10,7 +10,7 @@ public class Flashlight : MonoBehaviour
   public float lifespan = 10f; // in seconds
 
   [Header("Stun Settings")]
-  public float stunRange = 5f;
+  public float stunRange = 6f;
   public float stunDuration = 5f;
   public LayerMask detectionMask; // Stalker + environment
   public static Flashlight Instance;
@@ -121,6 +121,7 @@ public class Flashlight : MonoBehaviour
       // Check if we hit an eye
       if (hit.collider.CompareTag("StalkerEye"))
       {
+        Debug.Log("hit eye");
         stalker = hit.collider.GetComponentInParent<Stalker>();
         return true;
       }
