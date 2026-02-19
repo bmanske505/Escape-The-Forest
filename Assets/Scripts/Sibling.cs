@@ -95,7 +95,7 @@ public class Sibling : MonoBehaviour
     numberTimesLost += 1;
     if (numberTimesLost == 2) // this is the second time they've lost sibling, let them echo!
     {
-      GameUI.Instance.ShowBanner("\"I keep losing you! Let me try calling for you with the SPACEBAR\"");
+      GameUI.Instance.ShowTutorialPopup("Echo", "I keep losing my little sibling! Maybe I should try calling out to them with SPACEBAR.");
       Player.Instance.AddToInventory("Echo");
     }
   }

@@ -35,6 +35,7 @@ public class Player : MonoBehaviour
 
   void OnEnable()
   {
+    Time.timeScale = 1f;
     Cursor.lockState = CursorLockMode.Locked;
     Cursor.visible = false;
 

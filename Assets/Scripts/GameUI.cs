@@ -16,9 +16,10 @@ public class GameUI : MonoBehaviour
   [SerializeField] private TextMeshProUGUI levelText;
 
   [Header("Popup UI")]
-  [SerializeField] private CanvasGroup popupGroup;
-  [SerializeField] private TMP_Text popupTitle;
-  [SerializeField] private TMP_Text popupMessage;
+  [SerializeField] private CanvasGroup tutorialPopupGroup;
+  [SerializeField] private TMP_Text tutorialPopupTitle;
+  [SerializeField] private TMP_Text tutorialPopupMessage;
+  [SerializeField] private CanvasGroup diedPopupGroup;
 
   private Coroutine activeRoutine;
   public static GameUI Instance;
@@ -82,23 +83,32 @@ public class GameUI : MonoBehaviour
     activeRoutine = StartCoroutine(BannerRoutine(message, duration));
   }
 
-  public void ShowPopup(string title, string message)
+  public void ShowTutorialPopup(string title, string message)
   {
     if (activeRoutine != null)
       StopCoroutine(activeRoutine);
 
     Time.timeScale = 0f;
-    popupTitle.text = title;
-    popupMessage.text = message;
-    popupGroup.gameObject.SetActive(true);
+    tutorialPopupTitle.text = title;
+    tutorialPopupMessage.text = message;
+    tutorialPopupGroup.gameObject.SetActive(true);
 
     Cursor.lockState = CursorLockMode.None;
     Cursor.visible = true;
   }
 
-  public void HidePopup()
+  public void ShowDeathPopup()
   {
-    popupGroup.gameObject.SetActive(false);
+    Time.timeScale = 0f;
+    diedPopupGroup.gameObject.SetActive(true);
+
+    Cursor.lockState = CursorLockMode.None;
+    Cursor.visible = true;
+  }
+
+  public void HideTutorialPopup()
+  {
+    tutorialPopupGroup.gameObject.SetActive(false);
 
     Cursor.lockState = CursorLockMode.Locked;
     Cursor.visible = false;
@@ -137,5 +147,10 @@ public class GameUI : MonoBehaviour
     }
 
     bannerGroup.alpha = to;
+  }
+
+  public void ReplayLevel()
+  {
+    LevelMaster.Instance.ReplayLevel();
   }
 }

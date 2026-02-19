@@ -136,8 +136,7 @@ public class Stalker : MonoBehaviour
     if (other.CompareTag("Player"))
     {
       // Change so that player spawns at the start of the maze and the stalker resets
-      GameUI.Instance.ShowBanner("YOU DIED");
-      LevelMaster.Instance.ReplayLevel();
+      GameUI.Instance.ShowDeathPopup();
     }
     else if (other.CompareTag("Sibling"))
     {
@@ -157,7 +156,7 @@ public class Stalker : MonoBehaviour
     currentState = State.Stunned;
     agent.isStopped = true;
     agent.ResetPath(); // optional: immediately clear current destination
-        
+
     // Teleport to random location after stun
     Vector3 randomPos = Utilities.GetNavTarget(transform.position, wanderRange, agent);
     agent.Warp(randomPos);

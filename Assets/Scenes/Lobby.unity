@@ -2316,11 +2316,11 @@ MonoBehaviour:
     <b>Fonts</b>
 
     <link="https://www.dafont.com/witchwoode.font">WitchWoode
-    <color=blue>(Chad Savage)</color></link>
+    <color=blue>(chad savage)</color></link>
 
 
     <link="https://www.dafont.com/ms-scratch.font">MS
-    Scratch <color=blue>(Chuck B)</color></link>'
+    Scratch <color=blue>(chuck b)</color></link>'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 121378abef5c5491788ab66ad838e351, type: 2}
   m_sharedMaterial: {fileID: 5646795783941750008, guid: 121378abef5c5491788ab66ad838e351, type: 2}
@@ -2420,7 +2420,6 @@ GameObject:
   - component: {fileID: 5831681385558412580}
   - component: {fileID: 2290268569685780981}
   - component: {fileID: 6572923327943765382}
-  - component: {fileID: 4197755883309648600}
   m_Layer: 5
   m_Name: ExitButton
   m_TagString: Untagged
@@ -2514,18 +2513,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -400, y: -200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2596051553266724422
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8626905228845052555}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9481d2e671d9041e992c1b4a1fe5e05f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Toggler
 --- !u!114 &2615116999424776589
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2659,18 +2646,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &4197755883309648600
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1158990993966589748}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9481d2e671d9041e992c1b4a1fe5e05f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Toggler
 --- !u!1 &4430406910932021108
 GameObject:
   m_ObjectHideFlags: 0
@@ -3415,7 +3390,6 @@ GameObject:
   - component: {fileID: 1754089437695455003}
   - component: {fileID: 7756485513327785943}
   - component: {fileID: 5548970997919185609}
-  - component: {fileID: 2596051553266724422}
   m_Layer: 5
   m_Name: ExitButton
   m_TagString: Untagged

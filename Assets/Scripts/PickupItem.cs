@@ -19,7 +19,7 @@ public class PickupItem : MonoBehaviour
 
     Player.Instance.AddToInventory(toAdd);
 
-    GameUI.Instance.ShowPopup(gameObject.name, onPickupMessage); // replace with popup window later
+    GameUI.Instance.ShowTutorialPopup(gameObject.name, onPickupMessage); // replace with popup window later
     Destroy(gameObject);
   }
 }

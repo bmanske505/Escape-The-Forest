@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3456655738924280429
 Transform:
   m_ObjectHideFlags: 0
@@ -628,8 +628,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e42467c8826b4095a436d7b683b4e01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  walkSpeed: 2
-  sprintSpeed: 4
+  walkSpeed: 1.5
+  sprintSpeed: 2.5
   staminaDrainPerSecond: 25
   staminaRegenPerSecond: 15
   regenDelay: 1.5
