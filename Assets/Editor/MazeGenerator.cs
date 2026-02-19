@@ -101,7 +101,7 @@ public class MazeGenerator : EditorWindow
         new Level
         {
             name = "Level 5",
-            lightColor = new Color(0.2f, 0.2f, 0.2f, 0.2f),
+            lightColor = new Color(0.3f, 0.3f, 0.3f, 1f),
             fog = 0.5f,
             maze =
 @"
@@ -126,9 +126,9 @@ public class MazeGenerator : EditorWindow
         new Level
         {
             name = "Level 6",
-            light = 0f,
-            lightColor = Color.blue,
-            maze = 
+            fog = 0.6f,
+            lightColor = new Color(0.2f, 0.2f, 0.2f, 1f),
+            maze =
 @"
 #|###########################
 #*####________###_____._____#
@@ -151,11 +151,11 @@ public class MazeGenerator : EditorWindow
 
         new Level
         {
-          
+
             name = "Level 7",
-            light = 0f,
-            lightColor = Color.gray,
-            maze = 
+            fog = 0.7f,
+            lightColor = new Color(0.1f, 0.1f, 0.1f, 1f),
+            maze =
 @"
 ################|################
 ########_______#*#_______########
