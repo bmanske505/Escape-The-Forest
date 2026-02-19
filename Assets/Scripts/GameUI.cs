@@ -43,7 +43,7 @@ public class GameUI : MonoBehaviour
 
   public void UpdateLevelBar()
   {
-    levelText.text = "Progress: " + LevelMaster.Instance.GetProgress() * 100 + "%";
+    levelText.text = string.Format("Progress: {0} / {1}", LevelMaster.Instance.GetCurrentLevel(), LevelMaster.Instance.GetTotalLevels());
   }
 
   public void UpdateStaminaBar(float value)

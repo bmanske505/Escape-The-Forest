@@ -79,9 +79,14 @@ public class LevelMaster : Singleton<LevelMaster>
     return (float)index / levels.Length;
   }
 
-  public int GetLevelIndex()
+  public int GetCurrentLevel()
   {
-    return index;
+    return index + 1;
+  }
+
+  public int GetTotalLevels()
+  {
+    return levels.Length;
   }
 
   /* =======================

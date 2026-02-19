@@ -53,7 +53,7 @@ public class SunProgression : Singleton<SunProgression>
   int GetSunLevelFromLevelMaster()
   {
     // index is 0-based → convert to 1–5 range
-    int level = Mathf.Clamp(LevelMaster.Instance.GetLevelIndex() + 1, 1, maxSunLevels);
+    int level = Mathf.Clamp(LevelMaster.Instance.GetCurrentLevel() + 1, 1, maxSunLevels);
     return level;
   }
 
