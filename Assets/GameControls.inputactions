@@ -32,6 +32,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Flash",
+                    "type": "Button",
+                    "id": "bc7c96af-b4d3-4491-9177-2394fb2ab627",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Echo",
+                    "type": "Button",
+                    "id": "e0dbfe1a-1a8f-40be-b472-a16f16aac8a4",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -153,6 +171,28 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Sprint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "42c7f68c-826b-46cd-8b92-3d43a0d95ebb",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Flash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4aafac84-f900-4275-a949-cb3e55470c23",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Echo",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -669,62 +709,6 @@
                     "processors": "",
                     "groups": "XR",
                     "action": "TrackedDeviceOrientation",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                }
-            ]
-        },
-        {
-            "name": "Flashlight",
-            "id": "3499d0f6-ad08-4d01-bd6e-d64ed0930e07",
-            "actions": [
-                {
-                    "name": "Flash",
-                    "type": "Button",
-                    "id": "c4a407cc-6e7c-46ce-9a38-7d05aa426b62",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                }
-            ],
-            "bindings": [
-                {
-                    "name": "",
-                    "id": "eec46778-5e6c-4da6-baa9-6afc72d1c933",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Flash",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                }
-            ]
-        },
-        {
-            "name": "Echo",
-            "id": "d1974b2b-2759-4dc9-b285-4275773499c9",
-            "actions": [
-                {
-                    "name": "Echo",
-                    "type": "Button",
-                    "id": "49d2d795-6518-4555-b401-8dc09de93f04",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                }
-            ],
-            "bindings": [
-                {
-                    "name": "",
-                    "id": "7d5593a1-a62c-4162-89b7-ae1fb89d8cef",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Echo",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
