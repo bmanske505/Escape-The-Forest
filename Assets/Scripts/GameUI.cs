@@ -15,7 +15,13 @@ public class GameUI : MonoBehaviour
   [SerializeField] private Slider staminaBar;
   [SerializeField] private TextMeshProUGUI levelText;
 
-  private Coroutine bannerRoutine;
+  [Header("Popup UI")]
+  [SerializeField] private CanvasGroup tutorialPopupGroup;
+  [SerializeField] private TMP_Text tutorialPopupTitle;
+  [SerializeField] private TMP_Text tutorialPopupMessage;
+  [SerializeField] private CanvasGroup diedPopupGroup;
+
+  private Coroutine activeRoutine;
   public static GameUI Instance;
 
   void Awake()
@@ -45,7 +51,8 @@ public class GameUI : MonoBehaviour
     if (value < 0)
     {
       staminaBar.gameObject.SetActive(false);
-    } else
+    }
+    else
     {
       staminaBar.gameObject.SetActive(true);
       staminaBar.value = value;
@@ -70,10 +77,43 @@ public class GameUI : MonoBehaviour
   /// </summary>
   public void ShowBanner(string message, float duration = 2f)
   {
-    if (bannerRoutine != null)
-      StopCoroutine(bannerRoutine);
+    if (activeRoutine != null)
+      StopCoroutine(activeRoutine);
 
-    bannerRoutine = StartCoroutine(BannerRoutine(message, duration));
+    activeRoutine = StartCoroutine(BannerRoutine(message, duration));
+  }
+
+  public void ShowTutorialPopup(string title, string message)
+  {
+    if (activeRoutine != null)
+      StopCoroutine(activeRoutine);
+
+    Time.timeScale = 0f;
+    tutorialPopupTitle.text = title;
+    tutorialPopupMessage.text = message;
+    tutorialPopupGroup.gameObject.SetActive(true);
+
+    Cursor.lockState = CursorLockMode.None;
+    Cursor.visible = true;
+  }
+
+  public void ShowDeathPopup()
+  {
+    Time.timeScale = 0f;
+    diedPopupGroup.gameObject.SetActive(true);
+
+    Cursor.lockState = CursorLockMode.None;
+    Cursor.visible = true;
+  }
+
+  public void HideTutorialPopup()
+  {
+    tutorialPopupGroup.gameObject.SetActive(false);
+
+    Cursor.lockState = CursorLockMode.Locked;
+    Cursor.visible = false;
+
+    Time.timeScale = 1f;
   }
 
 
@@ -92,7 +132,7 @@ public class GameUI : MonoBehaviour
     yield return Fade(1f, 0f);
 
     bannerGroup.gameObject.SetActive(false);
-    bannerRoutine = null;
+    activeRoutine = null;
   }
 
   private IEnumerator Fade(float from, float to)
@@ -107,5 +147,10 @@ public class GameUI : MonoBehaviour
     }
 
     bannerGroup.alpha = to;
+  }
+
+  public void ReplayLevel()
+  {
+    LevelMaster.Instance.ReplayLevel();
   }
 }

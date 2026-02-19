@@ -18,7 +18,7 @@ public class Flashlight : MonoBehaviour
   [Header("Input")]
   InputAction flashInput;
 
-  private float charge = 1f;
+  private static float charge = 1f;
 
   private Light beam;
 

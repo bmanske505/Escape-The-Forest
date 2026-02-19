@@ -14,7 +14,7 @@ public class MazeGenerator : EditorWindow
     public string name;        // scene name
     public string maze;        // ASCII maze
     public Color lightColor = Color.white;
-    public float light = 1f; // [0,1] normalized
+    public float fog = 0f; // [0,1] normalized
   }
 
   // Hard-coded levels
@@ -23,7 +23,6 @@ public class MazeGenerator : EditorWindow
         new Level
         {
             name = "Level 1",
-            light = 1f,
             lightColor = Color.white,
             maze =
 @"
@@ -40,8 +39,7 @@ public class MazeGenerator : EditorWindow
         new Level
         {
             name = "Level 2",
-            light = 0.75f,
-            lightColor = Color.yellow,
+            lightColor = new Color(1f, 0.75f, 0f, 1f),
             maze =
 @"
 #|###########
@@ -60,12 +58,11 @@ public class MazeGenerator : EditorWindow
         {
 
             name = "Level 3",
-            light = 0.5f,
-            lightColor = Color.orange,
+            lightColor = new Color(1f, 0.2f, 0f, 1f),
             maze =
 @"
 #################
-|*_____#________#
+|*____F#________#
 ######_#_###_##_#
 #________###_##_#
 #_##_###______###
@@ -81,8 +78,8 @@ public class MazeGenerator : EditorWindow
         new Level
         {
             name = "Level 4",
-            light = 0.25f,
-            lightColor = Color.red,
+            lightColor = new Color(0.5f, 0f, 1f, 1f),
+            fog = 0.25f,
             maze =
 @"
 ###################E#
@@ -104,8 +101,8 @@ public class MazeGenerator : EditorWindow
         new Level
         {
             name = "Level 5",
-            light = 0f,
-            lightColor = Color.purple,
+            lightColor = new Color(0.2f, 0.2f, 0.2f, 0.2f),
+            fog = 0.5f,
             maze =
 @"
 #########################
@@ -320,11 +317,9 @@ public class MazeGenerator : EditorWindow
     RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
     RenderSettings.ambientLight = level.lightColor;
 
-
     RenderSettings.fog = true;
-    RenderSettings.fogMode = FogMode.ExponentialSquared;
-    RenderSettings.fogDensity = 1 - level.light;
-    RenderSettings.fogColor = level.lightColor;
+    RenderSettings.fogColor = Color.black;
+    RenderSettings.fogDensity = level.fog;
 
 
     var sun = RenderSettings.sun;
