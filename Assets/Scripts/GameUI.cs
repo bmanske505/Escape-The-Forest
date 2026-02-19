@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class GameUI : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class GameUI : MonoBehaviour
   [SerializeField] private TMP_Text tutorialPopupMessage;
   [SerializeField] private CanvasGroup diedPopupGroup;
 
-  private Coroutine activeRoutine;
+  private Coroutine bannerRoutine;
   public static GameUI Instance;
 
   void Awake()
@@ -43,7 +44,7 @@ public class GameUI : MonoBehaviour
 
   public void UpdateLevelBar()
   {
-    levelText.text = "Progress: " + LevelMaster.Instance.GetProgress() * 100 + "%";
+    levelText.text = string.Format("Progress: {0} / {1}", LevelMaster.Instance.GetCurrentLevel(), LevelMaster.Instance.GetTotalLevels());
   }
 
   public void UpdateStaminaBar(float value)
@@ -77,16 +78,16 @@ public class GameUI : MonoBehaviour
   /// </summary>
   public void ShowBanner(string message, float duration = 2f)
   {
-    if (activeRoutine != null)
-      StopCoroutine(activeRoutine);
+    if (bannerRoutine != null)
+      StopCoroutine(bannerRoutine);
 
-    activeRoutine = StartCoroutine(BannerRoutine(message, duration));
+    bannerRoutine = StartCoroutine(BannerRoutine(message, duration));
   }
 
   public void ShowTutorialPopup(string title, string message)
   {
-    if (activeRoutine != null)
-      StopCoroutine(activeRoutine);
+
+    InputSystem.actions.FindActionMap("Player", true).Disable();
 
     Time.timeScale = 0f;
     tutorialPopupTitle.text = title;
@@ -114,6 +115,7 @@ public class GameUI : MonoBehaviour
     Cursor.visible = false;
 
     Time.timeScale = 1f;
+    InputSystem.actions.FindActionMap("Player", true).Enable();
   }
 
 
@@ -132,7 +134,7 @@ public class GameUI : MonoBehaviour
     yield return Fade(1f, 0f);
 
     bannerGroup.gameObject.SetActive(false);
-    activeRoutine = null;
+    bannerRoutine = null;
   }
 
   private IEnumerator Fade(float from, float to)
