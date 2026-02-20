@@ -611,7 +611,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   cameraPivot: {fileID: 34324232110295040}
-  mouseSensitivity: 100
+  mouseSensitivity: 50
   minPitch: -40
   maxPitch: 40
   siblingPrefab: {fileID: 7096211616557163575, guid: 5ecf42d14cac04963bbaaf185bc1eb1c, type: 3}

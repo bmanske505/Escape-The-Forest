@@ -1,6 +1,10 @@
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public static class Utilities
 {
@@ -57,6 +61,7 @@ public static class Utilities
 
   public static void EnsureFolderPath(string path)
   {
+#if UNITY_EDITOR
     string[] parts = path.Split('/');
     string current = parts[0]; // "Assets"
 
@@ -71,6 +76,7 @@ public static class Utilities
 
       current = next;
     }
+#endif
   }
 
 

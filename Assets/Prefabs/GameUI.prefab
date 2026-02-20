@@ -417,7 +417,7 @@ MonoBehaviour:
   m_text: 'Progress: 0%'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 121378abef5c5491788ab66ad838e351, type: 2}
-  m_sharedMaterial: {fileID: 5646795783941750008, guid: 121378abef5c5491788ab66ad838e351, type: 2}
+  m_sharedMaterial: {fileID: -7837311698185074745, guid: 121378abef5c5491788ab66ad838e351, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -783,7 +783,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!114 &8629597994229008972
 MonoBehaviour:

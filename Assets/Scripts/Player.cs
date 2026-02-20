@@ -10,7 +10,6 @@ public class Player : MonoBehaviour
 
   [Header("Look")]
   public Transform cameraPivot;
-  public float mouseSensitivity = 120f;
   public float minPitch = -80f;
   public float maxPitch = 80f;
 
@@ -31,6 +30,12 @@ public class Player : MonoBehaviour
     Instance = this;
     lookAction = InputSystem.actions.FindAction("Look");
     PopulateInventory();
+  }
+
+  void OnDestroy()
+  {
+    if (Instance == this)
+      Instance = null;
   }
 
   void OnEnable()
@@ -75,11 +80,11 @@ public class Player : MonoBehaviour
 
   void HandleLook()
   {
-    pitch -= lookInput.y * mouseSensitivity * Time.deltaTime;
+    pitch -= lookInput.y * SettingsManager.Instance.sensitivityY * Time.deltaTime;
     pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
     cameraPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
 
-    float yaw = lookInput.x * mouseSensitivity * Time.deltaTime;
+    float yaw = lookInput.x * SettingsManager.Instance.sensitivityX * Time.deltaTime;
     transform.Rotate(0f, yaw, 0f, Space.World);
   }
 

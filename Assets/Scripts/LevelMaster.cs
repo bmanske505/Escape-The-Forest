@@ -2,8 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -24,10 +22,14 @@ public class LevelMaster : Singleton<LevelMaster>
 
   private bool isLoading = false;
 
+  private float bankedCharge = 1f;
+
   protected override void Awake()
   {
     base.Awake();
+#if UNITY_EDITOR
     CacheSceneNames();
+#endif
   }
 
   /* =======================
@@ -66,6 +68,11 @@ public class LevelMaster : Singleton<LevelMaster>
 
     index = newIndex;
     LoadScene(scenes[index]);
+    if (Flashlight.Instance)
+    {
+      Flashlight.Instance.SetCharge(bankedCharge);
+      bankedCharge = Flashlight.Instance.GetCharge();
+    }
   }
 
   public void LoadScene(string name)
@@ -76,7 +83,7 @@ public class LevelMaster : Singleton<LevelMaster>
 
   public float GetProgress()
   {
-    return (float)index / levels.Length;
+    return (float)index / scenes.Length;
   }
 
   public int GetCurrentLevel()
@@ -86,7 +93,7 @@ public class LevelMaster : Singleton<LevelMaster>
 
   public int GetTotalLevels()
   {
-    return levels.Length;
+    return scenes.Length;
   }
 
   /* =======================

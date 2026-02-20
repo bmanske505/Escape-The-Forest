@@ -137,7 +137,12 @@ public class Flashlight : MonoBehaviour
 
   public void Charge(float amount)
   {
-    charge = Mathf.Clamp01(charge + amount);
+    SetCharge(charge + amount);
+  }
+
+  public void SetCharge(float newCharge)
+  {
+    charge = Mathf.Clamp01(newCharge);
   }
 
 }
