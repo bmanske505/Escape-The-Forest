@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
   public Transform cameraPivot;
   public float minPitch = -80f;
   public float maxPitch = 80f;
+  float lookScaler = Application.platform == RuntimePlatform.WebGLPlayer ? 0.1f : 1.2f;
 
   [Header("Sibling")]
   public GameObject siblingPrefab;
@@ -80,11 +81,11 @@ public class Player : MonoBehaviour
 
   void HandleLook()
   {
-    pitch -= lookInput.y * SettingsManager.Instance.sensitivityY * Time.deltaTime;
+    pitch -= lookInput.y * SettingsManager.Instance.sensitivityY * lookScaler * Time.deltaTime;
     pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
     cameraPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
 
-    float yaw = lookInput.x * SettingsManager.Instance.sensitivityX * Time.deltaTime;
+    float yaw = lookInput.x * SettingsManager.Instance.sensitivityX * lookScaler * Time.deltaTime;
     transform.Rotate(0f, yaw, 0f, Space.World);
   }
 
