@@ -1,6 +1,8 @@
 using System.Collections;
+using Scripts.FirebaseScripts;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -23,6 +25,7 @@ public class LevelMaster : Singleton<LevelMaster>
   private bool isLoading = false;
 
   private float bankedCharge = 1f;
+  public DateTime dateTime = DateTime.Now;
 
   protected override void Awake()
   {
@@ -40,6 +43,7 @@ public class LevelMaster : Singleton<LevelMaster>
   {
     if (isLoading) return;
     LoadLevel(index);
+    FirebaseAnalytics.LogEvent("Player got caught");
   }
 
   public void PlayNextLevel()
@@ -54,6 +58,7 @@ public class LevelMaster : Singleton<LevelMaster>
     }
 
     LoadLevel(nextIndex);
+    FirebaseAnalytics.LogEventParameter($"level {index}", $"{DateTime.Now - dateTime}");
   }
 
   public void LoadLevel(int newIndex)
