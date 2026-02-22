@@ -1,4 +1,5 @@
 using System.Collections;
+using Scripts.FirebaseScripts;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -136,12 +137,12 @@ public class Stalker : MonoBehaviour
     if (other.CompareTag("Player"))
     {
       // Change so that player spawns at the start of the maze and the stalker resets
+      FirebaseAnalytics.LogEvent("player_died");
       GameUI.Instance.ShowDeathPopup();
     }
     else if (other.CompareTag("Sibling"))
     {
-      Debug.Log("The stalker caused the sibling to hide.");
-      other.GetComponent<Sibling>().Hide();
+      other.GetComponent<Sibling>().Hide("stalker");
     }
   }
 

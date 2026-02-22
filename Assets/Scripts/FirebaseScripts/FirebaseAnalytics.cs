@@ -2,8 +2,9 @@ using System.Runtime.InteropServices;
 
 namespace Scripts.FirebaseScripts
 {
-    public static class FirebaseAnalytics
-    {
+  public static class FirebaseAnalytics
+  {
+#if UNITY_WEBGL && !UNITY_EDITOR
         /// <summary>
         /// Setup current user's properties
         /// </summary>
@@ -29,5 +30,10 @@ namespace Scripts.FirebaseScripts
         /// </param>
         [DllImport("__Internal")]
         public static extern void LogEventParameter(string eventName, string eventParam);
-    }
+#else
+    public static void SetUserProperties(string props) { }
+    public static void LogEvent(string name) { }
+    public static void LogEventParameter(string name, string param) { }
+#endif
+  }
 }

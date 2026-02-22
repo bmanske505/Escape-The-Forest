@@ -2,14 +2,15 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
 using TMPro;
+using UnityEngine.UI;
 
 public class SettingsManager : Singleton<SettingsManager>
 {
-  public float sensitivityX = 100f;
-  public float sensitivityY = 100f;
 
-  [SerializeField] private TMP_Text sensitivityXtext;
-  [SerializeField] private TMP_Text sensitivityYtext;
+  [SerializeField] private TMP_Text sensitivityXText;
+  [SerializeField] private TMP_Text sensitivityYText;
+  [SerializeField] private Slider sensitivityXSlider;
+  [SerializeField] private Slider sensitivityYSlider;
   [SerializeField] private GameObject settingsMenu;
 
   private InputAction settingsAction;
@@ -19,8 +20,13 @@ public class SettingsManager : Singleton<SettingsManager>
     base.Awake();
     settingsAction = InputSystem.actions.FindAction("ToggleSettings");
 
-    sensitivityXtext.text = $"Look X Sensitivity: {sensitivityX}";
-    sensitivityYtext.text = $"Look Y Sensitivity: {sensitivityY}";
+    float sensitivityX = PlayerPrefs.GetFloat("sensitivity_x", 100f);
+    sensitivityXText.text = $"Look X Sensitivity: {sensitivityX}";
+    sensitivityXSlider.value = sensitivityX;
+
+    float sensitivityY = PlayerPrefs.GetFloat("sensitivity_y", 100f);
+    sensitivityYText.text = $"Look Y Sensitivity: {sensitivityY}";
+    sensitivityYSlider.value = sensitivityY;
   }
 
   void OnEnable()
@@ -35,19 +41,18 @@ public class SettingsManager : Singleton<SettingsManager>
 
   public void SetMouseSensitivityX(float value)
   {
-    sensitivityX = value;
-    sensitivityXtext.text = $"Look X Sensitivity: {sensitivityX}";
+    PlayerPrefs.SetFloat("sensitivity_x", value);
+    sensitivityXText.text = $"Look X Sensitivity: {value}";
   }
 
   public void SetMouseSensitivityY(float value)
   {
-    sensitivityY = value;
-    sensitivityYtext.text = $"Look Y Sensitivity: {sensitivityY}";
+    PlayerPrefs.SetFloat("sensitivity_y", value);
+    sensitivityYText.text = $"Look Y Sensitivity: {value}";
   }
 
   public void OnToggleSettings(CallbackContext context)
   {
-    Debug.Log("Trying to toggle!");
     TogglePopup();
   }
 
@@ -69,6 +74,11 @@ public class SettingsManager : Singleton<SettingsManager>
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
       }
+    }
+
+    if (!settingsMenu.activeSelf) // we just closed the settings, save the settings to disk!
+    {
+      PlayerPrefs.Save();
     }
   }
 }

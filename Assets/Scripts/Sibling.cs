@@ -1,4 +1,5 @@
-using System;
+using Newtonsoft.Json;
+using Scripts.FirebaseScripts;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -67,7 +68,7 @@ public class Sibling : MonoBehaviour
       lostTimer += Time.deltaTime;
       if (lostTimer >= lostTimeMax)
       {
-        Hide();
+        Hide("abandoned");
         lostTimer = 0f;
       }
     }
@@ -77,7 +78,7 @@ public class Sibling : MonoBehaviour
     }
   }
 
-  public void Hide()
+  public void Hide(string context)
   {
     Vector3 spot = Utilities.GetNavTarget(player.transform.position, hideRange, agent);
 
@@ -98,6 +99,8 @@ public class Sibling : MonoBehaviour
       GameUI.Instance.ShowTutorialPopup("Echo", "I keep losing my little sibling! Maybe I should try calling out to them with SPACEBAR.");
       Player.Instance.AddToInventory("Echo");
     }
+
+    FirebaseAnalytics.LogEventParameter("sibling_hid", JsonConvert.SerializeObject(new { cause = context }));
   }
 
 
@@ -111,6 +114,5 @@ public class Sibling : MonoBehaviour
   public void Respond()
   {
     audioSrc.Play();
-    print("Responding!");
   }
 }

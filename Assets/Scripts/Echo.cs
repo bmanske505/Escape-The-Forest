@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -35,7 +34,6 @@ public class Echo : MonoBehaviour
   IEnumerator CallForSibling()
   {
     audioSrc.Play();
-    print("Calling!");
 
     // Wait until audio finishes
     yield return new WaitWhile(() => audioSrc.isPlaying);

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
@@ -17,8 +16,6 @@ public class Flashlight : MonoBehaviour
 
   [Header("Input")]
   InputAction flashInput;
-
-  private static float charge = 1f;
 
   private Light beam;
 
@@ -42,12 +39,12 @@ public class Flashlight : MonoBehaviour
   void Start()
   {
     beam.enabled = false;
-    GameUI.Instance.UpdateFlashlightBar(charge);
+    GameUI.Instance.UpdateFlashlightBar(GetCharge());
   }
 
   void Update()
   {
-    if (charge == 0f)
+    if (GetCharge() == 0f)
     {
       if (IsOn())
       {
@@ -63,8 +60,8 @@ public class Flashlight : MonoBehaviour
         GameUI.Instance.ShowBanner($"\"Aha! How do you like being stunned for {stunDuration} seconds? 😎\"", stunDuration);
         stalker.Stun(stunDuration);
       }
-      charge = Mathf.Clamp01(charge - Time.deltaTime / lifespan);
-      GameUI.Instance.UpdateFlashlightBar(charge);
+      SetCharge(Mathf.Clamp01(GetCharge() - Time.deltaTime / lifespan));
+      GameUI.Instance.UpdateFlashlightBar(GetCharge());
     }
   }
 
@@ -92,7 +89,7 @@ public class Flashlight : MonoBehaviour
 
   private void On()
   {
-    if (charge > 0f)
+    if (GetCharge() > 0f)
     {
       beam.enabled = true;
     }
@@ -121,7 +118,6 @@ public class Flashlight : MonoBehaviour
       // Check if we hit an eye
       if (hit.collider.CompareTag("StalkerEye"))
       {
-        Debug.Log("hit eye");
         stalker = hit.collider.GetComponentInParent<Stalker>();
         return true;
       }
@@ -132,17 +128,17 @@ public class Flashlight : MonoBehaviour
 
   public float GetCharge()
   {
-    return charge;
+    return PlayerPrefs.GetFloat("flashlight_charge", 1f);
   }
 
   public void Charge(float amount)
   {
-    SetCharge(charge + amount);
+    SetCharge(GetCharge() + amount);
   }
 
   public void SetCharge(float newCharge)
   {
-    charge = Mathf.Clamp01(newCharge);
+    PlayerPrefs.SetFloat("flashlight_charge", Mathf.Clamp01(newCharge));
   }
 
 }

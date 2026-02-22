@@ -9,7 +9,7 @@ public class MenuUI : MonoBehaviour
 
   public void Restart()
   {
-    LevelMaster.Instance.LoadLevel(0);
+    LevelMaster.Instance.Restart();
   }
 
   public void Lobby()

@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using NUnit.Compatibility;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,9 +14,6 @@ public class Player : MonoBehaviour
   [Header("Sibling")]
   public GameObject siblingPrefab;
   public Vector3 siblingSpawnOffset = new Vector3(0f, 0f, 0f);
-
-  [Header("Inventory")]
-  static List<string> inventory = new List<string>();
 
   private float pitch;
 
@@ -81,16 +75,20 @@ public class Player : MonoBehaviour
 
   void HandleLook()
   {
-    pitch -= lookInput.y * SettingsManager.Instance.sensitivityY * lookScaler * Time.deltaTime;
+    pitch -= lookInput.y * PlayerPrefs.GetFloat("sensitivity_y") * lookScaler * Time.deltaTime;
     pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
     cameraPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
 
-    float yaw = lookInput.x * SettingsManager.Instance.sensitivityX * lookScaler * Time.deltaTime;
+    float yaw = lookInput.x * PlayerPrefs.GetFloat("sensitivity_x") * lookScaler * Time.deltaTime;
     transform.Rotate(0f, yaw, 0f, Space.World);
   }
 
   void PopulateInventory()
   {
+    string[] inventory = PlayerPrefs
+    .GetString("inventory", "")
+    .Split(',', System.StringSplitOptions.RemoveEmptyEntries);
+
     foreach (string item in inventory)
     {
 
@@ -101,7 +99,12 @@ public class Player : MonoBehaviour
 
   public void AddToInventory(string name)
   {
-    inventory.Add(name);
+    string inventory = PlayerPrefs.GetString("inventory", "");
+    if (inventory != "") // we have at least one item, add a comma
+    {
+      inventory += ",";
+    }
+    PlayerPrefs.SetString("inventory", inventory + name);
     EnableComponent(name);
   }
 

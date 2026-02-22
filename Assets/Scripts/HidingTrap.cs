@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class HidingTrap : MonoBehaviour
 {
@@ -10,7 +9,7 @@ public class HidingTrap : MonoBehaviour
     if (!triggered && other.CompareTag("Player") && !Sibling.Instance.IsHiding)
     {
       triggered = true;
-      Sibling.Instance.Hide();
+      Sibling.Instance.Hide("trigger");
     }
   }
 }

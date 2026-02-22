@@ -3,6 +3,8 @@ using Scripts.FirebaseScripts;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
+using Newtonsoft.Json;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -20,37 +22,58 @@ public class LevelMaster : Singleton<LevelMaster>
   [SerializeField, HideInInspector]
   private string[] scenes;
 
-  private int index = 0;
-
   private bool isLoading = false;
-
-  private float bankedCharge = 1f;
-  public DateTime dateTime = DateTime.Now;
+  public float levelTime = 0f; // for timing each level
 
   protected override void Awake()
   {
     base.Awake();
-#if UNITY_EDITOR
     CacheSceneNames();
-#endif
+
+    // configure user settings firebase analytics logging
+    if (!PlayerPrefs.HasKey("id"))
+    {
+      string id = Guid.NewGuid().ToString();
+      PlayerPrefs.SetString("id", id);
+      PlayerPrefs.Save();
+    }
+    FirebaseAnalytics.SetUserProperties(JsonConvert.SerializeObject(new { id = PlayerPrefs.GetString("id"), version = Application.version, platform = Application.platform.ToString() }));
+  }
+
+  void Update()
+  {
+    if (Time.timeScale != 0f && Player.Instance) // player is in a game and the game is not paused
+    {
+      levelTime += Time.deltaTime;
+    }
   }
 
   /* =======================
    * Public API
    * ======================= */
 
+  public void Restart()
+  {
+    PlayerPrefs.DeleteKey("inventory");
+    PlayerPrefs.SetFloat("flashlight_charge", 1f);
+    LoadLevel(0);
+  }
+
   public void ReplayLevel()
   {
     if (isLoading) return;
-    LoadLevel(index);
-    FirebaseAnalytics.LogEvent("Player got caught");
+    LoadLevel(GetLevel());
   }
 
   public void PlayNextLevel()
   {
+    // log the current level's data
+    FirebaseAnalytics.LogEventParameter("level_complete", JsonConvert.SerializeObject(new { level = GetLevel(), time_spent = levelTime }));
+    levelTime = 0f; // reset the counter
+
     if (isLoading) return;
 
-    int nextIndex = index + 1;
+    int nextIndex = GetLevel() + 1;
     if (nextIndex >= scenes.Length)
     {
       LoadScene("Win");
@@ -58,26 +81,21 @@ public class LevelMaster : Singleton<LevelMaster>
     }
 
     LoadLevel(nextIndex);
-    FirebaseAnalytics.LogEventParameter($"level {index}", $"{DateTime.Now - dateTime}");
+    PlayerPrefs.Save();
   }
 
-  public void LoadLevel(int newIndex)
+  public void LoadLevel(int index)
   {
     if (isLoading) return;
 
-    if (newIndex < 0 || newIndex >= scenes.Length)
+    if (index < 0 || index >= scenes.Length)
     {
-      Debug.LogError($"GameMaster: Invalid level index {newIndex}");
+      Debug.LogError($"GameMaster: Invalid level index {index}");
       return;
     }
 
-    index = newIndex;
+    PlayerPrefs.SetInt("level_index", index);
     LoadScene(scenes[index]);
-    if (Flashlight.Instance)
-    {
-      Flashlight.Instance.SetCharge(bankedCharge);
-      bankedCharge = Flashlight.Instance.GetCharge();
-    }
   }
 
   public void LoadScene(string name)
@@ -88,12 +106,12 @@ public class LevelMaster : Singleton<LevelMaster>
 
   public float GetProgress()
   {
-    return (float)index / scenes.Length;
+    return (float)GetLevel() / scenes.Length;
   }
 
-  public int GetCurrentLevel()
+  public int GetLevel()
   {
-    return index + 1;
+    return PlayerPrefs.GetInt("level_index", 0);
   }
 
   public int GetTotalLevels()
