@@ -7,7 +7,7 @@ namespace Scripts.FirebaseScripts
 #if UNITY_WEBGL && !UNITY_EDITOR
 
     [DllImport("__Internal")]
-    private static extern string GetHostDomain();
+    public static extern string GetHostDomain();
 
     [DllImport("__Internal")]
     public static extern void SetUserId(string id);
