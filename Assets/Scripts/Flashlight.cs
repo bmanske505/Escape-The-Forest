@@ -17,6 +17,11 @@ public class Flashlight : MonoBehaviour
   public static Flashlight Instance;
   private static float charge;
 
+  // use for flashlight analytics
+  private float flashlightTime = 0f;
+  private float totalTime = 0f;
+
+
   [Header("Input")]
   InputAction flashInput;
 
@@ -54,6 +59,10 @@ public class Flashlight : MonoBehaviour
 
   void Update()
   {
+    if (Time.timeScale == 0f || !Player.Instance) return; // player not in game or paused
+
+    totalTime += Time.deltaTime;
+
     if (GetCharge() == 0f)
     {
       if (IsOn())
@@ -66,6 +75,10 @@ public class Flashlight : MonoBehaviour
     }
     if (IsOn())
     {
+      if (Time.timeScale != 0f && Player.Instance) // player is in a game and the game is not paused
+      {
+        flashlightTime += Time.deltaTime;
+      }
 
       if (IsHittingStalkerEyes(out Stalker stalker))
       {
@@ -151,6 +164,11 @@ public class Flashlight : MonoBehaviour
   public void SetCharge(float newCharge)
   {
     charge = Mathf.Clamp01(newCharge);
+  }
+
+  public float GetUseRatio()
+  {
+    return flashlightTime / totalTime;
   }
 
 }

@@ -20,7 +20,8 @@ public class Sibling : MonoBehaviour
   // Data
   static int numberTimesLost = 0;
 
-  private float lostTimer = 0f;
+  private float lostTimer = 0f; // used with lostTimeMax
+  private float hidingTimer = 0f; // used to log amount of time the sibling was hiding for before found
   public bool IsHiding { get; private set; } = false;
 
   void Awake()
@@ -52,8 +53,12 @@ public class Sibling : MonoBehaviour
 
   void Update()
   {
-    if (player == null || IsHiding)
+    if (player == null) { return; }
+    else if (IsHiding)
+    {
+      hidingTimer += Time.deltaTime;
       return;
+    }
 
     float currentDistance = Vector3.Distance(transform.position, player.position);
 
@@ -112,6 +117,9 @@ public class Sibling : MonoBehaviour
 
   public void Unhide()
   {
+    FirebaseAnalytics.LogEventParameter("sibling_found", JsonConvert.SerializeObject(new { time_spent = hidingTimer }));
+    hidingTimer = 0f;
+
     GameUI.Instance.ShowBanner("\"There you are! Don't go running off again, you hear me?\"");
     IsHiding = false;
     collectible.SetActive(false);

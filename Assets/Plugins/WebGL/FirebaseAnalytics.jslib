@@ -1,5 +1,10 @@
 mergeInto(LibraryManager.library, {
 
+  GetHostDomain: function () {
+    var host = window.location.hostname || "unknown";
+    return allocateUTF8(host);
+  },
+
   SetUserId: function (idPtr) {
     const id = UTF8ToString(idPtr);
     firebase.analytics().setUserId(id);

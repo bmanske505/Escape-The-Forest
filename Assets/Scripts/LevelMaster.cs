@@ -26,6 +26,8 @@ public class LevelMaster : Singleton<LevelMaster>
 
   private bool isLoading = false;
   private float levelTime = 0f; // for timing each level
+  private Vector2 weightedSensitivitySum = Vector2.zero;
+  private float sensitivityTime = 0f;
 
   protected override void Awake()
   {
@@ -40,7 +42,7 @@ public class LevelMaster : Singleton<LevelMaster>
     }
     string id = PlayerPrefs.GetString("id");
     FirebaseAnalytics.SetUserId(id);
-    FirebaseAnalytics.SetUserProperties(JsonConvert.SerializeObject(new { id = id, version = Application.version, platform = Application.platform.ToString() }));
+    FirebaseAnalytics.SetUserProperties(JsonConvert.SerializeObject(new { id = id, version = Application.version, platform = Application.platform.ToString(), domain = FirebaseAnalytics.GetHostDomain() }));
   }
 
   void Update()
@@ -48,12 +50,19 @@ public class LevelMaster : Singleton<LevelMaster>
     if (Time.timeScale != 0f && Player.Instance) // player is in a game and the game is not paused
     {
       levelTime += Time.deltaTime;
+      sensitivityTime += Time.deltaTime;
     }
   }
 
   /* =======================
    * Public API
    * ======================= */
+
+  public void CacheSensitivityUse()
+  {
+    weightedSensitivitySum += new Vector2(PlayerPrefs.GetFloat("sensitivity_x"), PlayerPrefs.GetFloat("sensitivity_y")) * sensitivityTime;
+    sensitivityTime = 0f;
+  }
 
   public void NewGame()
   {
@@ -70,8 +79,14 @@ public class LevelMaster : Singleton<LevelMaster>
   public void PlayNextLevel()
   {
     // log the current level's data
-    FirebaseAnalytics.LogEventParameter("level_complete", JsonConvert.SerializeObject(new { level = GetLevel(), time_spent = levelTime }));
+    CacheSensitivityUse();
+
+    float flashlightRatio = Flashlight.Instance ? Flashlight.Instance.GetUseRatio() : 0f;
+
+    FirebaseAnalytics.LogEventParameter("level_complete", JsonConvert.SerializeObject(new { level = GetLevel(), time_spent = levelTime, flashlight_pct_on = flashlightRatio, sensitivity_x_avg = weightedSensitivitySum[0] / levelTime, sensitivity_y_avg = weightedSensitivitySum[1] / levelTime }));
     levelTime = 0f; // reset the counter
+    sensitivityTime = 0f;
+    weightedSensitivitySum = Vector2.zero;
 
     if (isLoading) return;
 

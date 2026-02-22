@@ -7,6 +7,9 @@ namespace Scripts.FirebaseScripts
 #if UNITY_WEBGL && !UNITY_EDITOR
 
     [DllImport("__Internal")]
+    private static extern string GetHostDomain();
+
+    [DllImport("__Internal")]
     public static extern void SetUserId(string id);
 
     /// <summary>
@@ -35,6 +38,7 @@ namespace Scripts.FirebaseScripts
     [DllImport("__Internal")]
     public static extern void LogEventParameter(string eventName, string eventParam);
 #else
+    public static string GetHostDomain() { return "editor"; }
     public static void SetUserId(string id) { }
     public static void SetUserProperties(string props) { }
     public static void LogEvent(string name) { }
