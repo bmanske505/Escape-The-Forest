@@ -2,6 +2,29 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
+
+		<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-auth-compat.js"></script>
+
+		<script>
+			const firebaseConfig = {
+				apiKey: "AIzaSyAwCZkNPd5wM3EJvOVVU4r_OYHx0qzSHoQ",
+				authDomain: "escape-the-forest-8fe9b.firebaseapp.com",
+				projectId: "escape-the-forest-8fe9b",
+				storageBucket: "escape-the-forest-8fe9b.firebasestorage.app",
+				messagingSenderId: "437342000393",
+				appId: "1:437342000393:web:d231ad8bd6400bba702fd8",
+				measurementId: "G-5CRCW35DMV",
+			};
+
+			firebase.initializeApp(firebaseConfig);
+			firebase.analytics();
+			firebase.auth();
+
+			console.log("Firebase compat initialized");
+		</script>
+
 		<style>
 			* {
 				margin: 0;
@@ -54,30 +77,6 @@
 					window.unityInstance = unityInstance;
 				},
 			);
-		</script>
-
-		<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics-compat.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-auth-compat.js"></script>
-
-		<script>
-			const firebaseConfig = {
-				apiKey: "AIzaSyAwCZkNPd5wM3EJvOVVU4r_OYHx0qzSHoQ",
-				authDomain: "escape-the-forest-8fe9b.firebaseapp.com",
-				projectId: "escape-the-forest-8fe9b",
-				storageBucket: "escape-the-forest-8fe9b.firebasestorage.app",
-				messagingSenderId: "437342000393",
-				appId: "1:437342000393:web:d231ad8bd6400bba702fd8",
-				measurementId: "G-5CRCW35DMV",
-			};
-
-			firebase.initializeApp(firebaseConfig);
-
-			// OPTIONAL but useful
-			firebase.analytics();
-			firebase.auth();
-
-			console.log("Firebase compat initialized");
 		</script>
 	</body>
 </html>
