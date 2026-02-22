@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+using Scripts.FirebaseScripts;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
@@ -50,6 +52,8 @@ public class Flashlight : MonoBehaviour
       {
         Off();
         GameUI.Instance.ShowBanner("\"Crap.\"");
+
+        FirebaseAnalytics.LogEventParameter("flashlight_died", JsonConvert.SerializeObject(new { level = LevelMaster.Instance.GetLevel() }));
       }
     }
     if (IsOn())

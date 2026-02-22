@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
 using Newtonsoft.Json;
+using System.Data.Common;
+
 
 
 #if UNITY_EDITOR
@@ -33,11 +35,12 @@ public class LevelMaster : Singleton<LevelMaster>
     // configure user settings firebase analytics logging
     if (!PlayerPrefs.HasKey("id"))
     {
-      string id = Guid.NewGuid().ToString();
-      PlayerPrefs.SetString("id", id);
+      PlayerPrefs.SetString("id", Guid.NewGuid().ToString());
       PlayerPrefs.Save();
     }
-    FirebaseAnalytics.SetUserProperties(JsonConvert.SerializeObject(new { id = PlayerPrefs.GetString("id"), version = Application.version, platform = Application.platform.ToString() }));
+    string id = PlayerPrefs.GetString("id");
+    FirebaseAnalytics.SetUserId(id);
+    FirebaseAnalytics.SetUserProperties(JsonConvert.SerializeObject(new { id = id, version = Application.version, platform = Application.platform.ToString() }));
   }
 
   void Update()
@@ -52,16 +55,15 @@ public class LevelMaster : Singleton<LevelMaster>
    * Public API
    * ======================= */
 
-  public void Restart()
+  public void NewGame()
   {
     PlayerPrefs.DeleteKey("inventory");
-    PlayerPrefs.SetFloat("flashlight_charge", 1f);
+    PlayerPrefs.DeleteKey("flashlight_charge");
     LoadLevel(0);
   }
 
-  public void ReplayLevel()
+  public void PlayCurrentLevel()
   {
-    if (isLoading) return;
     LoadLevel(GetLevel());
   }
 

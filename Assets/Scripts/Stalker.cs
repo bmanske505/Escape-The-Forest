@@ -1,4 +1,5 @@
 using System.Collections;
+using Newtonsoft.Json;
 using Scripts.FirebaseScripts;
 using UnityEngine;
 using UnityEngine.AI;
@@ -137,7 +138,7 @@ public class Stalker : MonoBehaviour
     if (other.CompareTag("Player"))
     {
       // Change so that player spawns at the start of the maze and the stalker resets
-      FirebaseAnalytics.LogEvent("player_died");
+      FirebaseAnalytics.LogEventParameter("player_died", JsonConvert.SerializeObject(new { level = LevelMaster.Instance.GetLevel() }));
       GameUI.Instance.ShowDeathPopup();
     }
     else if (other.CompareTag("Sibling"))
@@ -149,6 +150,7 @@ public class Stalker : MonoBehaviour
   public void Stun(float duration)
   {
     if (currentState == State.Stunned) return; // prevent chain stuns
+    FirebaseAnalytics.LogEventParameter("stalker_stunned", JsonConvert.SerializeObject(new { level = LevelMaster.Instance.GetLevel()}));
     StartCoroutine(StunRoutine(duration));
   }
 

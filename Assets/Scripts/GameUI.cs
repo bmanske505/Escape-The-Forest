@@ -151,9 +151,4 @@ public class GameUI : MonoBehaviour
 
     bannerGroup.alpha = to;
   }
-
-  public void ReplayLevel()
-  {
-    LevelMaster.Instance.ReplayLevel();
-  }
 }

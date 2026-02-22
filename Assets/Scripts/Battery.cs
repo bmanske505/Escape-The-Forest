@@ -1,10 +1,17 @@
+using Newtonsoft.Json;
+using Scripts.FirebaseScripts;
+
 public class Battery : Collectible
 {
   public float charge = 0.3f;
   public void OnCollect()
   {
     if (Flashlight.Instance.GetCharge() < 1f)
-    { // consume the battery
+    {
+
+      FirebaseAnalytics.LogEventParameter("battery_collected", JsonConvert.SerializeObject(new { level = LevelMaster.Instance.GetLevel() }));
+
+      // consume the battery
       GameUI.Instance.ShowBanner("\"I found a battery! Sweet!\"");
       Flashlight.Instance.Charge(charge);
       GameUI.Instance.UpdateFlashlightBar(Flashlight.Instance.GetCharge());

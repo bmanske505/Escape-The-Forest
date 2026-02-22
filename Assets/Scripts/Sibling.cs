@@ -100,7 +100,7 @@ public class Sibling : MonoBehaviour
       Player.Instance.AddToInventory("Echo");
     }
 
-    FirebaseAnalytics.LogEventParameter("sibling_hid", JsonConvert.SerializeObject(new { cause = context }));
+    FirebaseAnalytics.LogEventParameter("sibling_hid", JsonConvert.SerializeObject(new { level = LevelMaster.Instance.GetLevel(), cause = context }));
   }
 
 
@@ -114,5 +114,6 @@ public class Sibling : MonoBehaviour
   public void Respond()
   {
     audioSrc.Play();
+    FirebaseAnalytics.LogEventParameter("echo_used", JsonConvert.SerializeObject(new { level = LevelMaster.Instance.GetLevel() }));
   }
 }
