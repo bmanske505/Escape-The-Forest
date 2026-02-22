@@ -1,14 +1,15 @@
 mergeInto(LibraryManager.library, {
+	GetHostDomain: function () {
+		var host = window.location.hostname || "unknown";
+		console.log("FirebaseAnalytics: GetHostDomain called", host);
+		return stringToNewUTF8(host);
+	},
 
-  GetHostDomain: function () {
-    var host = window.location.hostname || "unknown";
-    return allocateUTF8(host);
-  },
-
-  SetUserId: function (idPtr) {
-    const id = UTF8ToString(idPtr);
-    firebase.analytics().setUserId(id);
-  },
+	SetUserId: function (idPtr) {
+		const id = UTF8ToString(idPtr);
+		console.log("FirebaseAnalytics: SetUserId called", id);
+		firebase.analytics().setUserId(id);
+	},
 
 	SetUserProperties: function (properties) {
 		var props = JSON.parse(UTF8ToString(properties));
