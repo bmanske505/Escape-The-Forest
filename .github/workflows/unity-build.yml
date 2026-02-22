@@ -44,7 +44,7 @@ jobs:
           targetPlatform: WebGL
           unityVersion: 6000.3.5f1
           buildsPath: build
-          versioning: none   # <-- add this line to preserve your ProjectSettings version
+          versioning: None   # <-- add this line to preserve your ProjectSettings version
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
