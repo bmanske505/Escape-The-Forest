@@ -332,8 +332,8 @@ Camera:
   m_GameObject: {fileID: 8711823549261042073}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.045656826, g: 0.084905684, b: 0.026032405, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -611,7 +611,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   cameraPivot: {fileID: 34324232110295040}
-  mouseSensitivity: 50
   minPitch: -40
   maxPitch: 40
   siblingPrefab: {fileID: 7096211616557163575, guid: 5ecf42d14cac04963bbaaf185bc1eb1c, type: 3}

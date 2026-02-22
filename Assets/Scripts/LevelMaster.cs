@@ -25,7 +25,7 @@ public class LevelMaster : Singleton<LevelMaster>
   private string[] scenes;
 
   private bool isLoading = false;
-  public float levelTime = 0f; // for timing each level
+  private float levelTime = 0f; // for timing each level
 
   protected override void Awake()
   {
@@ -97,6 +97,7 @@ public class LevelMaster : Singleton<LevelMaster>
     }
 
     PlayerPrefs.SetInt("level_index", index);
+
     LoadScene(scenes[index]);
   }
 

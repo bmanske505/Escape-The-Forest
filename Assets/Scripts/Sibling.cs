@@ -30,6 +30,12 @@ public class Sibling : MonoBehaviour
     audioSrc = GetComponent<AudioSource>();
   }
 
+  void OnDestroy()
+  {
+    if (Instance == this)
+      Instance = null;
+  }
+
   void Start()
   {
     collectible = GetComponentInChildren<Collectible>();

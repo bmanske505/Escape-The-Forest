@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
   public Vector3 siblingSpawnOffset = new Vector3(0f, 0f, 0f);
 
   private float pitch;
+  private string localInventory;
 
   private InputAction lookAction;
   private Vector2 lookInput;
@@ -99,13 +100,17 @@ public class Player : MonoBehaviour
 
   public void AddToInventory(string name)
   {
-    string inventory = PlayerPrefs.GetString("inventory", "");
-    if (inventory != "") // we have at least one item, add a comma
+    if (localInventory != "") // we have at least one item, add a comma
     {
-      inventory += ",";
+      localInventory += ",";
     }
-    PlayerPrefs.SetString("inventory", inventory + name);
+    localInventory += name;
     EnableComponent(name);
+  }
+
+  public string GetInventory()
+  {
+    return localInventory;
   }
 
   private void EnableComponent(string name)

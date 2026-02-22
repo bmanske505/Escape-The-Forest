@@ -28,7 +28,6 @@ public class GameUI : MonoBehaviour
   void Awake()
   {
     Instance = this;
-
     // Ensure banner starts hidden
     if (bannerGroup != null)
     {
@@ -37,9 +36,21 @@ public class GameUI : MonoBehaviour
     }
   }
 
+  void OnDestroy()
+  {
+    if (Instance == this)
+      Instance = null;
+  }
+
   void Start()
   {
     UpdateLevelBar();
+  }
+
+  // used by the death popup
+  public void Retry()
+  {
+    LevelMaster.Instance.PlayCurrentLevel();
   }
 
   public void UpdateLevelBar()

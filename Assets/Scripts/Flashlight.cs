@@ -15,6 +15,7 @@ public class Flashlight : MonoBehaviour
   public float stunDuration = 5f;
   public LayerMask detectionMask; // Stalker + environment
   public static Flashlight Instance;
+  private static float charge;
 
   [Header("Input")]
   InputAction flashInput;
@@ -23,9 +24,16 @@ public class Flashlight : MonoBehaviour
 
   public void Awake()
   {
-    beam = GetComponent<Light>();
     Instance = this;
+    beam = GetComponent<Light>();
     flashInput = InputSystem.actions.FindAction("Flash");
+    SetCharge(PlayerPrefs.GetFloat("flashlight_charge", 1f));
+  }
+
+  void OnDestroy()
+  {
+    if (Instance == this)
+      Instance = null;
   }
 
   void OnEnable()
@@ -132,7 +140,7 @@ public class Flashlight : MonoBehaviour
 
   public float GetCharge()
   {
-    return PlayerPrefs.GetFloat("flashlight_charge", 1f);
+    return charge;
   }
 
   public void Charge(float amount)
@@ -142,7 +150,7 @@ public class Flashlight : MonoBehaviour
 
   public void SetCharge(float newCharge)
   {
-    PlayerPrefs.SetFloat("flashlight_charge", Mathf.Clamp01(newCharge));
+    charge = Mathf.Clamp01(newCharge);
   }
 
 }

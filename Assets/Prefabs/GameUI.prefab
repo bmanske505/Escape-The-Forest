@@ -1750,7 +1750,7 @@ RectTransform:
   m_Father: {fileID: 6347345127357181180}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2122,7 +2122,7 @@ GameObject:
   - component: {fileID: 2374570647457500873}
   - component: {fileID: 6987640955259286253}
   m_Layer: 5
-  m_Name: ExitButton
+  m_Name: TryAgainButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2232,7 +2232,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 7291728148109573312}
         m_TargetAssemblyTypeName: GameUI, Assembly-CSharp
-        m_MethodName: ReplayLevel
+        m_MethodName: Retry
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

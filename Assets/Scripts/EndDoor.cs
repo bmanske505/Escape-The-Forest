@@ -13,6 +13,12 @@ public class EndDoor : MonoBehaviour
       }
       else
       {
+        // bank info from this level
+        if (Flashlight.Instance)
+        {
+          PlayerPrefs.SetFloat("flashlight_charge", Flashlight.Instance.GetCharge());
+        }
+        PlayerPrefs.SetString("inventory", Player.Instance.GetInventory());
         LevelMaster.Instance.PlayNextLevel();
       }
     }

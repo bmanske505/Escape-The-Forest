@@ -167,6 +167,7 @@ public class Stalker : MonoBehaviour
     yield return new WaitForSeconds(duration);
 
     currentState = State.Wandering;
+    agent.speed = wanderSpeed; // <-- reset speed
     agent.isStopped = false;
   }
 }
