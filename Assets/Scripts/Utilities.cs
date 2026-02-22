@@ -30,7 +30,6 @@ public static class Utilities
 
     for (int i = 0; i < maxAttempts; i++)
     {
-      Debug.LogWarning("Finding new target: Iteration #" + i);
       // Pick a direction and overshoot slightly to help in mazes
       Vector3 dir = Random.insideUnitSphere;
       dir.y = 0f;

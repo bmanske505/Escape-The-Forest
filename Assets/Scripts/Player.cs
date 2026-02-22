@@ -75,11 +75,11 @@ public class Player : MonoBehaviour
 
   void HandleLook()
   {
-    pitch -= lookInput.y * PlayerPrefs.GetFloat("sensitivity_y") * lookScaler * Time.deltaTime;
+    pitch -= lookInput.y * PlayerPrefs.GetFloat("sensitivity_y", 100f) * lookScaler * Time.deltaTime;
     pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
     cameraPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
 
-    float yaw = lookInput.x * PlayerPrefs.GetFloat("sensitivity_x") * lookScaler * Time.deltaTime;
+    float yaw = lookInput.x * PlayerPrefs.GetFloat("sensitivity_x", 100f) * lookScaler * Time.deltaTime;
     transform.Rotate(0f, yaw, 0f, Space.World);
   }
 
