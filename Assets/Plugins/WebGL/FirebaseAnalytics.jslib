@@ -1,9 +1,9 @@
 mergeInto(LibraryManager.library, {
-  
+
   SetUserId: function (idPtr) {
     const id = UTF8ToString(idPtr);
     firebase.analytics().setUserId(id);
-  }
+  },
 
 	SetUserProperties: function (properties) {
 		var props = JSON.parse(UTF8ToString(properties));
