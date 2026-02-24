@@ -29,7 +29,7 @@ public class LevelMaster : Singleton<LevelMaster>
   private Vector2 weightedSensitivitySum = Vector2.zero;
   private float sensitivityTime = 0f;
 
-=  protected override void Awake()
+  protected override void Awake()
   {
     base.Awake();
     CacheSceneNames();
