@@ -1,4 +1,8 @@
 using System.Runtime.InteropServices;
+using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using UnityEngine;
 
 namespace Scripts.FirebaseScripts
 {
@@ -9,16 +13,14 @@ namespace Scripts.FirebaseScripts
     private static extern void LogDocumentToFirebase(string collectionName, string jsonData);
 #if UNITY_WEBGL && !UNITY_EDITOR
 
-    public static void LogDocument(string collectionName, object jsonData)
+    public static void LogDocument(string collectionName, object obj)
     {
-      // Convert original object to JSON string first
-      string originalJson = JsonUtility.ToJson(jsonData);
-
       // Deserialize to a Dictionary for flexibility
-      var dict = JsonUtility.FromJson<SerializableDictionary>(originalJson).ToDictionary();
+      var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(obj));
 
       // Add extra fields
       dict["userId"] = PlayerPrefs.GetString("id", "unregistered");
+      dict["playthrough"] = PlayerPrefs.GetInt("playthrough", 0);
       dict["version"] = Application.version;
       dict["platform"] = Application.platform.ToString();
       dict["domain"] = Application.absoluteURL;
@@ -26,7 +28,7 @@ namespace Scripts.FirebaseScripts
       dict["sensitivity_y"] = PlayerPrefs.GetFloat("sensitivity_y", 100f);
 
       // Convert back to JSON
-      string enrichedJson = JsonUtility.ToJson(new SerializableDictionary(dict));
+      string enrichedJson = JsonConvert.SerializeObject(dict);
 
       // Send to Firebase
       LogDocumentToFirebase(collectionName, enrichedJson);
