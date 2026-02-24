@@ -4,7 +4,7 @@
 		<meta charset="utf-8" />
 
 		<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics-compat.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore-compat.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-auth-compat.js"></script>
 
 		<script>
@@ -19,7 +19,7 @@
 			};
 
 			firebase.initializeApp(firebaseConfig);
-			firebase.analytics();
+			firebase.firestore();
 			firebase.auth();
 
 			console.log("Firebase compat initialized");
@@ -72,11 +72,8 @@
 				productVersion: "{{{ PRODUCT_VERSION }}}",
 			};
 			var script = document.createElement("script");
-			createUnityInstance(document.querySelector("#unity-canvas"), config, (progress) => {}).then(
-				(unityInstance) => {
-					window.unityInstance = unityInstance;
-				},
-			);
+			createUnityInstance(document.querySelector("#unity-canvas"), config);
 		</script>
+		<script type="module" src="firebase_manager.js"></script>
 	</body>
 </html>

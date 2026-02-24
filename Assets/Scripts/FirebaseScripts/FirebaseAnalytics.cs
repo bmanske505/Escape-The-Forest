@@ -22,8 +22,8 @@ namespace Scripts.FirebaseScripts
       dict["version"] = Application.version;
       dict["platform"] = Application.platform.ToString();
       dict["domain"] = Application.absoluteURL;
-      dict["sensitivity_x"] = PlayerPrefs.GetFloat("sensitivity_x", 100f)
-      dict["sensitivity_y"] = PlayerPrefs.GetFloat("sensitivity_y", 100f)
+      dict["sensitivity_x"] = PlayerPrefs.GetFloat("sensitivity_x", 100f);
+      dict["sensitivity_y"] = PlayerPrefs.GetFloat("sensitivity_y", 100f);
 
       // Convert back to JSON
       string enrichedJson = JsonUtility.ToJson(new SerializableDictionary(dict));
