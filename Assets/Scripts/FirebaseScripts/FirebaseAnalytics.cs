@@ -4,45 +4,36 @@ namespace Scripts.FirebaseScripts
 {
   public static class FirebaseAnalytics
   {
+
+    [DllImport("__Internal")]
+    private static extern void LogDocumentToFirebase(string collectionName, string jsonData);
 #if UNITY_WEBGL && !UNITY_EDITOR
 
-    [DllImport("__Internal")]
-    public static extern string GetHostDomain();
+    public static void LogDocument(string collectionName, object jsonData)
+    {
+      // Convert original object to JSON string first
+      string originalJson = JsonUtility.ToJson(jsonData);
 
-    [DllImport("__Internal")]
-    public static extern void SetUserId(string id);
+      // Deserialize to a Dictionary for flexibility
+      var dict = JsonUtility.FromJson<SerializableDictionary>(originalJson).ToDictionary();
 
-    /// <summary>
-    /// Setup current user's properties
-    /// </summary>
-    /// <param name="props">JSON-formatted string of the property
-    /// ex : {"name":"MonsterName", "lives":"3"}
-    /// </param>
-    [DllImport("__Internal")]
-    public static extern void SetUserProperties(string props);
+      // Add extra fields
+      dict["userId"] = PlayerPrefs.GetString("id", "unregistered");
+      dict["version"] = Application.version;
+      dict["platform"] = Application.platform.ToString();
+      dict["domain"] = Application.absoluteURL;
+      dict["sensitivity_x"] = PlayerPrefs.GetFloat("sensitivity_x", 100f)
+      dict["sensitivity_y"] = PlayerPrefs.GetFloat("sensitivity_y", 100f)
 
-    /// <summary>
-    /// Log an event without parameter
-    /// </summary>
-    /// <param name="eventName">Name of the event</param>
-    [DllImport("__Internal")]
-    public static extern void LogEvent(string eventName);
+      // Convert back to JSON
+      string enrichedJson = JsonUtility.ToJson(new SerializableDictionary(dict));
 
-    /// <summary>
-    /// Log an event with parameter
-    /// </summary>
-    /// <param name="eventName">Name of the event</param>
-    /// <param name="eventParam">JSON-formatted string of parameter.
-    /// ex : {"name":"MonsterName", "lives":"3"}
-    /// </param>
-    [DllImport("__Internal")]
-    public static extern void LogEventParameter(string eventName, string eventParam);
+      // Send to Firebase
+      LogDocumentToFirebase(collectionName, enrichedJson);
+    }
+
 #else
-    public static string GetHostDomain() { return "editor"; }
-    public static void SetUserId(string id) { }
-    public static void SetUserProperties(string props) { }
-    public static void LogEvent(string name) { }
-    public static void LogEventParameter(string name, string param) { }
+    public static void LogDocument(string collectionName, object jsonData) { }
 #endif
   }
 }

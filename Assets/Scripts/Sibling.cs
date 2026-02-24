@@ -111,13 +111,13 @@ public class Sibling : MonoBehaviour
       Player.Instance.AddToInventory("Echo");
     }
 
-    FirebaseAnalytics.LogEventParameter("sibling_hid", JsonConvert.SerializeObject(new { level = LevelMaster.Instance.GetLevel(), cause = context }));
+    FirebaseAnalytics.LogDocument("sibling_hid", JsonConvert.SerializeObject(new { level = LevelMaster.Instance.GetLevel(), cause = context }));
   }
 
 
   public void Unhide()
   {
-    FirebaseAnalytics.LogEventParameter("sibling_found", JsonConvert.SerializeObject(new { time_spent = hidingTimer }));
+    FirebaseAnalytics.LogDocument("sibling_found", JsonConvert.SerializeObject(new { time_spent = hidingTimer }));
     hidingTimer = 0f;
 
     GameUI.Instance.ShowBanner("\"There you are! Don't go running off again, you hear me?\"");
@@ -128,6 +128,6 @@ public class Sibling : MonoBehaviour
   public void Respond()
   {
     audioSrc.Play();
-    FirebaseAnalytics.LogEventParameter("echo_used", JsonConvert.SerializeObject(new { level = LevelMaster.Instance.GetLevel() }));
+    FirebaseAnalytics.LogDocument("echo_used", JsonConvert.SerializeObject(new { level = LevelMaster.Instance.GetLevel() }));
   }
 }

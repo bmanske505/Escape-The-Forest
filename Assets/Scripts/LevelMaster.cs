@@ -41,8 +41,6 @@ public class LevelMaster : Singleton<LevelMaster>
       PlayerPrefs.Save();
     }
     string id = PlayerPrefs.GetString("id");
-    FirebaseAnalytics.SetUserId(id);
-    FirebaseAnalytics.SetUserProperties(JsonConvert.SerializeObject(new { id = id, version = Application.version, platform = Application.platform.ToString(), domain = FirebaseAnalytics.GetHostDomain() }));
   }
 
   void Update()
@@ -68,6 +66,7 @@ public class LevelMaster : Singleton<LevelMaster>
   {
     PlayerPrefs.DeleteKey("inventory");
     PlayerPrefs.DeleteKey("flashlight_charge");
+    PlayerPrefs.SetInt("playthrough", PlayerPrefs.GetInt("playthrough", 0) + 1);
     LoadLevel(0);
   }
 
@@ -83,7 +82,7 @@ public class LevelMaster : Singleton<LevelMaster>
 
     float flashlightRatio = Flashlight.Instance ? Flashlight.Instance.GetUseRatio() : 0f;
 
-    FirebaseAnalytics.LogEventParameter("level_complete", JsonConvert.SerializeObject(new { level = GetLevel(), time_spent = levelTime, flashlight_pct_on = flashlightRatio, sensitivity_x_avg = weightedSensitivitySum[0] / levelTime, sensitivity_y_avg = weightedSensitivitySum[1] / levelTime }));
+    FirebaseAnalytics.LogDocument("level_complete", JsonConvert.SerializeObject(new { level = GetLevel(), time_spent = levelTime, flashlight_pct_on = flashlightRatio, sensitivity_x_avg = weightedSensitivitySum[0] / levelTime, sensitivity_y_avg = weightedSensitivitySum[1] / levelTime }));
     levelTime = 0f; // reset the counter
     sensitivityTime = 0f;
     weightedSensitivitySum = Vector2.zero;

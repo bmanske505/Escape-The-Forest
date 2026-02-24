@@ -29,8 +29,6 @@ public class SettingsManager : Singleton<SettingsManager>
     float sensitivityY = PlayerPrefs.GetFloat("sensitivity_y", 100f);
     sensitivityYText.text = $"Look Y Sensitivity: {sensitivityY}";
     sensitivityYSlider.value = sensitivityY;
-
-    FirebaseAnalytics.SetUserProperties(JsonConvert.SerializeObject(new { sensitivity_x = PlayerPrefs.GetFloat("sensitivity_x", 100f), sensitivity_y = PlayerPrefs.GetFloat("sensitivity_y", 100f) }));
   }
 
   void OnEnable()
@@ -83,8 +81,6 @@ public class SettingsManager : Singleton<SettingsManager>
     if (!settingsMenu.activeSelf) // we just closed the settings, save the settings to disk!
     {
       PlayerPrefs.Save();
-      FirebaseAnalytics.SetUserProperties(JsonConvert.SerializeObject(new { sensitivity_x = PlayerPrefs.GetFloat("sensitivity_x", 100f), sensitivity_y = PlayerPrefs.GetFloat("sensitivity_y", 100f) }));
-
       LevelMaster.Instance.CacheSensitivityUse();
     }
   }

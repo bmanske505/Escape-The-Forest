@@ -9,7 +9,7 @@ public class Battery : Collectible
     if (Flashlight.Instance.GetCharge() < 1f)
     {
 
-      FirebaseAnalytics.LogEventParameter("battery_collected", JsonConvert.SerializeObject(new { level = LevelMaster.Instance.GetLevel() }));
+      FirebaseAnalytics.LogDocument("battery_collected", JsonConvert.SerializeObject(new { level = LevelMaster.Instance.GetLevel() }));
 
       // consume the battery
       GameUI.Instance.ShowBanner("\"I found a battery! Sweet!\"");
