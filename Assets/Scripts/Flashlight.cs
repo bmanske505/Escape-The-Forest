@@ -70,7 +70,7 @@ public class Flashlight : MonoBehaviour
         Off();
         GameUI.Instance.ShowBanner("\"Crap.\"");
 
-        FirebaseAnalytics.LogDocument("flashlight_died", JsonConvert.SerializeObject(new { level = LevelMaster.Instance.GetLevel() }));
+        FirebaseAnalytics.LogDocument("flashlight_died", new { level = LevelMaster.Instance.GetLevel() });
       }
     }
     if (IsOn())
