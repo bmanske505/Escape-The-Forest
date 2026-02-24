@@ -29,7 +29,7 @@ public class LevelMaster : Singleton<LevelMaster>
   private Vector2 weightedSensitivitySum = Vector2.zero;
   private float sensitivityTime = 0f;
 
-  protected override void Awake()
+=  protected override void Awake()
   {
     base.Awake();
     CacheSceneNames();
@@ -82,7 +82,7 @@ public class LevelMaster : Singleton<LevelMaster>
 
     float flashlightRatio = Flashlight.Instance ? Flashlight.Instance.GetUseRatio() : 0f;
 
-    FirebaseAnalytics.LogDocument("level_complete", new { level = GetLevel(), time_spent = levelTime, flashlight_pct_on = flashlightRatio, sensitivity_x_avg = weightedSensitivitySum[0] / levelTime, sensitivity_y_avg = weightedSensitivitySum[1] / levelTime });
+    FirebaseAnalytics.LogDocument("level_complete", new { level = GetLevel(), time_spent = levelTime, flashlight_pct_on = flashlightRatio }); //, sensitivity_x_avg = weightedSensitivitySum[0] / levelTime, sensitivity_y_avg = weightedSensitivitySum[1] / levelTime });
     levelTime = 0f; // reset the counter
     sensitivityTime = 0f;
     weightedSensitivitySum = Vector2.zero;
