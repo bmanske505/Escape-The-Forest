@@ -15,9 +15,6 @@ namespace Scripts.FirebaseScripts
 
     public static void LogDocument(string collectionName, object obj)
     {
-
-      console.log(collectionName, obj);
-
       // Deserialize to a Dictionary for flexibility
       var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(JsonConvert.SerializeObject(obj));
 
