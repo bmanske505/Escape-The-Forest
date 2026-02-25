@@ -1,33 +1,71 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
-# --- Step 1: Load CSV ---
-csv_path = "firestore2csv/local/1.csv"
-df = pd.read_csv(csv_path)
+# This script should be ran from the root "Escape the Forest" folder
 
-# --- Step 2: Columns & friendly titles ---
-x_col = "level"
-x_title = "Game Level"
+CSV_PATH = "Data/firestore2csv/local/"
+PNG_PATH = "Data/plots/"
 
-# Numeric y columns
-y_cols = ["flashlight_pct_on", "time_spent"]  # you can add timestamp if numeric
-y_titles = {
-    "flashlight_pct_on": ("Flashlight On", 'red', "% of level"),
-    "time_spent": (f"Time Spent", 'blue', "seconds"),
-    # "timestamp": "Timestamp (s)"  # optional if numeric
-}
+############### Utility functions ####################
 
-# --- Step 3: Compute average across all users per level ---
-avg_df = df.groupby(x_col)[y_cols].mean().reset_index()
+def get_df_from_csv(csv_name):
+    """
+    Builds a dataframe from a csv file
 
-for y_col in y_cols:
-    plt.figure()
-    y_title, y_color, y_unit = y_titles[y_col]
-    plt.plot(avg_df[x_col] + 1, avg_df[y_col], label=f"Average {y_title}", color=y_color, marker='o')
-    plt.xlabel(x_title)
-    plt.ylabel(f"{y_title} ({y_unit})")
-    plt.title(f"{y_title} over {x_title}")
+    Args:
+      csv_name (str): CSV file name inside CSV_PATH
+    
+    Returns:
+      a DataFrame built from the given csv file
+    """
+    csv_path = os.path.join(CSV_PATH, csv_name)
+    return pd.read_csv(csv_path)
+
+def save_plot(plot, name):
+    """
+    Saves a matplotlib plot to PNG_PATH with the given name.
+
+    Args:
+        plot: The matplotlib.pyplot object (usually plt)
+        name (str): File name to save (without path)
+    """
+    os.makedirs(PNG_PATH, exist_ok=True)  # Ensure directory exists
+    path = os.path.join(PNG_PATH, name)
+    plot.savefig(path)
+    #plot.close()  # Close figure to free memory
+    print(f"Plot saved to {path}")
+
+############### Defining the actual plots functions ####################
+
+def plot_1():
+    df = get_df_from_csv("1.csv")
+
+    # add a new column for overall flashlight info (convert % to seconds)
+    df['time_flashlight_on'] = df['flashlight_pct_on'] * df['time_spent']
+
+    # convert seconds info to minutes
+    df['time_spent'] /= 60
+    df["time_flashlight_on"] /= 60
+
+    # aggregate data by users
+    df = df.groupby('level')[['time_spent', 'time_flashlight_on']].mean()
+    levels = df.index + 1
+
+    print(df)
+
+    plot = plt.figure()
+    plt.bar(levels, df['time_spent'], color='blue', label='Exploring Maze')
+    plt.bar(levels, df["time_flashlight_on"], color="orange", label="Flashlight On")
+
     plt.legend()
-    plt.grid(True)
-plt.tight_layout()
-plt.show()
+    plt.title('Flashlight Usage & Time Spent by Level')
+    plt.xlabel('Level')
+    plt.ylabel('Time (average minutes per user)')
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+
+    save_plot(plot, "flashlight usage by level")
+
+############### Calling the plots functions ####################
+
+plot_1()
