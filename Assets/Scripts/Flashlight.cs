@@ -59,7 +59,6 @@ public class Flashlight : MonoBehaviour
 
   void Update()
   {
-    print($"Saved charge: {PlayerPrefs.GetFloat("flashlight_charge")}, local charge: {localCharge}");
     if (Time.timeScale == 0f || !Player.Instance) return; // player not in game or paused
 
     totalTime += Time.deltaTime;

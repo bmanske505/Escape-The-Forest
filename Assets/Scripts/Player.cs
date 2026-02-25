@@ -73,7 +73,6 @@ public class Player : MonoBehaviour
   void Update()
   {
     HandleLook();
-    print($"Saved inventory: {PlayerPrefs.GetString("inventory")}, local inventory: {localInventory}");
   }
 
   void HandleLook()
