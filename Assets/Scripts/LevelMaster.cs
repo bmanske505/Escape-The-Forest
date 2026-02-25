@@ -76,6 +76,9 @@ public class LevelMaster : Singleton<LevelMaster>
 
   public void PlayNextLevel()
   {
+
+    if (isLoading) return;
+
     // log the current level's data
     CacheSensitivityUse();
 
@@ -85,8 +88,6 @@ public class LevelMaster : Singleton<LevelMaster>
     levelTime = 0f; // reset the counter
     sensitivityTime = 0f;
     weightedSensitivitySum = Vector2.zero;
-
-    if (isLoading) return;
 
     int nextIndex = GetLevel() + 1;
     if (nextIndex >= scenes.Length)
