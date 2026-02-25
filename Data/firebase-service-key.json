@@ -1,0 +1,7 @@
+{
+	"type": "service_account",
+	"project_id": "your-project-id",
+	"private_key_id": "REDACTED",
+	"private_key": "REDACTED",
+	"client_email": "firebase-adminsdk@your-project.iam.gserviceaccount.com"
+}
