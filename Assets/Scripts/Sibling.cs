@@ -91,6 +91,7 @@ public class Sibling : MonoBehaviour
 
   public void Hide(string context)
   {
+    return;
     Vector3 spot = Utilities.GetNavTarget(player.transform.position, hideRange, agent);
 
     // Warp FIRST so no accidental pickup

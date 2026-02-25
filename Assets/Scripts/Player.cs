@@ -16,7 +16,7 @@ public class Player : MonoBehaviour
   public Vector3 siblingSpawnOffset = new Vector3(0f, 0f, 0f);
 
   private float pitch;
-  private string localInventory;
+  private static string localInventory;
 
   private InputAction lookAction;
   private Vector2 lookInput;
@@ -25,6 +25,7 @@ public class Player : MonoBehaviour
   {
     Instance = this;
     lookAction = InputSystem.actions.FindAction("Look");
+    localInventory = PlayerPrefs.GetString("inventory", "");
     PopulateInventory();
   }
 
@@ -72,6 +73,7 @@ public class Player : MonoBehaviour
   void Update()
   {
     HandleLook();
+    print($"Saved inventory: {PlayerPrefs.GetString("inventory")}, local inventory: {localInventory}");
   }
 
   void HandleLook()
@@ -86,9 +88,7 @@ public class Player : MonoBehaviour
 
   void PopulateInventory()
   {
-    string[] inventory = PlayerPrefs
-    .GetString("inventory", "")
-    .Split(',', System.StringSplitOptions.RemoveEmptyEntries);
+    string[] inventory = localInventory.Split(',', System.StringSplitOptions.RemoveEmptyEntries);
 
     foreach (string item in inventory)
     {

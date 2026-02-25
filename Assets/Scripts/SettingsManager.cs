@@ -33,12 +33,14 @@ public class SettingsManager : Singleton<SettingsManager>
 
   void OnEnable()
   {
-    settingsAction.performed += OnToggleSettings;
+    if (settingsAction != null)
+      settingsAction.performed += OnToggleSettings;
   }
 
   void OnDisable()
   {
-    settingsAction.performed -= OnToggleSettings;
+    if (settingsAction != null)
+      settingsAction.performed -= OnToggleSettings;
   }
 
   public void SetMouseSensitivityX(float value)
@@ -55,6 +57,7 @@ public class SettingsManager : Singleton<SettingsManager>
 
   public void OnToggleSettings(CallbackContext context)
   {
+    if (Time.timeScale == 0f && !settingsMenu.activeSelf) return; // prevent if already in another popup
     TogglePopup();
   }
 
@@ -80,7 +83,6 @@ public class SettingsManager : Singleton<SettingsManager>
 
     if (!settingsMenu.activeSelf) // we just closed the settings, save the settings to disk!
     {
-      PlayerPrefs.Save();
       LevelMaster.Instance.CacheSensitivityUse();
     }
   }

@@ -40,7 +40,6 @@ public class LevelMaster : Singleton<LevelMaster>
       PlayerPrefs.SetString("id", Guid.NewGuid().ToString());
       PlayerPrefs.Save();
     }
-    string id = PlayerPrefs.GetString("id");
   }
 
   void Update()
@@ -97,7 +96,6 @@ public class LevelMaster : Singleton<LevelMaster>
     }
 
     LoadLevel(nextIndex);
-    PlayerPrefs.Save();
   }
 
   public void LoadLevel(int index)

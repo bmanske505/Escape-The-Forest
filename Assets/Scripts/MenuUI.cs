@@ -5,7 +5,8 @@ public class MenuUI : MonoBehaviour
 {
   public void Start()
   {
-    GameObject.Find("ContinueButton").GetComponent<Button>().interactable = LevelMaster.Instance.GetLevel() != 0;
+    if (GameObject.Find("ContinueButton")?.GetComponent<Button>() is Button b)
+      b.interactable = LevelMaster.Instance.GetLevel() != 0;
   }
 
   public void Toggle(GameObject obj)
