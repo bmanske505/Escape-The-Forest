@@ -101,3 +101,7 @@ InitTestScene*.unity*
 # Unity user-specific files
 UserSettings/
 *.dwlt
+
+# Data stuff
+Data/firestore2csv
+Data/firebase-service-key.json
