@@ -1,6 +1,7 @@
 import math
 import subprocess
 
+from matplotlib.figure import Figure
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -87,6 +88,7 @@ def fig_to_png(fig: plt.Figure, name: str):
 
 ############### Defining the actual plots functions ####################
 
+
 # this is kinda replaced by the violin plot
 def stacked_bar():
     df = firestore_to_df("level_complete", ["flashlight_pct_on", "time_spent", "level"])
@@ -102,8 +104,20 @@ def stacked_bar():
     df = df.groupby("level")[["time_spent", "time_flashlight_on"]].mean()
 
     fig = plt.figure()
-    plt.bar(LEVELS + 1, df["time_spent"], color="navy", edgecolor="black", label="Exploring Maze")
-    plt.bar(LEVELS + 1, df["time_flashlight_on"], color="gold", edgecolor="black", label="Flashlight On")
+    plt.bar(
+        LEVELS + 1,
+        df["time_spent"],
+        color="navy",
+        edgecolor="black",
+        label="Exploring Maze",
+    )
+    plt.bar(
+        LEVELS + 1,
+        df["time_flashlight_on"],
+        color="gold",
+        edgecolor="black",
+        label="Flashlight On",
+    )
 
     plt.legend()
     plt.title("Flashlight Usage & Time Spent by Level")
@@ -119,6 +133,30 @@ def level_plots():
         "level_complete",
         ["level", "flashlight_pct_on", "time_spent", "userId"],
     )
+
+    # bar plot of user retention
+    total_users = df["userId"].nunique()
+    print(f"Total users: {total_users}")
+
+    users_per_level = df.groupby("level")["userId"].nunique().sort_index()
+
+    pct_per_level = (users_per_level / total_users) * 100
+    fig, ax = plt.subplots()
+    ax.plot(pct_per_level.index, pct_per_level.values, marker="o")
+
+    ax.set_title("User Retention across Levels")
+
+    ax.set_xlabel("Level")
+    ax.set_ylabel("% of User Base Completed")
+
+    ax.set_xticks(LEVELS)
+    ax.set_xticklabels(LEVELS + 1)
+
+    ax.set_ylim(0, 100)
+    ax.grid(True, linestyle="--", alpha=0.6)
+
+    fig_to_png(fig, "level_completion_percentage")
+    plt.close(fig)
 
     # --- violin plot: time spent per level ---
     df["time_spent_minutes"] = df["time_spent"] / 60
@@ -136,7 +174,9 @@ def level_plots():
     positions = [lvl for lvl, data in zip(LEVELS, time_spent_by_level) if data.size > 0]
 
     fig, ax = plt.subplots()
-    parts = ax.violinplot(time_spent_by_level, positions=positions, showmedians=True)
+    parts = ax.violinplot(
+        time_spent_by_level, positions=positions, showmeans=True, showmedians=False
+    )
 
     for pc in parts["bodies"]:
         pc.set_facecolor("blue")
@@ -263,12 +303,14 @@ def death_plot():
         )
 
     ax.set_xlabel("Level")
+    ax.set_xticks(LEVELS)
+    ax.set_xticklabels(LEVELS + 1)
     ax.set_ylabel("# of Occurences (average per user)")
-    ax.set_title("Player Death & Fight by Level")
+    ax.set_title("Player Death vs. Stuns by Level")
     ax.legend()
     ax.grid(axis="y", linestyle="--", alpha=0.7)
 
-    fig_to_png(fig, "death_dot")
+    fig_to_png(fig, "death_bar_plot")
 
 
 def get_num_users():
@@ -280,7 +322,7 @@ def get_num_users():
 
 ############### Calling the plots functions ####################
 
+stacked_bar()
 level_plots()
 flashlight_plot()
 death_plot()
-get_num_users()
