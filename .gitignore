@@ -103,4 +103,5 @@ UserSettings/
 *.dwlt
 
 # Data stuff
-Data/local/*
+Data/firestore2csv/secret.json
+Data/tables/*
