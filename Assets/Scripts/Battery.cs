@@ -9,17 +9,17 @@ public class Battery : Collectible
     if (Flashlight.Instance.GetCharge() < 1f)
     {
 
-      FirebaseAnalytics.LogDocument("battery_collected", new { level = LevelMaster.Instance.GetLevel() });
+      FirebaseAnalytics.LogDocument("battery_collected", new { });
 
       // consume the battery
-      GameUI.Instance.ShowBanner("\"I found a battery! Sweet!\"");
+      GameUI.Instance?.ShowBanner("\"I found a battery! Sweet!\"");
       Flashlight.Instance.Charge(charge);
-      GameUI.Instance.UpdateFlashlightBar(Flashlight.Instance.GetCharge());
+      GameUI.Instance?.UpdateFlashlightBar(Flashlight.Instance.GetCharge());
       Destroy(gameObject);
     }
     else
     {
-      GameUI.Instance.ShowBanner("\"Cool, a battery! I don't think I need it just yet, though.");
+      GameUI.Instance?.ShowBanner("\"Cool, a battery! I don't think I need it just yet, though.");
     }
   }
 }

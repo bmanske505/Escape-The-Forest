@@ -9,7 +9,7 @@ public class Sibling : MonoBehaviour
   public static Sibling Instance;
 
   public float lostRadius = 5f; // The max distance the player can stray from sibling before being considered "abandoned"
-  public float lostTimeMax = 3f;   // Seconds between sibling getting abandoned and going into hiding
+  public float lostTimeMax = 5f;   // Seconds between sibling getting abandoned and going into hiding
   public Vector2 hideRange = new Vector2(0, 10); // Min and max for hiding
 
   private Transform player;
@@ -91,9 +91,26 @@ public class Sibling : MonoBehaviour
 
   public void Hide(string context)
   {
-    Vector3 spot = Utilities.GetNavTarget(player.transform.position, hideRange, agent);
+    string tag = "HidingSpot";
+    GameObject[] hidingSpots = GameObject.FindGameObjectsWithTag(tag);
+    Vector3 spot;
 
-    // Warp FIRST so no accidental pickup
+    // Specified behavior if none found
+    if (hidingSpots == null || hidingSpots.Length == 0)
+    {
+      Debug.LogWarning($"No GameObjects found with tag '{tag}'. Using fallback position.");
+      spot = Utilities.GetNavTarget(player.transform.position, hideRange, agent);
+    } else
+    {
+      int index = Random.Range(0, hidingSpots.Length);
+      spot = hidingSpots[index].transform.position;
+    }
+
+    Hide(context, spot);
+  }
+
+  public void Hide(string context, Vector3 spot)
+  {
     agent.Warp(spot);
     agent.ResetPath();
 
@@ -102,16 +119,16 @@ public class Sibling : MonoBehaviour
     // Now it’s safe to be collectible again
     collectible.SetActive(true);
 
-    GameUI.Instance.ShowBanner("\"Playing hide and seek again? Where did you go, little sibling?\"");
+    GameUI.Instance?.ShowBanner("\"Playing hide and seek again? Where did you go, little sibling?\"");
 
     numberTimesLost += 1;
     if (numberTimesLost == 2) // this is the second time they've lost sibling, let them echo!
     {
-      GameUI.Instance.ShowTutorialPopup("Echo", "I keep losing my little sibling! Maybe I should try calling out to them with SPACEBAR.");
+      GameUI.Instance?.ShowTutorialPopup("Echo", "I keep losing my little sibling! Maybe I should try calling out to them with SPACEBAR.");
       Player.Instance.AddToInventory("Echo");
     }
 
-    FirebaseAnalytics.LogDocument("sibling_hid", new { level = LevelMaster.Instance.GetLevel(), cause = context });
+    FirebaseAnalytics.LogDocument("sibling_hid", new { cause = context });
   }
 
 
@@ -120,7 +137,7 @@ public class Sibling : MonoBehaviour
     FirebaseAnalytics.LogDocument("sibling_found", new { time_spent = hidingTimer });
     hidingTimer = 0f;
 
-    GameUI.Instance.ShowBanner("\"There you are! Don't go running off again, you hear me?\"");
+    GameUI.Instance?.ShowBanner("\"There you are! Don't go running off again, you hear me?\"");
     IsHiding = false;
     collectible.SetActive(false);
   }
@@ -128,6 +145,6 @@ public class Sibling : MonoBehaviour
   public void Respond()
   {
     audioSrc.Play();
-    FirebaseAnalytics.LogDocument("echo_used", new { level = LevelMaster.Instance.GetLevel() });
+    FirebaseAnalytics.LogDocument("echo_used", new { });
   }
 }

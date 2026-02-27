@@ -9,7 +9,7 @@ public class EndDoor : MonoBehaviour
     {
       if (Sibling.Instance.IsHiding)
       {
-        GameUI.Instance.ShowBanner("\"I need to find my little sibling first!\"");
+        GameUI.Instance?.ShowBanner("\"I need to find my little sibling first!\"");
       }
       else
       {

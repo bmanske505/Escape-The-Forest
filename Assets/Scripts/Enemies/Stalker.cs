@@ -4,7 +4,7 @@ using Scripts.FirebaseScripts;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Stalker : MonoBehaviour
+public class Stalker : Enemy
 {
 
   [Header("Movement")]
@@ -24,22 +24,19 @@ public class Stalker : MonoBehaviour
   private Vector3 lastKnownPlayerPosition;
   private float wanderTimer;
 
-  private enum State { Wandering, Chasing, Searching, Stunned }
-  private State currentState;
-
   void Start()
   {
     agent = GetComponent<NavMeshAgent>();
     player = GameObject.FindGameObjectWithTag("Player").transform;
 
-    currentState = State.Wandering;
+    state = State.Wandering;
     wanderTimer = wanderInterval;
     wanderSpeed = agent.speed;
   }
 
   void Update()
   {
-    switch (currentState)
+    switch (state)
     {
       case State.Wandering:
         Wander();
@@ -84,7 +81,7 @@ public class Stalker : MonoBehaviour
     {
       agent.speed = wanderSpeed;
       agent.SetDestination(lastKnownPlayerPosition);
-      currentState = State.Searching;
+      state = State.Searching;
     }
   }
 
@@ -92,7 +89,7 @@ public class Stalker : MonoBehaviour
   {
     if (!agent.pathPending && agent.remainingDistance <= 0.5f)
     {
-      currentState = State.Wandering;
+      state = State.Wandering;
       wanderTimer = wanderInterval;
     }
   }
@@ -103,8 +100,8 @@ public class Stalker : MonoBehaviour
   {
     if (CanSeePlayer())
     {
-      GameUI.Instance.ShowBanner("\"RUN\"");
-      currentState = State.Chasing;
+      GameUI.Instance?.ShowBanner("\"RUN\"");
+      state = State.Chasing;
       lastKnownPlayerPosition = player.position;
     }
   }
@@ -130,33 +127,9 @@ public class Stalker : MonoBehaviour
     return true;
   }
 
-  // ================= PLAYER CATCH =================
-
-  void OnTriggerEnter(Collider other)
+  protected override IEnumerator StunRoutine(float duration)
   {
-    if (currentState == State.Stunned) return;
-    if (other.CompareTag("Player"))
-    {
-      // Change so that player spawns at the start of the maze and the stalker resets
-      FirebaseAnalytics.LogDocument("player_died", new { level = LevelMaster.Instance.GetLevel() });
-      GameUI.Instance.ShowDeathPopup();
-    }
-    else if (other.CompareTag("Sibling"))
-    {
-      other.GetComponent<Sibling>().Hide("stalker");
-    }
-  }
-
-  public void Stun(float duration)
-  {
-    if (currentState == State.Stunned) return; // prevent chain stuns
-    FirebaseAnalytics.LogDocument("stalker_stunned", new { level = LevelMaster.Instance.GetLevel() });
-    StartCoroutine(StunRoutine(duration));
-  }
-
-  private IEnumerator StunRoutine(float duration)
-  {
-    currentState = State.Stunned;
+    state = State.Stunned;
     agent.isStopped = true;
     agent.ResetPath(); // optional: immediately clear current destination
 
@@ -166,7 +139,7 @@ public class Stalker : MonoBehaviour
 
     yield return new WaitForSeconds(duration);
 
-    currentState = State.Wandering;
+    state = State.Wandering;
     agent.speed = wanderSpeed; // <-- reset speed
     agent.isStopped = false;
   }

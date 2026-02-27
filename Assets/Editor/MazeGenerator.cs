@@ -14,7 +14,7 @@ public class MazeGenerator : EditorWindow
     public string name;        // scene name
     public string maze;        // ASCII maze
     public Color lightColor = Color.white;
-    public float fog = 0f; // [0,1] normalized
+    public float fog = 0.25f; // [0,1] normalized
   }
 
   // Hard-coded levels
@@ -79,7 +79,6 @@ public class MazeGenerator : EditorWindow
         {
             name = "Level 4",
             lightColor = new Color(0.5f, 0f, 1f, 1f),
-            fog = 0.25f,
             maze =
 @"
 ###################E#
@@ -102,7 +101,6 @@ public class MazeGenerator : EditorWindow
         {
             name = "Level 5",
             lightColor = new Color(0.3f, 0.3f, 0.3f, 1f),
-            fog = 0.5f,
             maze =
 @"
 #########################
@@ -126,7 +124,6 @@ public class MazeGenerator : EditorWindow
         new Level
         {
             name = "Level 6",
-            fog = 0.6f,
             lightColor = new Color(0.2f, 0.2f, 0.2f, 1f),
             maze =
 @"
@@ -153,7 +150,6 @@ public class MazeGenerator : EditorWindow
         {
 
             name = "Level 7",
-            fog = 0.7f,
             lightColor = new Color(0.1f, 0.1f, 0.1f, 1f),
             maze =
 @"
@@ -318,7 +314,7 @@ public class MazeGenerator : EditorWindow
     RenderSettings.ambientLight = level.lightColor;
 
     RenderSettings.fog = true;
-    RenderSettings.fogColor = Color.black;
+    RenderSettings.fogColor = level.lightColor;
     RenderSettings.fogDensity = level.fog;
 
 

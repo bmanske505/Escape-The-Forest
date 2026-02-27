@@ -20,14 +20,14 @@ public class StartDoor : MonoBehaviour
 
   void Start()
   {
-    GameUI.Instance.ShowBanner("I need to go home...");
+    GameUI.Instance?.ShowBanner("I need to go home...");
   }
 
   void OnTriggerEnter(Collider other)
   {
     if (other.CompareTag("Player"))
     {
-      GameUI.Instance.ShowBanner("I just came from there... I need to go home.");
+      GameUI.Instance?.ShowBanner("I just came from there... I need to go home.");
     }
   }
 }

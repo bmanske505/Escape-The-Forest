@@ -20,6 +20,7 @@ namespace Scripts.FirebaseScripts
 
       // Add extra fields
       dict["userId"] = PlayerPrefs.GetString("id", "unregistered");
+      dict["level"] = PlayerPrefs.GetInt("level_index", -1);
       dict["playthrough"] = PlayerPrefs.GetInt("playthrough", 0);
       dict["version"] = Application.version;
       dict["platform"] = Application.platform.ToString();

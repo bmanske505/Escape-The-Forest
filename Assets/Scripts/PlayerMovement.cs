@@ -17,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
   public float staminaRegenPerSecond = 15f;
   public float regenDelay = 1.5f;
 
-  private CharacterController controller;
+  Rigidbody rb;
 
   private float regenTimer;
 
@@ -31,7 +31,7 @@ public class PlayerMovement : MonoBehaviour
 
   void Awake()
   {
-    controller = GetComponent<CharacterController>();
+    rb = GetComponent<Rigidbody>();
 
     sprintAction = InputSystem.actions.FindAction("Sprint");
     moveAction = InputSystem.actions.FindAction("Move");
@@ -85,14 +85,21 @@ public class PlayerMovement : MonoBehaviour
 
   void HandleMovement()
   {
-    Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
-    Vector3 worldMove = transform.TransformDirection(move);
+    Vector3 input = new Vector3(moveInput.x, 0f, moveInput.y);
+
+    // Convert from local to world space
+    Vector3 worldMove = transform.TransformDirection(input).normalized;
 
     float speed = sprintInput ? sprintSpeed : walkSpeed;
 
-    Vector3 delta = worldMove * speed * Time.fixedDeltaTime;
+    Vector3 targetVelocity = worldMove * speed;
 
-    controller.Move(delta);
+    // Preserve vertical velocity (gravity, jumping, slopes)
+    rb.linearVelocity = new Vector3(
+        targetVelocity.x,
+        rb.linearVelocity.y,
+        targetVelocity.z
+    );
   }
 
   public void HandleStamina()
@@ -119,6 +126,6 @@ public class PlayerMovement : MonoBehaviour
         stamina = Mathf.Min(stamina, maxStamina);
       }
     }
-    GameUI.Instance.UpdateStaminaBar(stamina);
+    GameUI.Instance?.UpdateStaminaBar(stamina);
   }
 }

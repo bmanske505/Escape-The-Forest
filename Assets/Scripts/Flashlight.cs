@@ -54,7 +54,7 @@ public class Flashlight : MonoBehaviour
   void Start()
   {
     beam.enabled = false;
-    GameUI.Instance.UpdateFlashlightBar(GetCharge());
+    GameUI.Instance?.UpdateFlashlightBar(GetCharge());
   }
 
   void Update()
@@ -68,9 +68,9 @@ public class Flashlight : MonoBehaviour
       if (IsOn())
       {
         Off();
-        GameUI.Instance.ShowBanner("\"Crap.\"");
+        GameUI.Instance?.ShowBanner("\"Crap.\"");
 
-        FirebaseAnalytics.LogDocument("flashlight_died", new { level = LevelMaster.Instance.GetLevel() });
+        FirebaseAnalytics.LogDocument("flashlight_died", new { });
       }
     }
     if (IsOn())
@@ -82,11 +82,11 @@ public class Flashlight : MonoBehaviour
 
       if (IsHittingStalkerEyes(out Stalker stalker))
       {
-        GameUI.Instance.ShowBanner($"\"Aha! How do you like being stunned for {stunDuration} seconds? 😎\"", stunDuration);
+        GameUI.Instance?.ShowBanner($"\"Aha! How do you like being stunned for {stunDuration} seconds? 😎\"", stunDuration);
         stalker.Stun(stunDuration);
       }
       SetCharge(Mathf.Clamp01(GetCharge() - Time.deltaTime / lifespan));
-      GameUI.Instance.UpdateFlashlightBar(GetCharge());
+      GameUI.Instance?.UpdateFlashlightBar(GetCharge());
     }
   }
 
@@ -120,7 +120,7 @@ public class Flashlight : MonoBehaviour
     }
     else
     {
-      GameUI.Instance.ShowBanner("\"Dead... I wonder if there's any batteries lying around.\"");
+      GameUI.Instance?.ShowBanner("\"Dead... I wonder if there's any batteries lying around.\"");
     }
   }
 
