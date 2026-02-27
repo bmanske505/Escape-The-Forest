@@ -15,7 +15,7 @@ public class Flashlight : MonoBehaviour
   public float stunDuration = 5f;
   public LayerMask detectionMask; // Stalker + environment
   public static Flashlight Instance;
-  private static float charge;
+  private static float localCharge;
 
   // use for flashlight analytics
   private float flashlightTime = 0f;
@@ -153,7 +153,7 @@ public class Flashlight : MonoBehaviour
 
   public float GetCharge()
   {
-    return charge;
+    return localCharge;
   }
 
   public void Charge(float amount)
@@ -163,7 +163,7 @@ public class Flashlight : MonoBehaviour
 
   public void SetCharge(float newCharge)
   {
-    charge = Mathf.Clamp01(newCharge);
+    localCharge = Mathf.Clamp01(newCharge);
   }
 
   public float GetUseRatio()

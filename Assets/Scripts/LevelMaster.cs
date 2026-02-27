@@ -40,7 +40,6 @@ public class LevelMaster : Singleton<LevelMaster>
       PlayerPrefs.SetString("id", Guid.NewGuid().ToString());
       PlayerPrefs.Save();
     }
-    string id = PlayerPrefs.GetString("id");
   }
 
   void Update()
@@ -77,6 +76,9 @@ public class LevelMaster : Singleton<LevelMaster>
 
   public void PlayNextLevel()
   {
+
+    if (isLoading) return;
+
     // log the current level's data
     CacheSensitivityUse();
 
@@ -87,8 +89,6 @@ public class LevelMaster : Singleton<LevelMaster>
     sensitivityTime = 0f;
     weightedSensitivitySum = Vector2.zero;
 
-    if (isLoading) return;
-
     int nextIndex = GetLevel() + 1;
     if (nextIndex >= scenes.Length)
     {
@@ -97,7 +97,6 @@ public class LevelMaster : Singleton<LevelMaster>
     }
 
     LoadLevel(nextIndex);
-    PlayerPrefs.Save();
   }
 
   public void LoadLevel(int index)

@@ -20,6 +20,8 @@ public class EndDoor : MonoBehaviour
         }
         PlayerPrefs.SetString("inventory", Player.Instance.GetInventory());
         LevelMaster.Instance.PlayNextLevel();
+
+        PlayerPrefs.Save();
       }
     }
   }
