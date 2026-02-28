@@ -9,10 +9,12 @@ public class Dog : Enemy
   Vector3[] route;
   int index = 1;
   NavMeshAgent agent;
+  Animator anim;
 
   void Awake()
   {
     agent = GetComponent<NavMeshAgent>();
+    anim = GetComponentInChildren<Animator>();
     BuildRoute();
   }
 
@@ -41,11 +43,12 @@ public class Dog : Enemy
   void Start()
   {
     agent.Warp(route[0]);
-    agent.SetDestination(route[index % route.Length]);
+    agent.SetDestination(route[index]);
   }
 
   void Update()
   {
+    anim.speed = agent.speed / 2f;
     if (state == State.Stunned) return;
 
     // Check if a path is pending (still being calculated)
@@ -59,8 +62,8 @@ public class Dog : Enemy
         {
           // The agent has reached the target
           Debug.Log("Destination reached!");
-          index += 1;
-          agent.SetDestination(route[index % route.Length]);
+          index = (index + 1) % route.Length;
+          agent.SetDestination(route[index]);
         }
       }
     }

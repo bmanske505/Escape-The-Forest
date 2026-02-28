@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class HidingTrap : MonoBehaviour
@@ -7,8 +8,7 @@ public class HidingTrap : MonoBehaviour
 
   void OnTriggerEnter(Collider other)
   {
-    Debug.Log($"I've been triggered. {other}, {Sibling.Instance.IsHiding}");
-    if (!triggered && other.CompareTag("Player") && !Sibling.Instance.IsHiding)
+    if (!triggered && other.CompareTag("Player") && Sibling.Instance.state != Sibling.State.Hiding)
     {
       triggered = true;
       Sibling.Instance.Hide("trigger", hidingSpot.position);

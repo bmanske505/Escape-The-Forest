@@ -22,10 +22,11 @@ public abstract class Enemy : MonoBehaviour
       FirebaseAnalytics.LogDocument("player_died", new { type = GetType().Name });
       GameUI.Instance?.ShowDeathPopup();
     }
+    /*
     else if (other.CompareTag("Sibling"))
     {
       other.GetComponent<Sibling>().Hide(GetType().Name);
-    }
+    }*/
   }
 
   protected abstract IEnumerator StunRoutine(float duration);
