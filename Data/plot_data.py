@@ -1,74 +1,78 @@
-import math
-import subprocess
-
-from matplotlib.figure import Figure
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import os
+import subprocess
+from matplotlib import pyplot as plt
+import pandas as pd
+from google.cloud import firestore
 
 # This script should be ran from the root "Escape the Forest" folder
 
+LEVELS = np.arange(0, 7)
 CSV_PATH = "Data/tables/"
 PNG_PATH = "Data/plots/"
-
-LEVELS = np.arange(0, 7)
+COLLECTIONS = [
+    "battery_collected",
+    "echo_used",
+    "flashlight_died",
+    "level_complete",
+    "player_died",
+    "sibling_found",
+    "sibling_hid",
+    "stalker_stunned",
+]
 
 ############### Utility functions ####################
 
-
-def make_title(s: str) -> str:
-    """
-    Converts a string like 'battery_collected' into 'Battery Collected'.
-    """
-    return " ".join(word.capitalize() for word in s.split("_"))
-
-
-def csv_to_df(csv_name: str):
-    csv_path = os.path.join(CSV_PATH, csv_name)
-    return pd.read_csv(csv_path)
+def flatten_dict(d, parent_key="", sep="."):
+    items = []
+    for k, v in d.items():
+        new_key = f"{parent_key}{sep}{k}" if parent_key else k
+        if isinstance(v, dict):
+            items.extend(flatten_dict(v, new_key, sep=sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
 
 
-def firestore_to_df(
-    collection_name: str,
-    fields: list[str],
-    order_by: str = "level",
-    direction: str = "ASC",
-    output_filename: str = "output.csv",
+def pull_data(
+    collection_names: list[str] = COLLECTIONS,
+    cred_path: str = "Data/firestore2csv/secret.json",
 ):
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = cred_path
+    os.makedirs(CSV_PATH, exist_ok=True)
 
-    cmd = [
-        "poetry",
-        "run",
-        "python",
-        "firestore2csv.py",
-        "--cred-file",
-        "secret.json",
-        "--collection-name",
-        collection_name,
-        "--fields",
-        ",".join(fields),
-        "--order-by",
-        order_by,
-        "--direction",
-        direction,
-    ]
+    db = firestore.Client()
 
-    result = subprocess.run(
-        cmd, check=False, capture_output=True, text=True, cwd="Data/firestore2csv"
-    )
-    print(result.stderr)
-    print(result.returncode)
-    if result.returncode != 0:
-        raise RuntimeError(f"firestore2csv failed: {result.stderr}")
+    for collection_name in collection_names:
+        rows = []
 
-    output_path = os.path.join(CSV_PATH, output_filename)
-    with open(output_path, "w") as f:
-        f.write(result.stdout)
+        for doc in db.collection(collection_name).stream():
+            data = doc.to_dict()
+            if not data:
+                continue
 
-    return csv_to_df(output_filename)
+            flat = flatten_dict(data)
+            flat["_doc_id"] = doc.id  # optional but VERY useful
+            rows.append(flat)
 
+        if not rows:
+            print(f"Skipping empty collection: {collection_name}")
+            continue
+
+        df = pd.DataFrame(rows)
+
+        output_path = os.path.join(CSV_PATH, f"{collection_name}.csv")
+        df.to_csv(output_path, index=False)
+
+        print(f"Saved {output_path} ({len(df)} rows)")
+
+
+def csv_to_df(collection_name: str):
+    csv_path = os.path.join(CSV_PATH, f"{collection_name}.csv")
+    return pd.read_csv(csv_path)
 
 def fig_to_png(fig: plt.Figure, name: str):
     """
@@ -86,12 +90,21 @@ def fig_to_png(fig: plt.Figure, name: str):
     print(f"Plot saved to {path}")
 
 
-############### Defining the actual plots functions ####################
+############### Formatting functions ####################
 
+
+def make_title(s: str) -> str:
+    """
+    Converts a string like 'battery_collected' into 'Battery Collected'.
+    """
+    return " ".join(word.capitalize() for word in s.split("_"))
+
+
+############### Defining the actual plots functions ####################
 
 # this is kinda replaced by the violin plot
 def stacked_bar():
-    df = firestore_to_df("level_complete", ["flashlight_pct_on", "time_spent", "level"])
+    df = csv_to_df("level_complete")
 
     # add a new column for overall flashlight info (convert % to seconds)
     df["time_flashlight_on"] = df["flashlight_pct_on"] * df["time_spent"]
@@ -129,10 +142,7 @@ def stacked_bar():
 
 
 def level_plots():
-    df = firestore_to_df(
-        "level_complete",
-        ["level", "flashlight_pct_on", "time_spent", "userId"],
-    )
+    df = csv_to_df("level_complete")
 
     # bar plot of user retention
     total_users = df["userId"].nunique()
@@ -233,8 +243,7 @@ def flashlight_plot():
     colors = ["black", "chartreuse"]
 
     dfs = [
-        firestore_to_df(event, ["level", "userId"]).assign(event=event)
-        for event in events
+        csv_to_df(event) for event in events
     ]
     df: pd.DataFrame = pd.concat(dfs, ignore_index=True)
 
@@ -276,8 +285,7 @@ def death_plot():
     colors = ["red", "green"]
 
     dfs = [
-        firestore_to_df(event, ["level", "userId"]).assign(event=event)
-        for event in events
+        csv_to_df(event).assign(event=event) for event in events
     ]
 
     df: pd.DataFrame = pd.concat(dfs, ignore_index=True)
@@ -314,7 +322,7 @@ def death_plot():
 
 
 def get_num_users():
-    df = firestore_to_df("level_complete", ["userId"])
+    df = csv_to_df("level_complete")
     count = df["userId"].nunique()
     print(count)
     return count
@@ -322,7 +330,11 @@ def get_num_users():
 
 ############### Calling the plots functions ####################
 
-stacked_bar()
-level_plots()
-flashlight_plot()
-death_plot()
+# pull_data() # this refreshes the csv files from firestore
+
+# TODO: make sure you filter data by version! (1.1 for release 2)
+
+# stacked_bar()
+# level_plots()
+# flashlight_plot()
+# death_plot()
