@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
 
-[RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Player))]
 public class PlayerMovement : MonoBehaviour
 {
@@ -17,7 +16,7 @@ public class PlayerMovement : MonoBehaviour
   public float staminaRegenPerSecond = 15f;
   public float regenDelay = 1.5f;
 
-  Rigidbody rb;
+  CharacterController controller;
 
   private float regenTimer;
 
@@ -31,7 +30,7 @@ public class PlayerMovement : MonoBehaviour
 
   void Awake()
   {
-    rb = GetComponent<Rigidbody>();
+    controller = GetComponent<CharacterController>();
 
     sprintAction = InputSystem.actions.FindAction("Sprint");
     moveAction = InputSystem.actions.FindAction("Move");
@@ -52,7 +51,7 @@ public class PlayerMovement : MonoBehaviour
     //sprintAction.started -= OnSprint;
     //sprintAction.canceled -= OnSprint;
     moveAction.performed -= OnMove;
-    moveAction.canceled += OnMove;
+    moveAction.canceled -= OnMove;
   }
 
   private void OnSprint(CallbackContext context)
@@ -76,30 +75,33 @@ public class PlayerMovement : MonoBehaviour
   {
     // We're just gonna disable sprint entirely lol
     // HandleStamina();
-  }
-
-  void FixedUpdate()
-  {
-    HandleMovement();
+    HandleMovement(); // not physics based
   }
 
   void HandleMovement()
   {
-    Vector3 input = new Vector3(moveInput.x, 0f, moveInput.y);
-
-    // Convert from local to world space
-    Vector3 worldMove = transform.TransformDirection(input).normalized;
+    // Horizontal input
+    Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
+    Vector3 worldMove = transform.TransformDirection(move).normalized;
 
     float speed = sprintInput ? sprintSpeed : walkSpeed;
 
-    Vector3 targetVelocity = worldMove * speed;
+    Vector3 velocity = worldMove * speed;
 
-    // Preserve vertical velocity (gravity, jumping, slopes)
-    rb.linearVelocity = new Vector3(
-        targetVelocity.x,
-        rb.linearVelocity.y,
-        targetVelocity.z
-    );
+    // Ground check
+    if (controller.isGrounded)
+    {
+      // Small downward force to keep us snapped to ground
+      velocity.y = -1f;
+    }
+    else
+    {
+      // Apply gravity while airborne
+      velocity.y = -9.8f;
+    }
+
+    // Move character
+    controller.Move(velocity * Time.deltaTime);
   }
 
   public void HandleStamina()
