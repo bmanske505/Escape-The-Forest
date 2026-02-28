@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 using Unity.AI.Navigation;
+using UnityEngine.SceneManagement;
 
 public class MazeGenerator : EditorWindow
 {
@@ -14,6 +15,7 @@ public class MazeGenerator : EditorWindow
     public string name;        // scene name
     public string maze;        // ASCII maze
     public Color lightColor = Color.white;
+    public float light = 1f;
     public float fog = 0.25f; // [0,1] normalized
   }
 
@@ -23,7 +25,6 @@ public class MazeGenerator : EditorWindow
         new Level
         {
             name = "Level 1",
-            lightColor = Color.white,
             maze =
 @"
 #########
@@ -62,11 +63,11 @@ public class MazeGenerator : EditorWindow
         {
 
             name = "Level 3",
-            lightColor = new Color(1f, 0.2f, 0f, 1f),
+            lightColor = new Color(1f, 0.25f, 0f, 1f),
             maze =
 @"
 ###########|#
-#_#____#___*#
+#_#________*#
 #_#_#_#_###_#
 #_#_#_#_#_#_#
 #_#_###_#_#_#
@@ -84,7 +85,8 @@ public class MazeGenerator : EditorWindow
         new Level
         {
             name = "Level 4",
-            lightColor = new Color(0.5f, 0f, 1f, 1f),
+            light = 0.75f,
+            lightColor = new Color(1f, 0f, 0f, 1f),
             maze =
 @"
 ###################E#
@@ -106,7 +108,8 @@ public class MazeGenerator : EditorWindow
         new Level
         {
             name = "Level 5",
-            lightColor = new Color(0.3f, 0.3f, 0.3f, 1f),
+            light = 0.6f,
+            lightColor = new Color(1f, 0f, 1f, 1f),
             maze =
 @"
 #########################
@@ -130,7 +133,8 @@ public class MazeGenerator : EditorWindow
         new Level
         {
             name = "Level 6",
-            lightColor = new Color(0.2f, 0.2f, 0.2f, 1f),
+            light = 0.5f,
+            lightColor = new Color(0f, 0f, 1f, 1f),
             maze =
 @"
 #|###########################
@@ -156,7 +160,8 @@ public class MazeGenerator : EditorWindow
         {
 
             name = "Level 7",
-            lightColor = new Color(0.1f, 0.1f, 0.1f, 1f),
+            light = 0.25f,
+            lightColor = new Color(0f, 0f, 1f, 1f),
             maze =
 @"
 ################|################
@@ -306,23 +311,29 @@ public class MazeGenerator : EditorWindow
   string templatePath
 )
   {
-    // --- Prevent overwriting an existing scene ---
-    if (System.IO.File.Exists(scenePath))
+    Scene scene;
+    // --- Open or create the scene ---
+    if (File.Exists(scenePath))
     {
-      Debug.LogWarning($"Scene already exists at path, skipping build:\n{scenePath}");
-      return;
+      // Scene exists → open it
+      scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+      Debug.Log($"Opened existing scene: {scenePath}");
+    }
+    else
+    {
+      // Scene doesn't exist → create a new scene from template
+      scene = EditorSceneManager.OpenScene(templatePath, OpenSceneMode.Single);
+      Debug.Log($"Created new scene from template: {templatePath}");
     }
 
-    var scene = EditorSceneManager.OpenScene(templatePath, OpenSceneMode.Single);
 
-    // Set lighting
+    // Set lighting regardless
     RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-    RenderSettings.ambientLight = level.lightColor;
+    RenderSettings.ambientLight = new Color(level.light, level.light, level.light, 1.0f);
 
     RenderSettings.fog = true;
-    RenderSettings.fogColor = level.lightColor;
+    RenderSettings.fogColor = Color.black;
     RenderSettings.fogDensity = level.fog;
-
 
     var sun = RenderSettings.sun;
     if (sun != null)
@@ -331,131 +342,134 @@ public class MazeGenerator : EditorWindow
     }
 
     // Build the maze
-
-    var root = new GameObject("Maze");
-
-    // Map: prefab name -> parent GameObject (e.g. "Wall" -> Walls)
-    var parentMap = new Dictionary<string, GameObject>();
-
-    var lines = level.maze
-        .Replace("\r\n", "\n")
-        .Split('\n', System.StringSplitOptions.RemoveEmptyEntries);
-
-    int width = lines[0].Length;
-    int depth = lines.Length;
-
-    // --- Instantiate prefabs ---
-    for (int z = 0; z < lines.Length; z++)
+    if (File.Exists(scenePath))
     {
-      for (int x = 0; x < lines[z].Length; x++)
-      {
-        char c = lines[z][x];
-        var prefab = settings.GetPrefab(c);
-        if (!prefab) continue;
-
-        string parentName = prefab.name + "s";
-
-        if (!parentMap.TryGetValue(parentName, out var parent))
-        {
-          parent = new GameObject(parentName);
-          parent.transform.SetParent(root.transform);
-          parentMap[parentName] = parent;
-        }
-
-        var obj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-        obj.transform.position = new Vector3(x, obj.transform.position.y, -z);
-        obj.transform.SetParent(parent.transform);
-      }
+      Debug.LogWarning($"Scene already exists at path, skipping maze build: {scenePath}");
     }
-
-    // --- Find and resize Ground ---
-    var ground = GameObject.Find("Ground");
-    if (ground != null)
+    else
     {
-      var renderer = ground.GetComponent<Renderer>();
-      if (renderer != null)
-      {
-        ground.transform.localScale =
-          new Vector3(width * 0.1f, 1f, depth * 0.1f);
+      var root = new GameObject("Maze");
 
-        ground.transform.position =
-          new Vector3(
-            (width - 1) * 0.5f,
-            ground.transform.position.y,
-            -(depth - 1) * 0.5f
-          );
+      // Map: prefab name -> parent GameObject (e.g. "Wall" -> Walls)
+      var parentMap = new Dictionary<string, GameObject>();
+
+      var lines = level.maze
+          .Replace("\r\n", "\n")
+          .Split('\n', System.StringSplitOptions.RemoveEmptyEntries);
+
+      int width = lines[0].Length;
+      int depth = lines.Length;
+
+      // --- Instantiate prefabs ---
+      for (int z = 0; z < lines.Length; z++)
+      {
+        for (int x = 0; x < lines[z].Length; x++)
+        {
+          char c = lines[z][x];
+          var prefab = settings.GetPrefab(c);
+          if (!prefab) continue;
+
+          string parentName = prefab.name + "s";
+
+          if (!parentMap.TryGetValue(parentName, out var parent))
+          {
+            parent = new GameObject(parentName);
+            parent.transform.SetParent(root.transform);
+            parentMap[parentName] = parent;
+          }
+
+          var obj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+          obj.transform.position = new Vector3(x, obj.transform.position.y, -z);
+          obj.transform.SetParent(parent.transform);
+        }
+      }
+
+      // --- Find and resize Ground ---
+      var ground = GameObject.Find("Ground");
+      if (ground != null)
+      {
+        var renderer = ground.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+          ground.transform.localScale =
+            new Vector3(width * 0.1f, 1f, depth * 0.1f);
+
+          ground.transform.position =
+            new Vector3(
+              (width - 1) * 0.5f,
+              ground.transform.position.y,
+              -(depth - 1) * 0.5f
+            );
+        }
+        else
+        {
+          Debug.LogWarning("Ground object does not have a Renderer. Cannot size it automatically.");
+        }
       }
       else
       {
-        Debug.LogWarning("Ground object does not have a Renderer. Cannot size it automatically.");
+        Debug.LogWarning("Ground object not found in the scene. Place a GameObject named 'Ground'.");
       }
-    }
-    else
-    {
-      Debug.LogWarning("Ground object not found in the scene. Place a GameObject named 'Ground'.");
-    }
 
-    // --- NavMesh baking ---
-    var nav = GameObject.Find("NavMesh Surface");
-    if (nav != null && nav.TryGetComponent(out NavMeshSurface surface))
-    {
-      surface.BuildNavMesh();
-    }
-    else
-    {
-      Debug.LogWarning("NavMesh Surface not found or missing NavMeshSurface component.");
-    }
-
-    // --- Rotate doors to face nearest DoorMagnet ---
-
-    GameObject magnetsParent = GameObject.Find("DoorMagnets");
-
-    void RotateDoor(Transform door)
-    {
-      Transform closest = null;
-      float minDist = float.MaxValue;
-
-      foreach (Transform child in magnetsParent.transform)
+      // --- NavMesh baking ---
+      var nav = GameObject.Find("NavMesh Surface");
+      if (nav != null && nav.TryGetComponent(out NavMeshSurface surface))
       {
-        GameObject magnet = child.gameObject;
-        float d = Vector3.SqrMagnitude(
-            magnet.transform.position - door.position
-        );
+        surface.BuildNavMesh();
+      }
+      else
+      {
+        Debug.LogWarning("NavMesh Surface not found or missing NavMeshSurface component.");
+      }
 
-        if (d < minDist)
+      // --- Rotate doors to face nearest DoorMagnet ---
+
+      GameObject magnetsParent = GameObject.Find("DoorMagnets");
+
+      void RotateDoor(Transform door)
+      {
+        Transform closest = null;
+        float minDist = float.MaxValue;
+
+        foreach (Transform child in magnetsParent.transform)
         {
-          minDist = d;
-          closest = magnet.transform;
+          GameObject magnet = child.gameObject;
+          float d = Vector3.SqrMagnitude(
+              magnet.transform.position - door.position
+          );
+
+          if (d < minDist)
+          {
+            minDist = d;
+            closest = magnet.transform;
+          }
+        }
+
+        if (closest != null)
+        {
+          Vector3 dir = closest.position - door.position;
+          dir.y = 0f; // keep doors upright
+
+          if (dir.sqrMagnitude > 0.001f)
+          {
+            door.rotation = Quaternion.LookRotation(dir, Vector3.up);
+          }
         }
       }
 
-      if (closest != null)
+      foreach (Transform door in GameObject.Find("StartDoors").transform)
       {
-        Vector3 dir = closest.position - door.position;
-        dir.y = 0f; // keep doors upright
-
-        if (dir.sqrMagnitude > 0.001f)
-        {
-          door.rotation = Quaternion.LookRotation(dir, Vector3.up);
-        }
+        RotateDoor(door);
       }
+
+      foreach (Transform door in GameObject.Find("EndDoors").transform)
+      {
+        RotateDoor(door);
+      }
+
+      DestroyImmediate(magnetsParent);
     }
-
-    foreach (Transform door in GameObject.Find("StartDoors").transform)
-    {
-      RotateDoor(door);
-    }
-
-    foreach (Transform door in GameObject.Find("EndDoors").transform)
-    {
-      RotateDoor(door);
-    }
-
-    DestroyImmediate(magnetsParent);
-
 
     EditorSceneManager.SaveScene(scene, scenePath);
   }
-
-
 }

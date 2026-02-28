@@ -1,22 +1,47 @@
 using System.Collections;
+using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class Dog : Enemy
 {
-  public Transform[] route;
+  Vector3[] route;
   int index = 1;
   NavMeshAgent agent;
 
   void Awake()
   {
     agent = GetComponent<NavMeshAgent>();
+    BuildRoute();
+  }
+
+  void BuildRoute()
+  {
+    route = GameObject.FindGameObjectsWithTag("DogRouteNode")
+        .OrderBy(go => ExtractRouteIndex(go.name))
+        .Select(go => go.transform.position)
+        .ToArray();
+  }
+
+  int ExtractRouteIndex(string name)
+  {
+    // Matches digits inside parentheses: (1), (23), etc.
+    var match = Regex.Match(name, @"\((\d+)\)");
+
+    if (!match.Success)
+    {
+      Debug.LogError($"DogRouteNode object '{name}' is missing a route number!");
+      return int.MaxValue; // shove bad ones to the end
+    }
+
+    return int.Parse(match.Groups[1].Value);
   }
 
   void Start()
   {
-    agent.Warp(route[0].position);
-    agent.SetDestination(route[index % route.Length].position);
+    agent.Warp(route[0]);
+    agent.SetDestination(route[index % route.Length]);
   }
 
   void Update()
@@ -35,7 +60,7 @@ public class Dog : Enemy
           // The agent has reached the target
           Debug.Log("Destination reached!");
           index += 1;
-          agent.SetDestination(route[index % route.Length].position);
+          agent.SetDestination(route[index % route.Length]);
         }
       }
     }
