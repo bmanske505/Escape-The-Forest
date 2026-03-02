@@ -46,7 +46,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff298d71aff364cd2bfa473a234e22a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Flashlight
-  lifespan: 20
+  expendRate: 0.1
+  regenDelay: 2
+  regenRate: 0.05
   stunRange: 5
   stunDuration: 5
   detectionMask:
@@ -602,11 +604,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e42467c8826b4095a436d7b683b4e01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  walkSpeed: 1
-  sprintSpeed: 2.5
-  staminaDrainPerSecond: 25
-  staminaRegenPerSecond: 15
-  regenDelay: 1.5
+  speed: 2
 --- !u!143 &7725067570600824346
 CharacterController:
   m_ObjectHideFlags: 0

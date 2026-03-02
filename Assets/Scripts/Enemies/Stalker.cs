@@ -43,7 +43,7 @@ public class Stalker : NavMeshEnemy
   public void Stun(float duration)
   {
     if (CurrentState == State.Stunned) return; // prevent chain stuns
-    FirebaseAnalytics.LogDocument("enemy_stunned", new { type = GetType().Name });
+    FirebaseAnalytics.LogDocument("stalker_stunned", new { });
     StartCoroutine(StunRoutine(duration));
   }
 

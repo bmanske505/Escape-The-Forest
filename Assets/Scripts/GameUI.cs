@@ -13,7 +13,6 @@ public class GameUI : MonoBehaviour
 
   [Header("Stat Bars")]
   [SerializeField] private Slider flashlightBar;
-  [SerializeField] private Slider staminaBar;
   [SerializeField] private TextMeshProUGUI levelText;
 
   [Header("Popup UI")]
@@ -60,19 +59,6 @@ public class GameUI : MonoBehaviour
     levelText.text = string.Format("Progress: {0} / {1}", LevelMaster.Instance.GetLevel() + 1, LevelMaster.Instance.GetTotalLevels());
   }
 
-  public void UpdateStaminaBar(float value)
-  {
-    if (value < 0)
-    {
-      staminaBar.gameObject.SetActive(false);
-    }
-    else
-    {
-      staminaBar.gameObject.SetActive(true);
-      staminaBar.value = value;
-    }
-  }
-
   public void UpdateFlashlightBar(float value)
   {
     if (value < 0)
@@ -84,6 +70,11 @@ public class GameUI : MonoBehaviour
       flashlightBar.gameObject.SetActive(true);
       flashlightBar.value = value;
     }
+  }
+
+  public void SetFlashlightBarOpacity(float alpha)
+  {
+    flashlightBar.GetComponent<CanvasGroup>().alpha = alpha;
   }
 
   /// <summary>
