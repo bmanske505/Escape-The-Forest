@@ -9,9 +9,9 @@ public class Stalker : NavMeshEnemy
 {
   [Header("Agent")]
   float repathTimer;
-  public float repathRate = 0.25f;  // update path 4x/sec
+  public float repathRate = 1f;  // update path 1x/sec
   public float repathThreshold = 0.5f; // only update if player moved this much
-
+  private NavMeshPath path;
   private HashSet<GameObject> eyes = new HashSet<GameObject>(); // for stun animation (prototyped)
 
   void Start()
@@ -25,6 +25,7 @@ public class Stalker : NavMeshEnemy
     }
 
     CurrentState = State.Walking;
+    path = new NavMeshPath();
   }
 
   protected override void Update()
@@ -32,15 +33,30 @@ public class Stalker : NavMeshEnemy
     base.Update();
     if (CurrentState != State.Walking || !agent.isOnNavMesh) return;
 
-    // Project player onto NavMesh
-    NavMeshHit hit;
-    if (!NavMesh.SamplePosition(Player.Instance.transform.position, out hit, 2f, NavMesh.AllAreas)) return;
+    if (Time.time < repathTimer) return;
+    repathTimer = Time.time + repathRate;
 
-    // Only update path if player moved enough or timer expired
-    if (Vector3.Distance(agent.destination, hit.position) > repathThreshold || Time.time > repathTimer)
+    // Sample with a larger radius - 2f is too tight if player is slightly off-mesh
+    NavMeshHit hit;
+    if (!NavMesh.SamplePosition(Player.Instance.transform.position, out hit, 5f, NavMesh.AllAreas)) return;
+
+    // Skip if player hasn't moved enough
+    if (Vector3.Distance(agent.destination, hit.position) <= repathThreshold) return;
+
+    // Calculate path first to validate it before committing
+    if (agent.CalculatePath(hit.position, path))
     {
-      agent.SetDestination(hit.position);
-      repathTimer = Time.time + repathRate;
+      if (path.status == NavMeshPathStatus.PathComplete)
+      {
+        agent.SetPath(path);
+      }
+      else if (path.status == NavMeshPathStatus.PathPartial)
+      {
+        // Path is partial - navigate to the closest reachable point instead
+        // This keeps the stalker moving toward the player rather than idling
+        agent.SetPath(path);
+      }
+      // PathInvalid: do nothing, keep current path
     }
   }
 
