@@ -5,16 +5,8 @@ using static UnityEngine.InputSystem.InputAction;
 [RequireComponent(typeof(Player))]
 public class PlayerMovement : MonoBehaviour
 {
-  [Header("Stamina")]
-  static float stamina;
 
-  public float walkSpeed = 2f;
-  public float sprintSpeed = 4f;
-
-  private float maxStamina = 100f;
-  public float staminaDrainPerSecond = 25f;
-  public float staminaRegenPerSecond = 15f;
-  public float regenDelay = 1.5f;
+  public float speed = 2f;
 
   CharacterController controller;
 
@@ -54,18 +46,6 @@ public class PlayerMovement : MonoBehaviour
     moveAction.canceled -= OnMove;
   }
 
-  private void OnSprint(CallbackContext context)
-  {
-    if (context.started && stamina > 0f)
-    {
-      sprintInput = true;
-    }
-    else
-    {
-      sprintInput = false;
-    }
-  }
-
   private void OnMove(CallbackContext context)
   {
     moveInput = context.ReadValue<Vector2>();
@@ -74,7 +54,6 @@ public class PlayerMovement : MonoBehaviour
   void Update()
   {
     // We're just gonna disable sprint entirely lol
-    // HandleStamina();
     HandleMovement(); // not physics based
   }
 
@@ -83,8 +62,6 @@ public class PlayerMovement : MonoBehaviour
     // Horizontal input
     Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
     Vector3 worldMove = transform.TransformDirection(move).normalized;
-
-    float speed = sprintInput ? sprintSpeed : walkSpeed;
 
     Vector3 velocity = worldMove * speed;
 
@@ -102,32 +79,5 @@ public class PlayerMovement : MonoBehaviour
 
     // Move character
     controller.Move(velocity * Time.deltaTime);
-  }
-
-  public void HandleStamina()
-  {
-    if (sprintInput && stamina > 0f)
-    {
-      stamina -= staminaDrainPerSecond * Time.deltaTime;
-      regenTimer = regenDelay;
-
-      if (stamina <= 0f)
-      {
-        stamina = 0f;
-      }
-    }
-    else
-    {
-      if (regenTimer > 0f)
-      {
-        regenTimer -= Time.deltaTime;
-      }
-      else
-      {
-        stamina += staminaRegenPerSecond * Time.deltaTime;
-        stamina = Mathf.Min(stamina, maxStamina);
-      }
-    }
-    GameUI.Instance?.UpdateStaminaBar(stamina);
   }
 }

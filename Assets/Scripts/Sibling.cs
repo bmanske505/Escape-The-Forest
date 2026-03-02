@@ -41,6 +41,8 @@ public class Sibling : MonoBehaviour
     audioSrc = GetComponent<AudioSource>();
     anim = GetComponentInChildren<Animator>();
     collectible = GetComponentInChildren<Collectible>();
+
+    agent.updateRotation = false; // set manually in update for snappy rotation
   }
 
   void OnDestroy()
@@ -56,6 +58,13 @@ public class Sibling : MonoBehaviour
 
   void Update()
   {
+    if (agent.velocity.sqrMagnitude > 0.1f)
+    {
+      // Calculate direction and rotate instantly
+      Quaternion lookRotation = Quaternion.LookRotation(agent.velocity);
+      transform.rotation = lookRotation;
+    }
+
     anim.SetFloat("speed", agent.velocity.magnitude, 0.5f, Time.deltaTime);
 
     if (state == State.Hiding)
@@ -141,7 +150,7 @@ public class Sibling : MonoBehaviour
   public void Respond()
   {
     audioSrc.Play();
-    FirebaseAnalytics.LogDocument("echo_used", new { });
+    FirebaseAnalytics.LogDocument("echo_used", new { distance = (Player.Instance.transform.position - transform.position).magnitude });
   }
 
   void SetState(State newState)

@@ -7,8 +7,12 @@ using static UnityEngine.InputSystem.InputAction;
 public class Flashlight : MonoBehaviour
 {
 
-  [Header("Charge Settings")]
-  public float lifespan = 10f; // in seconds
+  [Header("Charge Settings")] // NOTE: charge is [0,1]
+  public float expendRate = 0.05f;          // charge lost per second
+  public float regenDelay = 2f;         // seconds before regen starts
+  public float regenRate = 0.05f;       // charge regenerated per second
+  private float regenTimer = 0f;
+  private bool isRecharging = false;
 
   [Header("Stun Settings")]
   public float stunRange = 6f;
@@ -59,34 +63,82 @@ public class Flashlight : MonoBehaviour
 
   void Update()
   {
-    if (Time.timeScale == 0f || !Player.Instance) return; // player not in game or paused
+    if (Time.timeScale == 0f || !Player.Instance) return;
 
     totalTime += Time.deltaTime;
 
-    if (GetCharge() == 0f)
-    {
-      if (IsOn())
-      {
-        Off();
-        GameUI.Instance?.ShowBanner("\"Crap.\"");
-
-        FirebaseAnalytics.LogDocument("flashlight_died", new { });
-      }
-    }
     if (IsOn())
     {
-      if (Time.timeScale != 0f && Player.Instance) // player is in a game and the game is not paused
-      {
-        flashlightTime += Time.deltaTime;
-      }
+      HandleDrain();
+    }
+    else
+    {
+      HandleRechargeState();
+    }
 
-      if (IsHittingStalkerEyes(out Stalker stalker))
+    GameUI.Instance?.UpdateFlashlightBar(GetCharge());
+  }
+
+  private void HandleDrain()
+  {
+    regenTimer = 0f;
+    isRecharging = false;
+
+    flashlightTime += Time.deltaTime;
+    SetCharge(GetCharge() - Time.deltaTime * expendRate);
+
+    if (GetCharge() <= 0f)
+    {
+      Off();
+      GameUI.Instance?.ShowBanner("\"Crap.\"");
+      FirebaseAnalytics.LogDocument("flashlight_died", new { });
+    }
+
+    if (IsHittingStalkerEyes(out Stalker stalker) &&
+        stalker.CurrentState != NavMeshEnemy.State.Stunned)
+    {
+      GameUI.Instance?.ShowBanner(
+        $"\"Aha! How do you like being stunned for {stunDuration} seconds? 😎\"",
+        stunDuration
+      );
+
+      stalker.Stun(stunDuration);
+    }
+  }
+
+  private void HandleRechargeState()
+  {
+    if (GetCharge() >= 1f)
+    {
+      isRecharging = false;
+      return;
+    }
+
+    regenTimer += Time.deltaTime;
+
+    if (!isRecharging)
+    {
+      // update the UI bar
+      // Waiting to enter recharge
+      if (regenTimer >= regenDelay)
       {
-        GameUI.Instance?.ShowBanner($"\"Aha! How do you like being stunned for {stunDuration} seconds? 😎\"", stunDuration);
-        stalker.Stun(stunDuration);
+        isRecharging = true;
+        GameUI.Instance.SetFlashlightBarOpacity(0.1f);
+        GameUI.Instance?.ShowBanner("\"Hold on... recharging.\"");
       }
-      SetCharge(Mathf.Clamp01(GetCharge() - Time.deltaTime / lifespan));
-      GameUI.Instance?.UpdateFlashlightBar(GetCharge());
+    }
+    else
+    {
+      // Actively recharging (locked out)
+      SetCharge(GetCharge() + regenRate * Time.deltaTime);
+
+      if (GetCharge() >= 1f)
+      {
+        SetCharge(1f);
+        isRecharging = false;
+        GameUI.Instance.SetFlashlightBarOpacity(1f);
+        GameUI.Instance?.ShowBanner("\"Okay. Back in business.\"");
+      }
     }
   }
 
@@ -102,25 +154,30 @@ public class Flashlight : MonoBehaviour
 
   public void Toggle()
   {
+    if (isRecharging)
+    {
+      GameUI.Instance?.ShowBanner("\"It’s recharging — can’t use it yet.\"");
+      return;
+    }
+
     if (IsOn())
-    {
       Off();
-    }
     else
-    {
       On();
-    }
   }
 
   private void On()
   {
-    if (GetCharge() > 0f)
+    if (GetCharge() > 0f && !isRecharging)
     {
+      regenTimer = 0f;
       beam.enabled = true;
     }
     else
     {
-      GameUI.Instance?.ShowBanner("\"Dead... I wonder if there's any batteries lying around.\"");
+      GameUI.Instance?.ShowBanner(
+        "\"Dead... I wonder if there's any batteries lying around.\""
+      );
     }
   }
 
