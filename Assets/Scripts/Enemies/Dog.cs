@@ -4,16 +4,15 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Dog : Enemy
+public class Dog : NavMeshEnemy
 {
   Vector3[] route;
   int index = 1;
-  NavMeshAgent agent;
   Animator anim;
 
-  void Awake()
+  protected override void Awake()
   {
-    agent = GetComponent<NavMeshAgent>();
+    base.Awake();
     anim = GetComponentInChildren<Animator>();
     BuildRoute();
   }
@@ -46,10 +45,11 @@ public class Dog : Enemy
     agent.SetDestination(route[index]);
   }
 
-  void Update()
+  protected override void Update()
   {
+    base.Update();
     anim.speed = agent.speed / 2f;
-    if (state == State.Stunned) return;
+    if (CurrentState == State.Stunned) return;
 
     // Check if a path is pending (still being calculated)
     if (!agent.pathPending)
@@ -68,16 +68,4 @@ public class Dog : Enemy
       }
     }
   }
-
-  protected override IEnumerator StunRoutine(float duration)
-  {
-    state = State.Stunned;
-    agent.isStopped = true;
-
-    yield return new WaitForSeconds(duration);
-
-    state = State.Wandering;
-    agent.isStopped = false;
-  }
-
 }

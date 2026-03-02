@@ -1,146 +1,70 @@
 using System.Collections;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Scripts.FirebaseScripts;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Stalker : Enemy
+public class Stalker : NavMeshEnemy
 {
-
-  [Header("Movement")]
-  private float wanderSpeed; // pulled from navmesh
-  public float chaseSpeed = 3f;
-  public Vector2 wanderRange;
-  public float wanderInterval = 3f;
-
-  [Header("Vision")]
-  public float viewDistance = 15f;
-  public float viewAngle = 90f;
-  public LayerMask obstacleMask;
-
-  private NavMeshAgent agent;
   private Transform player;
 
   private Vector3 lastKnownPlayerPosition;
   private float wanderTimer;
 
+  private HashSet<GameObject> eyes = new HashSet<GameObject>(); // for stun animation (prototyped)
+
   void Start()
   {
-    agent = GetComponent<NavMeshAgent>();
+    foreach (Transform child in transform)
+    {
+      if (child.name == "Eye")
+      {
+        eyes.Add(child.gameObject);
+      }
+    }
+
     player = GameObject.FindGameObjectWithTag("Player").transform;
 
-    state = State.Wandering;
-    wanderTimer = wanderInterval;
-    wanderSpeed = agent.speed;
+    CurrentState = State.Walking;
   }
 
-  void Update()
+  protected override void Update()
   {
-    switch (state)
+    base.Update();
+    switch (CurrentState)
     {
-      case State.Wandering:
-        Wander();
-        LookForPlayer();
-        break;
-
-      case State.Chasing:
-        ChasePlayer();
-        break;
-
-      case State.Searching:
-        SearchLastKnownPosition();
-        LookForPlayer();
+      case State.Walking:
+        agent.SetDestination(Player.Instance.transform.position);
         break;
     }
   }
 
-  // ================= STATES =================
-
-  void Wander()
+  public void Stun(float duration)
   {
-    wanderTimer += Time.deltaTime;
-
-    if (wanderTimer >= wanderInterval)
-    {
-      Vector3 newPos = Utilities.GetNavTarget(transform.position, wanderRange, agent);
-      agent.SetDestination(newPos);
-      wanderTimer = 0f;
-    }
+    if (CurrentState == State.Stunned) return; // prevent chain stuns
+    FirebaseAnalytics.LogDocument("enemy_stunned", new { type = GetType().Name });
+    StartCoroutine(StunRoutine(duration));
   }
 
-  void ChasePlayer()
+  protected IEnumerator StunRoutine(float duration)
   {
-    agent.speed = chaseSpeed;
-    agent.SetDestination(player.position);
-
-    if (CanSeePlayer())
+    foreach (GameObject eye in eyes)
     {
-      lastKnownPlayerPosition = player.position;
-    }
-    else
-    {
-      agent.speed = wanderSpeed;
-      agent.SetDestination(lastKnownPlayerPosition);
-      state = State.Searching;
-    }
-  }
-
-  void SearchLastKnownPosition()
-  {
-    if (!agent.pathPending && agent.remainingDistance <= 0.5f)
-    {
-      state = State.Wandering;
-      wanderTimer = wanderInterval;
-    }
-  }
-
-  // ================= VISION =================
-
-  void LookForPlayer()
-  {
-    if (CanSeePlayer())
-    {
-      GameUI.Instance?.ShowBanner("\"RUN\"");
-      state = State.Chasing;
-      lastKnownPlayerPosition = player.position;
-    }
-  }
-
-  bool CanSeePlayer()
-  {
-    Vector3 directionToPlayer = (player.position - transform.position).normalized;
-    float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-
-    if (distanceToPlayer > viewDistance)
-      return false;
-
-    float angle = Vector3.Angle(transform.forward, directionToPlayer);
-    if (angle > viewAngle / 2f)
-      return false;
-
-    if (Physics.Raycast(transform.position + Vector3.up, directionToPlayer,
-        distanceToPlayer, obstacleMask))
-    {
-      return false;
+      eye.SetActive(false);
     }
 
-    return true;
-  }
-
-  protected override IEnumerator StunRoutine(float duration)
-  {
-    state = State.Stunned;
+    CurrentState = State.Stunned;
     agent.isStopped = true;
-    agent.ResetPath(); // optional: immediately clear current destination
-
-    // Teleport to random location after stun
-    Vector3 randomPos = Utilities.GetNavTarget(transform.position, wanderRange, agent);
-    agent.Warp(randomPos);
 
     yield return new WaitForSeconds(duration);
 
-    state = State.Wandering;
-    agent.speed = wanderSpeed; // <-- reset speed
+    foreach (GameObject eye in eyes)
+    {
+      eye.SetActive(true);
+    }
+
+    CurrentState = State.Walking;
     agent.isStopped = false;
   }
 }

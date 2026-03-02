@@ -68,6 +68,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee295c1a3c5be4aca8bd27ce04b5b0bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Dog
+  tip: make sure to stay out of the wolf's path!
 --- !u!195 &5909967328159209276
 NavMeshAgent:
   m_ObjectHideFlags: 0

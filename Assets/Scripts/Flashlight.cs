@@ -80,7 +80,7 @@ public class Flashlight : MonoBehaviour
         flashlightTime += Time.deltaTime;
       }
 
-      if (IsHittingStalkerEyes(out Stalker stalker))
+      if (IsHittingStalkerEyes(out Stalker stalker) && stalker.CurrentState != NavMeshEnemy.State.Stunned)
       {
         GameUI.Instance?.ShowBanner($"\"Aha! How do you like being stunned for {stunDuration} seconds? 😎\"", stunDuration);
         stalker.Stun(stunDuration);
