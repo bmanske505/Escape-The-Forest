@@ -20,6 +20,11 @@ public class Sibling : MonoBehaviour
   public float lostTimeMax = 5f;   // Seconds between sibling getting abandoned and going into hiding
   public Vector2 hideRange = new Vector2(0, 10); // Min and max for hiding
 
+  [Header("Agent")]
+  float repathTimer;
+  public float repathRate = 0.25f;  // update path 4x/sec
+  public float repathThreshold = 0.5f; // only update if player moved this much
+
   private NavMeshAgent agent;
   private Animator anim;
   private Collectible collectible;
@@ -31,8 +36,8 @@ public class Sibling : MonoBehaviour
   private float lostTimer = 0f; // used with lostTimeMax
   private float hidingTimer = 0f; // used to log amount of time the sibling was hiding for before found
 
-  public enum State { Hiding, Walking, Running };
-  public State state { get; private set; } = State.Walking;
+  public enum State { Hiding, Following, Fleeing };
+  public State state { get; private set; } = State.Following;
 
   void Awake()
   {
@@ -53,7 +58,7 @@ public class Sibling : MonoBehaviour
 
   void Start()
   {
-    SetState(State.Walking);
+    SetState(State.Following);
   }
 
   void Update()
@@ -67,44 +72,42 @@ public class Sibling : MonoBehaviour
 
     anim.SetFloat("speed", agent.velocity.magnitude, 0.5f, Time.deltaTime);
 
-    if (state == State.Hiding)
+    switch (state)
     {
-      hidingTimer += Time.deltaTime;
-      return;
-    }
-    else if (state == State.Running)
-    {
-      return;
-    }
+      case State.Following:
+        if (agent.isOnNavMesh)
+        {
+          // Project player onto NavMesh
+          NavMeshHit hit;
+          if (!NavMesh.SamplePosition(Player.Instance.transform.position, out hit, 2f, NavMesh.AllAreas)) return;
 
-    // atp, state == State.Walking
-
-    float currentDistance = Vector3.Distance(transform.position, Player.Instance.transform.position);
-
-    // Only move if farther than stopping distance
-    if (currentDistance > agent.stoppingDistance)
-    {
-      agent.SetDestination(Player.Instance.transform.position);
-    }
-    else
-    {
-      // Player is within follow distance, stop moving
-      agent.ResetPath();
-    }
-
-    // --- Check if stuck or sufficiently far from player
-    if ((transform.position - Player.Instance.transform.position).magnitude > lostRadius)
-    {
-      lostTimer += Time.deltaTime;
-      if (lostTimer >= lostTimeMax)
-      {
-        Hide("abandoned");
-        lostTimer = 0f;
-      }
-    }
-    else
-    {
-      lostTimer = 0f;
+          // Only update path if player moved enough or timer expired
+          if (Vector3.Distance(agent.destination, hit.position) > repathThreshold || Time.time > repathTimer)
+          {
+            agent.SetDestination(hit.position);
+            repathTimer = Time.time + repathRate;
+          }
+        }
+        // --- Check if stuck or sufficiently far from player
+        if ((transform.position - Player.Instance.transform.position).magnitude > lostRadius)
+        {
+          lostTimer += Time.deltaTime;
+          if (lostTimer >= lostTimeMax)
+          {
+            Hide("abandoned");
+            lostTimer = 0f;
+          }
+        }
+        else
+        {
+          lostTimer = 0f;
+        }
+        break;
+      case State.Hiding:
+        hidingTimer += Time.deltaTime;
+        return;
+      case State.Fleeing:
+        return;
     }
   }
 
@@ -131,7 +134,7 @@ public class Sibling : MonoBehaviour
 
   public void Hide(string context, Vector3 spot)
   {
-    SetState(State.Running);
+    SetState(State.Fleeing);
     agent.SetDestination(spot);
     StartCoroutine(WaitForArrivalThenHide());
     FirebaseAnalytics.LogDocument("sibling_hid", new { cause = context });
@@ -144,7 +147,7 @@ public class Sibling : MonoBehaviour
     hidingTimer = 0f;
 
     GameUI.Instance?.ShowBanner("\"There you are! Don't go running off again, you hear me?\"");
-    SetState(State.Walking);
+    SetState(State.Following);
   }
 
   public void Respond()
@@ -161,12 +164,12 @@ public class Sibling : MonoBehaviour
 
     switch (state)
     {
-      case State.Walking:
+      case State.Following:
         collectible.SetActive(false);
         agent.speed = walkSpeed;
         break;
 
-      case State.Running:
+      case State.Fleeing:
         collectible.SetActive(false);
         agent.isStopped = false;
         agent.speed = runSpeed;
@@ -193,7 +196,7 @@ public class Sibling : MonoBehaviour
     SetState(State.Hiding);
 
     numberTimesLost += 1;
-    if (numberTimesLost == 2) // this is the second time they've lost sibling, let them echo!
+    if (numberTimesLost >= 2 && !Player.Instance.HasItem("echo")) // this is the second time they've lost sibling, let them echo!
     {
       GameUI.Instance?.ShowTutorialPopup("Echo", "I keep losing my little sibling! Maybe I should try calling out to them with SPACEBAR.");
       Player.Instance.AddToInventory("Echo");

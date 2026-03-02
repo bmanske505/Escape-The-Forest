@@ -107,6 +107,11 @@ public class Player : MonoBehaviour
     EnableComponent(name);
   }
 
+  public bool HasItem(string name)
+  {
+    return localInventory.Contains(name);
+  }
+
   public string GetInventory()
   {
     return localInventory;

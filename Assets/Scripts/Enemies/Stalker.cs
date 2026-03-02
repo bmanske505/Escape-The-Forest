@@ -7,10 +7,10 @@ using UnityEngine.AI;
 
 public class Stalker : NavMeshEnemy
 {
-  private Transform player;
-
-  private Vector3 lastKnownPlayerPosition;
-  private float wanderTimer;
+  [Header("Agent")]
+  float repathTimer;
+  public float repathRate = 0.25f;  // update path 4x/sec
+  public float repathThreshold = 0.5f; // only update if player moved this much
 
   private HashSet<GameObject> eyes = new HashSet<GameObject>(); // for stun animation (prototyped)
 
@@ -24,19 +24,23 @@ public class Stalker : NavMeshEnemy
       }
     }
 
-    player = GameObject.FindGameObjectWithTag("Player").transform;
-
     CurrentState = State.Walking;
   }
 
   protected override void Update()
   {
     base.Update();
-    switch (CurrentState)
+    if (CurrentState != State.Walking || !agent.isOnNavMesh) return;
+
+    // Project player onto NavMesh
+    NavMeshHit hit;
+    if (!NavMesh.SamplePosition(Player.Instance.transform.position, out hit, 2f, NavMesh.AllAreas)) return;
+
+    // Only update path if player moved enough or timer expired
+    if (Vector3.Distance(agent.destination, hit.position) > repathThreshold || Time.time > repathTimer)
     {
-      case State.Walking:
-        agent.SetDestination(Player.Instance.transform.position);
-        break;
+      agent.SetDestination(hit.position);
+      repathTimer = Time.time + repathRate;
     }
   }
 

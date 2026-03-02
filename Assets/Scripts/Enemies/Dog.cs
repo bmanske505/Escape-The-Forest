@@ -6,6 +6,9 @@ using UnityEngine.AI;
 
 public class Dog : NavMeshEnemy
 {
+  [Header("Route")]
+  [SerializeField] private Transform routeRoot; // Drag DogRoute1, DogRoute2, etc
+
   Vector3[] route;
   int index = 1;
   Animator anim;
@@ -19,9 +22,11 @@ public class Dog : NavMeshEnemy
 
   void BuildRoute()
   {
-    route = GameObject.FindGameObjectsWithTag("DogRouteNode")
-        .OrderBy(go => ExtractRouteIndex(go.name))
-        .Select(go => go.transform.position)
+    route = routeRoot
+        .GetComponentsInChildren<Transform>()
+        .Where(t => t != routeRoot) // exclude parent
+        .OrderBy(t => ExtractRouteIndex(t.name))
+        .Select(t => t.position)
         .ToArray();
   }
 
@@ -32,7 +37,7 @@ public class Dog : NavMeshEnemy
 
     if (!match.Success)
     {
-      Debug.LogError($"DogRouteNode object '{name}' is missing a route number!");
+      Debug.LogError($"'{name}' is missing a route number!");
       return int.MaxValue; // shove bad ones to the end
     }
 
