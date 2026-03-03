@@ -24,6 +24,7 @@ public class Sibling : MonoBehaviour
   float repathTimer;
   public float repathRate = 0.25f;  // update path 4x/sec
   public float repathThreshold = 0.5f; // only update if player moved this much
+  Vector3 lastPlayerPos;
 
   private NavMeshAgent agent;
   private Animator anim;
@@ -46,8 +47,6 @@ public class Sibling : MonoBehaviour
     audioSrc = GetComponent<AudioSource>();
     anim = GetComponentInChildren<Animator>();
     collectible = GetComponentInChildren<Collectible>();
-
-    agent.updateRotation = false; // set manually in update for snappy rotation
   }
 
   void OnDestroy()
@@ -75,34 +74,46 @@ public class Sibling : MonoBehaviour
     switch (state)
     {
       case State.Following:
-        if (agent.isOnNavMesh)
         {
-          // Project player onto NavMesh
-          NavMeshHit hit;
-          if (!NavMesh.SamplePosition(Player.Instance.transform.position, out hit, 2f, NavMesh.AllAreas)) return;
+          agent.isStopped = false;
 
-          // Only update path if player moved enough or timer expired
-          if (Vector3.Distance(agent.destination, hit.position) > repathThreshold || Time.time > repathTimer)
+          repathTimer -= Time.deltaTime;
+
+          float distToPlayer = Vector3.Distance(transform.position, Player.Instance.transform.position);
+
+          // Abandonment logic (keep this)
+          if (distToPlayer > lostRadius)
           {
-            agent.SetDestination(hit.position);
-            repathTimer = Time.time + repathRate;
+            lostTimer += Time.deltaTime;
+            if (lostTimer >= lostTimeMax)
+            {
+              Hide("abandoned");
+              lostTimer = 0f;
+              return;
+            }
           }
-        }
-        // --- Check if stuck or sufficiently far from player
-        if ((transform.position - Player.Instance.transform.position).magnitude > lostRadius)
-        {
-          lostTimer += Time.deltaTime;
-          if (lostTimer >= lostTimeMax)
+          else
           {
-            Hide("abandoned");
             lostTimer = 0f;
           }
+
+          // Only repath occasionally AND only if player moved enough
+          if (repathTimer <= 0f)
+          {
+            Vector3 playerPos = Player.Instance.GetPointOnSurface();
+
+            if ((playerPos - lastPlayerPos).sqrMagnitude > repathThreshold * repathThreshold
+                || agent.pathStatus != NavMeshPathStatus.PathComplete)
+            {
+              agent.SetDestination(playerPos);
+              lastPlayerPos = playerPos;
+            }
+
+            repathTimer = repathRate;
+          }
+
+          break;
         }
-        else
-        {
-          lostTimer = 0f;
-        }
-        break;
       case State.Hiding:
         hidingTimer += Time.deltaTime;
         return;

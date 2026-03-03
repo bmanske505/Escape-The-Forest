@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
@@ -13,7 +14,6 @@ public class Player : MonoBehaviour
 
   [Header("Sibling")]
   public GameObject siblingPrefab;
-  public Vector3 siblingSpawnOffset = new Vector3(0f, 0f, 0f);
 
   private float pitch;
   private static string localInventory;
@@ -41,16 +41,15 @@ public class Player : MonoBehaviour
     Cursor.lockState = CursorLockMode.Locked;
     Cursor.visible = false;
 
-    // Spawn sibling prefab as a sibling (same parent)
-
-    Vector3 spawnPos = transform.position + siblingSpawnOffset;
-
-    Instantiate(
+    GameObject sib = Instantiate(
       siblingPrefab,
-      spawnPos,
+      transform.position,
       Quaternion.identity,
       transform.parent   // 👈 THIS is what makes it a sibling
     );
+
+    sib.GetComponent<NavMeshAgent>().Warp(GetPointOnSurface());
+
 
     lookAction.performed += OnLook;
     lookAction.canceled += OnLook;
@@ -145,5 +144,12 @@ public class Player : MonoBehaviour
       mb.enabled = true;
       comp.gameObject.SetActive(true);
     }
+  }
+
+  public Vector2 GetPointOnSurface()
+  {
+    Vector2 pos = transform.position;
+    pos.y = -0.05f;
+    return pos;
   }
 }

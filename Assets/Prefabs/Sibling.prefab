@@ -134,6 +134,8 @@ MonoBehaviour:
   lostRadius: 5
   lostTimeMax: 5
   hideRange: {x: 3, y: 100}
+  repathRate: 0.25
+  repathThreshold: 0.5
 --- !u!195 &6929796537867617710
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -155,7 +157,7 @@ NavMeshAgent:
   m_Height: 0.6
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_ObstacleAvoidanceType: 0
 --- !u!82 &7112928679809650779
 AudioSource:
   m_ObjectHideFlags: 0

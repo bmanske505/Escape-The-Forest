@@ -38,7 +38,7 @@ public class Stalker : NavMeshEnemy
 
     // Sample with a larger radius - 2f is too tight if player is slightly off-mesh
     NavMeshHit hit;
-    if (!NavMesh.SamplePosition(Player.Instance.transform.position, out hit, 5f, NavMesh.AllAreas)) return;
+    if (!NavMesh.SamplePosition(Player.Instance.GetPointOnSurface(), out hit, 5f, NavMesh.AllAreas)) return;
 
     // Skip if player hasn't moved enough
     if (Vector3.Distance(agent.destination, hit.position) <= repathThreshold) return;
