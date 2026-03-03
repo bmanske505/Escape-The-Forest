@@ -321,11 +321,17 @@ def death_plot():
     fig_to_png(fig, "death_bar_plot")
 
 
-def get_num_users():
-    df = csv_to_df("level_complete")
-    count = df["userId"].nunique()
-    print(count)
-    return count
+def print_num_users():
+  df = csv_to_df("level_complete")
+  print("VERSION 1.0")
+  print(df[df["version"].apply(str).str.contains("1.0", regex=False, na=False, case=False)]["userId"].nunique())
+
+  print("VERSION 1.1")
+  print(
+      df[df["version"].apply(str).str.contains("1.1", regex=False, na=False, case=False)][
+          "userId"
+      ].nunique()
+  )
 
 
 ############### Calling the plots functions ####################
