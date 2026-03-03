@@ -39,7 +39,7 @@ def flatten_dict(d, parent_key="", sep="."):
 
 def pull_data(
     collection_names: list[str] = COLLECTIONS,
-    cred_path: str = "Data/firestore2csv/secret.json",
+    cred_path: str = "Data/secret.json",
 ):
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = cred_path
     os.makedirs(CSV_PATH, exist_ok=True)
@@ -336,7 +336,7 @@ def print_num_users():
 
 ############### Calling the plots functions ####################
 
-# pull_data() # this refreshes the csv files from firestore
+pull_data() # this refreshes the csv files from firestore
 
 # TODO: make sure you filter data by version! (1.1 for release 2)
 
