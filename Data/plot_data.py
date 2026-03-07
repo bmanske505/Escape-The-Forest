@@ -339,7 +339,7 @@ def print_num_users():
 
 ############### Calling the plots functions ####################
 
-# pull_data() # this refreshes the csv files from firestore
+pull_data() # this refreshes the csv files from firestore
 
 # TODO: make sure you filter data by version! (1.1 for release 2)
 
