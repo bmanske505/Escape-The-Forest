@@ -19,6 +19,7 @@ public class Sibling : MonoBehaviour
   public float lostRadius = 5f; // The max distance the player can stray from sibling before being considered "abandoned"
   public float lostTimeMax = 5f;   // Seconds between sibling getting abandoned and going into hiding
   public Vector2 hideRange = new Vector2(0, 10); // Min and max for hiding
+  public AudioClip[] clips;
 
   [Header("Agent")]
   float repathTimer;
@@ -37,7 +38,7 @@ public class Sibling : MonoBehaviour
   private float hidingTimer = 0f; // used to log amount of time the sibling was hiding for before found
 
   public enum State { Hiding, Following, Fleeing };
-  public State state { get; private set; } = State.Following;
+  public State CurrentState { get; private set; } = State.Following;
 
   void Awake()
   {
@@ -72,7 +73,7 @@ public class Sibling : MonoBehaviour
 
     anim.SetFloat("speed", agent.velocity.magnitude, 0.5f, Time.deltaTime);
 
-    switch (state)
+    switch (CurrentState)
     {
       case State.Following:
         if (agent.isOnNavMesh)
@@ -134,6 +135,11 @@ public class Sibling : MonoBehaviour
 
   public void Hide(string context, Vector3 spot)
   {
+    if (PlayerPrefs.GetInt("ab_group") == 0) // audio pipeline
+    {
+      AudioClip clip = clips[Random.Range(0, clips.Length)];
+      audioSrc.PlayOneShot(clip, 2f);
+    }
     SetState(State.Fleeing);
     agent.SetDestination(spot);
     StartCoroutine(WaitForArrivalThenHide());
@@ -152,17 +158,21 @@ public class Sibling : MonoBehaviour
 
   public void Respond()
   {
-    audioSrc.Play();
-    FirebaseAnalytics.LogDocument("echo_used", new { distance = (Player.Instance.transform.position - transform.position).magnitude });
+    if (CurrentState == State.Hiding)
+    {
+      audioSrc.Play();
+      FirebaseAnalytics.LogDocument("echo_used", new { distance = (Player.Instance.transform.position - transform.position).magnitude });
+
+    }
   }
 
   void SetState(State newState)
   {
     anim.SetBool("hiding", newState == State.Hiding);
 
-    state = newState;
+    CurrentState = newState;
 
-    switch (state)
+    switch (CurrentState)
     {
       case State.Following:
         collectible.SetActive(false);
@@ -198,12 +208,12 @@ public class Sibling : MonoBehaviour
     numberTimesLost += 1;
     if (numberTimesLost >= 2 && !Player.Instance.HasItem("echo")) // this is the second time they've lost sibling, let them echo!
     {
-      GameUI.Instance?.ShowTutorialPopup("Echo", "I keep losing my little sibling! Maybe I should try calling out to them with SPACEBAR.");
+      GameUI.Instance?.ShowTutorialPopup("Echo", "I keep losing Gregory! Maybe I should try calling out to him with SPACEBAR.");
       Player.Instance.AddToInventory("Echo");
     }
 
     GameUI.Instance?.ShowBanner(
-        "\"Playing hide and seek again? Where did you go, little sibling?\""
+        "\"Playing hide and seek again? Where did you go, Gregory?\""
     );
   }
 }

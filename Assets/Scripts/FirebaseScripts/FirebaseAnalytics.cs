@@ -29,6 +29,7 @@ namespace Scripts.FirebaseScripts
       dict["sensitivity_y"] = PlayerPrefs.GetFloat("sensitivity_y", 100f);
       dict["unix_time"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
       dict["ab_group"] = PlayerPrefs.GetInt("ab_group");
+      dict["music"] = PlayerPrefs.GetFloat("music");
 
       // Convert back to JSON
       string enrichedJson = JsonConvert.SerializeObject(dict);

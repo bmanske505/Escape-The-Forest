@@ -7,9 +7,9 @@ public class EndDoor : MonoBehaviour
   {
     if (other.CompareTag("Player"))
     {
-      if (Sibling.Instance.state == Sibling.State.Hiding)
+      if (Sibling.Instance.CurrentState == Sibling.State.Hiding)
       {
-        GameUI.Instance?.ShowBanner("\"I need to find my little sibling first!\"");
+        GameUI.Instance?.ShowBanner("\"I need to find Gregory first!\"");
       }
       else
       {

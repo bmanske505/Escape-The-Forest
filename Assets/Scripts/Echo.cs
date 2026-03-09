@@ -28,7 +28,14 @@ public class Echo : MonoBehaviour
 
   void OnEcho(CallbackContext context)
   {
-    StartCoroutine(CallForSibling());
+    if (Sibling.Instance.CurrentState == Sibling.State.Following)
+    {
+      GameUI.Instance.ShowBanner("Gregory is right behind me! I shouldn't call out to him right now...");
+    }
+    else
+    {
+      StartCoroutine(CallForSibling());
+    }
   }
 
   IEnumerator CallForSibling()

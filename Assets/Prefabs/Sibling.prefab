@@ -134,6 +134,12 @@ MonoBehaviour:
   lostRadius: 5
   lostTimeMax: 5
   hideRange: {x: 3, y: 100}
+  clips:
+  - {fileID: 8300000, guid: 7fe6d76510ad14711b7e69e507cc3aeb, type: 3}
+  - {fileID: 8300000, guid: f4e81c38dedf74055a25a077ad4c0418, type: 3}
+  - {fileID: 8300000, guid: 8fab02e8885a542da9886305c1251fe5, type: 3}
+  - {fileID: 8300000, guid: d14abeaf400204fe297440d5d5e2f5f6, type: 3}
+  - {fileID: 8300000, guid: ea58e25d6f8d443158407c3dd46bd199, type: 3}
   repathRate: 0.25
   repathThreshold: 0.5
 --- !u!195 &6929796537867617710
@@ -177,12 +183,12 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 3
-  MaxDistance: 12
+  Priority: 0
+  DopplerLevel: 0
+  MinDistance: 0
+  MaxDistance: 5
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -230,7 +236,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.2777778
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -245,7 +251,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
