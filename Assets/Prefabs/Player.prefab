@@ -407,7 +407,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 1
+  m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -591,7 +591,6 @@ MonoBehaviour:
   minPitch: -80
   maxPitch: 80
   siblingPrefab: {fileID: 7096211616557163575, guid: 5ecf42d14cac04963bbaaf185bc1eb1c, type: 3}
-  siblingSpawnOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &5732395994972137818
 MonoBehaviour:
   m_ObjectHideFlags: 0

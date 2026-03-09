@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import os
-import subprocess
 from matplotlib import pyplot as plt
 import pandas as pd
 from google.cloud import firestore
@@ -23,8 +22,10 @@ COLLECTIONS = [
     "sibling_hid",
     "stalker_stunned",
 ]
+VERSIONS = ["1.0", "1.1"]
 
 ############### Utility functions ####################
+
 
 def flatten_dict(d, parent_key="", sep="."):
     items = []
@@ -74,6 +75,7 @@ def csv_to_df(collection_name: str):
     csv_path = os.path.join(CSV_PATH, f"{collection_name}.csv")
     return pd.read_csv(csv_path)
 
+
 def fig_to_png(fig: plt.Figure, name: str):
     """
     Saves a matplotlib plot to PNG_PATH with the given name.
@@ -89,9 +91,16 @@ def fig_to_png(fig: plt.Figure, name: str):
     plt.close(fig)
     print(f"Plot saved to {path}")
 
+############### Data-cleaning functions ####################
+
+def filter_by_version(df: pd.DataFrame, version: str):
+    return df[
+        df["version"]
+        .apply(str)
+        .str.contains(version, regex=False, na=False, case=False)
+    ]
 
 ############### Formatting functions ####################
-
 
 def make_title(s: str) -> str:
     """
@@ -249,9 +258,7 @@ def flashlight_plot():
     events = ["flashlight_died", "battery_collected"]
     colors = ["black", "chartreuse"]
 
-    dfs = [
-        csv_to_df(event) for event in events
-    ]
+    dfs = [csv_to_df(event) for event in events]
     df: pd.DataFrame = pd.concat(dfs, ignore_index=True)
 
     # count occurrences per user per level per event, then average across users
@@ -287,13 +294,11 @@ def flashlight_plot():
     fig_to_png(fig, "flashlight_bar")
 
 
-def death_plot():
+def death_plot(version: str):
     events = ["player_died", "stalker_stunned"]
     colors = ["red", "green"]
 
-    dfs = [
-        csv_to_df(event).assign(event=event) for event in events
-    ]
+    dfs = [csv_to_df(event).assign(event=event) for event in events]
 
     df: pd.DataFrame = pd.concat(dfs, ignore_index=True)
     df = df[df["version"].apply(str).str.contains("1.1", regex=False, na=False, case=False)].groupby([
@@ -361,16 +366,13 @@ def sibling_found_plot():
     
 
 def print_num_users():
-  df = csv_to_df("level_complete")
-  print("VERSION 1.0")
-  print(df[df["version"].apply(str).str.contains("1.0", regex=False, na=False, case=False)]["userId"].nunique())
+    df = csv_to_df("level_complete")
+    for version in VERSIONS:
+        print(f"VERSION {version}")
+        filtered = filter_by_version(df, version)
+        unique_users = filtered["userId"].nunique()
 
-  print("VERSION 1.1")
-  print(
-      df[df["version"].apply(str).str.contains("1.1", regex=False, na=False, case=False)][
-          "userId"
-      ].nunique()
-  )
+        print(unique_users)
 
 
 ############### Calling the plots functions ####################
@@ -378,6 +380,8 @@ def print_num_users():
 #pull_data() # this refreshes the csv files from firestore
 
 # TODO: make sure you filter data by version! (1.1 for release 2)
+
+print_num_users()
 
 # stacked_bar()
 #level_plots()
