@@ -27,7 +27,8 @@ namespace Scripts.FirebaseScripts
       dict["domain"] = Application.absoluteURL;
       dict["sensitivity_x"] = PlayerPrefs.GetFloat("sensitivity_x", 100f);
       dict["sensitivity_y"] = PlayerPrefs.GetFloat("sensitivity_y", 100f);
-      dict["unix_time"] =DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+      dict["unix_time"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+      dict["ab_group"] = PlayerPrefs.GetInt("ab_group");
 
       // Convert back to JSON
       string enrichedJson = JsonConvert.SerializeObject(dict);

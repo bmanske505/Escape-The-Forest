@@ -27,7 +27,6 @@ window.firebaseManager = {
         const data = JSON.parse(jsonData);
         await addDoc(collection(db, collectionName), {
 					...data,
-					timestamp: Date.now(), // ms since epoch
 				});
     }
 };

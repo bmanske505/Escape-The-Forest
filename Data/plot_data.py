@@ -360,10 +360,7 @@ def sibling_found_plot():
     ax.set_xticks(avg_time.index)
     ax.grid(axis="y", linestyle="--", alpha=0.5)
     fig_to_png(fig, "sibling_found_plot")
-    
 
-
-    
 
 def print_num_users():
     df = csv_to_df("level_complete")
@@ -377,15 +374,11 @@ def print_num_users():
 
 ############### Calling the plots functions ####################
 
-#pull_data() # this refreshes the csv files from firestore
-
-# TODO: make sure you filter data by version! (1.1 for release 2)
-
-print_num_users()
-
+# pull_data() # this refreshes the csv files from firestore
+# print_num_users()
 # stacked_bar()
-#level_plots()
+# level_plots()
 # flashlight_plot()
-death_plot()
-#print_num_users()
-#sibling_found_plot()
+# death_plot()
+# print_num_users()
+# sibling_found_plot()
