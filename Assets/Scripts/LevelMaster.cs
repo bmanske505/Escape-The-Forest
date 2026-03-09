@@ -2,11 +2,8 @@ using System.Collections;
 using Scripts.FirebaseScripts;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System;
-using Newtonsoft.Json;
-using System.Data.Common;
-
-
+using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputAction;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -29,6 +26,10 @@ public class LevelMaster : Singleton<LevelMaster>
   private Vector2 weightedSensitivitySum = Vector2.zero;
   private float sensitivityTime = 0f;
 
+  // Actions
+  private InputAction ABAudioAction;
+  private InputAction ABVisualAction;
+
   protected override void Awake()
   {
     base.Awake();
@@ -37,9 +38,56 @@ public class LevelMaster : Singleton<LevelMaster>
     // configure user settings firebase analytics logging
     if (!PlayerPrefs.HasKey("id"))
     {
-      PlayerPrefs.SetString("id", Guid.NewGuid().ToString());
-      PlayerPrefs.Save();
+      PlayerPrefs.SetString("id", System.Guid.NewGuid().ToString());
     }
+
+    if (!PlayerPrefs.HasKey("ab_group"))
+    {
+      int group = Random.Range(0, 2);
+      PlayerPrefs.SetInt("ab_group", group); // 0 = audio, 1 = visual
+      Debug.Log($"Player assigned to group {group}");
+    }
+    PlayerPrefs.Save();
+
+    ABAudioAction = InputSystem.actions.FindAction("ABAudio");
+    ABVisualAction = InputSystem.actions.FindAction("ABVisual");
+  }
+
+  void OnEnable()
+  {
+    if (ABAudioAction != null)
+    {
+      ABAudioAction.performed += OnABAudio;
+    }
+    if (ABVisualAction != null)
+    {
+      ABVisualAction.performed += OnABVisual;
+    }
+  }
+
+  void OnDisable()
+  {
+    if (ABAudioAction != null)
+    {
+      ABAudioAction.performed -= OnABAudio;
+    }
+    if (ABVisualAction != null)
+    {
+      ABVisualAction.performed -= OnABVisual;
+    }
+  }
+
+  void OnABAudio(CallbackContext context)
+  {
+    PlayerPrefs.SetInt("ab_group", 0); // 0 represents audio A/B pipeline
+    Debug.Log("Set to Audio A/B pipeline");
+  }
+
+  void OnABVisual(CallbackContext context)
+  {
+    PlayerPrefs.SetInt("ab_group", 1); // 1 represents visual A/B pipeline
+    Debug.Log("Set to Visual A/B pipeline");
+
   }
 
   void Update()
