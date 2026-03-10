@@ -7,6 +7,10 @@ public class MenuUI : MonoBehaviour
   {
     if (GameObject.Find("ContinueButton")?.GetComponent<Button>() is Button b)
       b.interactable = LevelMaster.Instance.GetLevel() != 0;
+
+    GameObject message = GameObject.FindWithTag("AudioDisclaimer");
+    Debug.Log(message);
+    message.SetActive(PlayerPrefs.GetInt("ab_group") == 0); // enable if audio pipeline, else disable
   }
 
   public void Toggle(GameObject obj)

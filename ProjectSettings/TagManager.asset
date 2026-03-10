@@ -9,6 +9,7 @@ TagManager:
   - StalkerEye
   - DoorMagnet
   - DogRouteNode
+  - AudioDisclaimer
   layers:
   - Default
   - TransparentFX
