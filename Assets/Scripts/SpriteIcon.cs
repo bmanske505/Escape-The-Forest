@@ -1,11 +1,7 @@
 using UnityEngine;
 
-public class SpriteIcon : MonoBehaviour
+public class SpriteIcon : VisualOnlyFeature
 {
-  void Start()
-  {
-    gameObject.SetActive(PlayerPrefs.GetInt("ab_group") == 1);
-  }
 
   void Update()
   {
