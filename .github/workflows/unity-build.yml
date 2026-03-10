@@ -5,8 +5,11 @@ on:
 
 jobs:
   build:
-    name: Build Unity WebGL
+    name: Build Unity
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        targetPlatform: [WebGL, StandaloneOSX, StandaloneWindows64]
     steps:
       - name: Free disk space
         uses: jlumbroso/free-disk-space@main
@@ -38,62 +41,73 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_USERNAME }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          targetPlatform: WebGL
+          targetPlatform: ${{ matrix.targetPlatform }}
           unityVersion: 6000.3.5f1
-          buildsPath: build
-          versioning: None   # <-- add this line to preserve your ProjectSettings version
+          buildsPath: build/${{ matrix.targetPlatform }}
+          versioning: None
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: webgl-build
-          path: build/WebGL/WebGL
+          name: build-${{ matrix.targetPlatform }}
+          path: build/${{ matrix.targetPlatform }}
 
-  deploy-github-pages:
-    name: Deploy to GitHub Pages
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: webgl-build
-          path: build
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload to Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: build
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-  deploy-itchio:
-    name: Deploy to itch.io
+  deploy-webgl:
+    name: Deploy WebGL to itch.io
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download build artifact
+      - name: Download WebGL build
         uses: actions/download-artifact@v4
         with:
-          name: webgl-build
-          path: build
+          name: build-WebGL
+          path: build/WebGL
 
-      - name: Deploy to itch.io
+      - name: Deploy WebGL
         uses: KikimoraGames/itch-publish@v0.0.3
         with:
           butlerApiKey: ${{ secrets.ITCH_API_KEY }}
-          gameData: build
+          gameData: build/WebGL
           itchUsername: ${{ secrets.ITCH_USERNAME }}
           itchGameId: ${{ secrets.ITCH_SLUG }}
           buildChannel: html5
+
+  deploy-mac:
+    name: Deploy macOS to itch.io
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download macOS build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-StandaloneOSX
+          path: build/StandaloneOSX
+
+      - name: Deploy macOS
+        uses: KikimoraGames/itch-publish@v0.0.3
+        with:
+          butlerApiKey: ${{ secrets.ITCH_API_KEY }}
+          gameData: build/StandaloneOSX
+          itchUsername: ${{ secrets.ITCH_USERNAME }}
+          itchGameId: ${{ secrets.ITCH_SLUG }}
+          buildChannel: mac
+
+  deploy-windows:
+    name: Deploy Windows to itch.io
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-StandaloneWindows64
+          path: build/StandaloneWindows64
+
+      - name: Deploy Windows
+        uses: KikimoraGames/itch-publish@v0.0.3
+        with:
+          butlerApiKey: ${{ secrets.ITCH_API_KEY }}
+          gameData: build/StandaloneWindows64
+          itchUsername: ${{ secrets.ITCH_USERNAME }}
+          itchGameId: ${{ secrets.ITCH_SLUG }}
+          buildChannel: windows

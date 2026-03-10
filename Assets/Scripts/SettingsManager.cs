@@ -55,6 +55,11 @@ public class SettingsManager : Singleton<SettingsManager>
     sensitivityYText.text = $"Look Y Sensitivity: {value}";
   }
 
+  public void ToggleMusic(bool value)
+  {
+    LevelMaster.Instance.ToggleMusic(value);
+  }
+
   public void OnToggleSettings(CallbackContext context)
   {
     if (Time.timeScale == 0f && !settingsMenu.activeSelf) return; // prevent if already in another popup
@@ -79,11 +84,6 @@ public class SettingsManager : Singleton<SettingsManager>
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
       }
-    }
-
-    if (!settingsMenu.activeSelf) // we just closed the settings, save the settings to disk!
-    {
-      LevelMaster.Instance.CacheSensitivityUse();
     }
   }
 }

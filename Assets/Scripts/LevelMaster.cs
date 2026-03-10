@@ -23,12 +23,13 @@ public class LevelMaster : Singleton<LevelMaster>
 
   private bool isLoading = false;
   private float levelTime = 0f; // for timing each level
-  private Vector2 weightedSensitivitySum = Vector2.zero;
-  private float sensitivityTime = 0f;
 
   // Actions
   private InputAction ABAudioAction;
   private InputAction ABVisualAction;
+
+  // Music volume
+  public float MusicVolume { get; private set; } = 0.5f;
 
   protected override void Awake()
   {
@@ -51,6 +52,8 @@ public class LevelMaster : Singleton<LevelMaster>
 
     ABAudioAction = InputSystem.actions.FindAction("ABAudio");
     ABVisualAction = InputSystem.actions.FindAction("ABVisual");
+
+    GetComponent<AudioSource>().volume = PlayerPrefs.GetFloat("music", MusicVolume);
   }
 
   void OnEnable()
@@ -95,19 +98,12 @@ public class LevelMaster : Singleton<LevelMaster>
     if (Time.timeScale != 0f && Player.Instance) // player is in a game and the game is not paused
     {
       levelTime += Time.deltaTime;
-      sensitivityTime += Time.deltaTime;
     }
   }
 
   /* =======================
    * Public API
    * ======================= */
-
-  public void CacheSensitivityUse()
-  {
-    weightedSensitivitySum += new Vector2(PlayerPrefs.GetFloat("sensitivity_x"), PlayerPrefs.GetFloat("sensitivity_y")) * sensitivityTime;
-    sensitivityTime = 0f;
-  }
 
   public void NewGame()
   {
@@ -128,14 +124,10 @@ public class LevelMaster : Singleton<LevelMaster>
     if (isLoading) return;
 
     // log the current level's data
-    CacheSensitivityUse();
-
     float flashlightRatio = Flashlight.Instance ? Flashlight.Instance.GetUseRatio() : 0f;
 
     FirebaseAnalytics.LogDocument("level_complete", new { time_spent = levelTime, flashlight_pct_on = flashlightRatio }); //, sensitivity_x_avg = weightedSensitivitySum[0] / levelTime, sensitivity_y_avg = weightedSensitivitySum[1] / levelTime });
     levelTime = 0f; // reset the counter
-    sensitivityTime = 0f;
-    weightedSensitivitySum = Vector2.zero;
 
     int nextIndex = GetLevel() + 1;
     if (nextIndex >= scenes.Length)
@@ -181,6 +173,13 @@ public class LevelMaster : Singleton<LevelMaster>
   public int GetTotalLevels()
   {
     return scenes.Length;
+  }
+
+  public void ToggleMusic(bool value)
+  {
+    float volume = value ? MusicVolume : 0f;
+    GetComponent<AudioSource>().volume = volume;
+    PlayerPrefs.SetFloat("music", volume);
   }
 
   /* =======================

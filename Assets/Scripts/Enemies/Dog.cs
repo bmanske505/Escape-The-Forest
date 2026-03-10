@@ -9,7 +9,7 @@ public class Dog : NavMeshEnemy
   [Header("Route")]
   [SerializeField] private Transform routeRoot; // Drag DogRoute1, DogRoute2, etc
 
-  Vector3[] route;
+  Transform[] route;
   int index = 1;
   Animator anim;
 
@@ -26,7 +26,6 @@ public class Dog : NavMeshEnemy
         .GetComponentsInChildren<Transform>()
         .Where(t => t != routeRoot) // exclude parent
         .OrderBy(t => ExtractRouteIndex(t.name))
-        .Select(t => t.position)
         .ToArray();
   }
 
@@ -46,8 +45,8 @@ public class Dog : NavMeshEnemy
 
   void Start()
   {
-    agent.Warp(route[0]);
-    agent.SetDestination(route[index]);
+    agent.Warp(route[0].position);
+    agent.SetDestination(route[index].position);
   }
 
   protected override void Update()
@@ -63,12 +62,12 @@ public class Dog : NavMeshEnemy
       if (agent.remainingDistance <= agent.stoppingDistance)
       {
         // Also check if the agent has stopped moving or has no path
-        if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
         {
           // The agent has reached the target
           Debug.Log("Destination reached!");
           index = (index + 1) % route.Length;
-          agent.SetDestination(route[index]);
+          agent.SetDestination(route[index].position);
         }
       }
     }
