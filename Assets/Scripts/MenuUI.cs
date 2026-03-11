@@ -9,7 +9,6 @@ public class MenuUI : MonoBehaviour
       b.interactable = LevelMaster.Instance.GetLevel() != 0;
 
     GameObject message = GameObject.FindWithTag("AudioDisclaimer");
-    Debug.Log(message);
     message.SetActive(PlayerPrefs.GetInt("ab_group") == 0); // enable if audio pipeline, else disable
   }
 

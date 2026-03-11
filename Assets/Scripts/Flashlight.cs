@@ -164,6 +164,8 @@ public class Flashlight : MonoBehaviour
       Off();
     else
       On();
+
+    FirebaseAnalytics.LogDocument("flashlight_toggled", new { on = IsOn() });
   }
 
   private void On()

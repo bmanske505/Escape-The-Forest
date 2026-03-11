@@ -25,8 +25,8 @@ public class LevelMaster : Singleton<LevelMaster>
   private float levelTime = 0f; // for timing each level
 
   // Actions
-  private InputAction ABAudioAction;
-  private InputAction ABVisualAction;
+  // private InputAction ABAudioAction;
+  // private InputAction ABVisualAction;
 
   // Music volume
   public float MusicVolume { get; private set; } = 0.3f;
@@ -46,16 +46,16 @@ public class LevelMaster : Singleton<LevelMaster>
     {
       int group = Random.Range(0, 2);
       PlayerPrefs.SetInt("ab_group", group); // 0 = audio, 1 = visual
-      Debug.Log($"Player assigned to group {group}");
     }
     PlayerPrefs.Save();
 
-    ABAudioAction = InputSystem.actions.FindAction("ABAudio");
-    ABVisualAction = InputSystem.actions.FindAction("ABVisual");
+    //ABAudioAction = InputSystem.actions.FindAction("ABAudio");
+    //ABVisualAction = InputSystem.actions.FindAction("ABVisual");
 
     GetComponent<AudioSource>().volume = PlayerPrefs.GetFloat("music", MusicVolume);
   }
 
+  /*
   void OnEnable()
   {
     if (ABAudioAction != null)
@@ -92,6 +92,7 @@ public class LevelMaster : Singleton<LevelMaster>
     Debug.Log("Set to Visual A/B pipeline");
 
   }
+  */
 
   void Update()
   {
