@@ -29,7 +29,7 @@ public class LevelMaster : Singleton<LevelMaster>
   private InputAction ABVisualAction;
 
   // Music volume
-  public float MusicVolume { get; private set; } = 0.5f;
+  public float MusicVolume { get; private set; } = 0.3f;
 
   protected override void Awake()
   {

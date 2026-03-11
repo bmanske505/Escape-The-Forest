@@ -206,7 +206,7 @@ public class Sibling : MonoBehaviour
     SetState(State.Hiding);
 
     numberTimesLost += 1;
-    if (numberTimesLost >= 2 && !Player.Instance.HasItem("echo")) // this is the second time they've lost sibling, let them echo!
+    if (numberTimesLost >= 2 && !Player.Instance.HasItem("echo") && PlayerPrefs.GetInt("ab_group") == 0) // this is the second time they've lost sibling, let them echo!
     {
       GameUI.Instance?.ShowTutorialPopup("Echo", "I keep losing Gregory! Maybe I should try calling out to him with SPACEBAR.");
       Player.Instance.AddToInventory("Echo");
