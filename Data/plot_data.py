@@ -22,7 +22,7 @@ COLLECTIONS = [
     "sibling_hid",
     "stalker_stunned",
 ]
-VERSIONS = [1.0, 1.1]
+VERSIONS = [1.0, 1.1, 1.2]
 
 ############### Utility functions ####################
 
@@ -440,8 +440,8 @@ def print_num_users():
 
 ############### Calling the plots functions ####################
 
-# pull_data() # this refreshes the csv files from firestore
-# print_num_users()
+pull_data() # this refreshes the csv files from firestore
+print_num_users()
 # new_plot()
 # sibling_found_plot(1.1)
 # sibling_found_plot(1.0)
