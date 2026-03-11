@@ -9,7 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        targetPlatform: [WebGL, StandaloneOSX, StandaloneWindows64]
+        include:
+          - targetPlatform: WebGL
+          - targetPlatform: StandaloneOSX
+          - targetPlatform: StandaloneWindows64
     steps:
       - name: Free disk space
         uses: jlumbroso/free-disk-space@main
@@ -30,8 +33,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          key: Library-${{ matrix.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
+            Library-${{ matrix.targetPlatform }}-
             Library-
 
       - name: Build with Unity
@@ -46,11 +50,36 @@ jobs:
           buildsPath: build/${{ matrix.targetPlatform }}
           versioning: None
 
-      - name: Upload build artifact
+      # macOS: the .app is a folder, so zip it into a single file before upload
+      - name: Zip macOS app
+        if: matrix.targetPlatform == 'StandaloneOSX'
+        run: |
+          cd build/StandaloneOSX/StandaloneOSX
+          APP=$(ls -d *.app | head -n 1)
+          zip -r "../../../$APP.zip" "$APP"
+          echo "MAC_ZIP=$APP.zip" >> $GITHUB_ENV
+
+      - name: Upload macOS artifact
+        if: matrix.targetPlatform == 'StandaloneOSX'
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ matrix.targetPlatform }}
-          path: build/${{ matrix.targetPlatform }}
+          name: build-StandaloneOSX
+          path: ${{ env.MAC_ZIP }}
+
+      # Windows: upload just the .exe (and required data folder)
+      - name: Upload Windows artifact
+        if: matrix.targetPlatform == 'StandaloneWindows64'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-StandaloneWindows64
+          path: build/StandaloneWindows64/StandaloneWindows64/
+
+      - name: Upload WebGL artifact
+        if: matrix.targetPlatform == 'WebGL'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-WebGL
+          path: build/WebGL/WebGL/
 
   deploy-webgl:
     name: Deploy WebGL to itch.io
