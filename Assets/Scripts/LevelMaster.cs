@@ -55,6 +55,11 @@ public class LevelMaster : Singleton<LevelMaster>
     GetComponent<AudioSource>().volume = PlayerPrefs.GetFloat("music", MusicVolume);
   }
 
+  void Start()
+  {
+    FirebaseAnalytics.LogDocument("session_start", new { });
+  }
+
   /*
   void OnEnable()
   {
