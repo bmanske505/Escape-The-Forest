@@ -23,7 +23,6 @@ COLLECTIONS = [
     "sibling_hid",
     "stalker_stunned",
 ]
-VERSIONS = [1.0, 1.1, 1.2]
 AB_PIPELINES = {0: "Audio", 1: "Visual"}
 VERSION_GROUPS = {
     "1.0": "#888888",
@@ -154,27 +153,18 @@ def make_title(s: str) -> str:
 
 def death_plot():
     df = csv_to_df("player_died")
-    df["type"] = df["type"].fillna("Stalker")
 
     df["version_group"] = df.apply(get_version_group, axis=1)
 
-    # ---- deaths per player ----
-    deaths_per_player = (
-        df.groupby(["level", "version_group", "userId"])
+    avg_deaths = (
+        df.groupby(["level", "version_group", "userId", "playthrough"])
         .size()
+        .groupby(["level", "version_group"])
+        .mean()
         .reset_index(name="deaths")
     )
 
-    # ---- average deaths per level/version ----
-    avg_deaths = (
-        deaths_per_player.groupby(["level", "version_group"])["deaths"]
-        .mean()
-        .reset_index()
-    )
-
-    levels = sorted(df["level"].unique())
-
-    x = np.arange(len(levels)) * 2.5
+    x = np.arange(len(LEVELS)) * 2.5
     width = 0.3
 
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -185,7 +175,7 @@ def death_plot():
 
         vals = []
 
-        for lvl in levels:
+        for lvl in LEVELS:
             row = avg_deaths[
                 (avg_deaths["level"] == lvl) & (avg_deaths["version_group"] == g)
             ]
@@ -193,12 +183,13 @@ def death_plot():
             if not row.empty:
                 vals.append(row["deaths"].values[0])
             else:
-                vals.append(np.nan)
+                vals.append(np.nan)  # leaves gap
 
         ax.bar(x + i * width, vals, width, label=g, color=c)
 
+    # label levels 1–7
     ax.set_xticks(x + 1.5 * width)
-    ax.set_xticklabels(levels)
+    ax.set_xticklabels([lvl + 1 for lvl in LEVELS])
 
     ax.set_xlabel("Level")
     ax.set_ylabel("Average Deaths per Player")
@@ -207,6 +198,13 @@ def death_plot():
 
     plt.tight_layout()
     fig_to_png(fig, "death_plot")
+
+
+# TODO: handle issues for this and below functions
+# - change level indexing to 1-based instead of 0-based
+# - plot ALL levels, not just levels with data
+# - make sure to treat same player but different playthrough as unique row when groupby
+# - HINT: check the above function for good implementation of these steps
 
 
 def sibling_hide():
@@ -439,15 +437,14 @@ def violin_plot(version: float):
 
 def print_num_users():
     df = csv_to_df("level_complete")
-    for version in VERSIONS:
-        print(f"VERSION {str(version)}")
-        filtered = df[df["version"] == version]
-        unique_users = filtered["userId"].nunique()
+    df["version_group"] = df.apply(get_version_group, axis=1)
+    # nunique per version_group
+    df = df.groupby("version_group")["userId"].nunique()
 
-        n_audio = filtered[filtered["ab_group"] == 0]["userId"].nunique()
-        n_visual = filtered[filtered["ab_group"] == 1]["userId"].nunique()
-
-        print(f"{unique_users} Users. Audio: {n_audio}, Visual: {n_visual}")
+    print("\nUSER DEMOGRAPHIC:")
+    for group, count in df.items():
+        print(f"Version {group}: {count} users")
+    print()
 
 
 ############### Calling the plots functions ####################
