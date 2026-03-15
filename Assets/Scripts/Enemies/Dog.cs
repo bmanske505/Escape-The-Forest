@@ -65,7 +65,6 @@ public class Dog : NavMeshEnemy
         if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
         {
           // The agent has reached the target
-          Debug.Log("Destination reached!");
           index = (index + 1) % route.Length;
           agent.SetDestination(route[index].position);
         }

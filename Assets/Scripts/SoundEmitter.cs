@@ -40,8 +40,6 @@ public class SoundEmitter : MonoBehaviour
       AudioClip clip = clips[Random.Range(0, clips.Length)];
       src.PlayOneShot(clip, volumeMultiplier);
 
-      Debug.Log("I made a sound!");
-
       yield return new WaitForSeconds(period);
     }
   }

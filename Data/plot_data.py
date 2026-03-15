@@ -1,3 +1,4 @@
+from matplotlib.ticker import PercentFormatter
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -22,9 +23,56 @@ COLLECTIONS = [
     "sibling_hid",
     "stalker_stunned",
 ]
-VERSIONS = [1.0, 1.1]
+VERSIONS = [1.0, 1.1, 1.2]
+AB_PIPELINES = {0: "Audio", 1: "Visual"}
+VERSION_GROUPS = {
+    "1.0": "#888888",
+    "1.1": "#FFA500",
+    "1.2 Audio": "#1f77b4",
+    "1.2 Visual": "#2ca02c",
+}
+THRESHOLD = 10  # number of minutes before an action is considered AFK
 
 ############### Utility functions ####################
+
+
+def get_version_group(row):
+    if row["version"] == 1.0:
+        return "1.0"
+    elif row["version"] == 1.1:
+        return "1.1"
+    elif row["version"] == 1.2 and row["ab_group"] == 0:
+        return "1.2 Audio"
+    elif row["version"] == 1.2 and row["ab_group"] == 1:
+        return "1.2 Visual"
+    return None
+
+
+def compute_level_times(df):
+    """
+    Compute time spent per level for each user/playthrough.
+
+    Returns a DataFrame with an added 'level_time' column (minutes).
+    Optionally filters out extreme values greater than max_minutes.
+    """
+    df = df.copy()
+
+    # ensure correct ordering
+    df = df.sort_values(["userId", "playthrough", "level"])
+
+    # compute time spent per level (difference between timestamps)
+    df["level_time"] = df.groupby(["userId", "playthrough"])["unix_time"].diff()
+
+    # drop level 0 (no previous timestamp)
+    df = df[df["level"] > 0]
+
+    # convert to minutes
+    df["level_time"] = df["level_time"] / 60
+
+    # optional: remove extreme values
+    df = df[df["level_time"] < THRESHOLD]
+
+    return df
 
 
 def flatten_dict(d, parent_key="", sep="."):
@@ -87,7 +135,6 @@ def fig_to_png(fig: plt.Figure, name: str):
     os.makedirs(PNG_PATH, exist_ok=True)  # Ensure directory exists
     path = os.path.join(PNG_PATH, f"{name}.png")
     fig.savefig(path)
-    fig.show(fig)
     plt.close(fig)
     print(f"Plot saved to {path}")
 
@@ -105,141 +152,258 @@ def make_title(s: str) -> str:
 ############### Defining the actual plots functions ####################
 
 
-# this is kinda replaced by the violin plot
-def stacked_bar(version: float):
-    df = csv_to_df("level_complete")
-    df = df[df["version"] == version]  # filter for the version
-
-    # add a new column for overall flashlight info (convert % to seconds)
-    df["time_flashlight_on"] = df["flashlight_pct_on"] * df["time_spent"]
-
-    # convert seconds info to minutes
-    df["time_spent"] /= 60
-    df["time_flashlight_on"] /= 60
-
-    # aggregate data by users
-    df = (
-        df.groupby("level")[["time_spent", "time_flashlight_on"]]
-        .mean()
-        .reindex(LEVELS, fill_value=0)
-    )
-
-    fig = plt.figure()
-    plt.bar(
-        LEVELS + 1,
-        df["time_spent"],
-        color="navy",
-        edgecolor="black",
-        label="Exploring Maze",
-    )
-    plt.bar(
-        LEVELS + 1,
-        df["time_flashlight_on"],
-        color="gold",
-        edgecolor="black",
-        label="Flashlight On",
-    )
-
-    plt.legend()
-    plt.title(f"Flashlight Usage & Time Spent by Level - Version {str(version)}")
-    plt.xlabel("Level")
-    plt.ylabel("Time (average minutes per user)")
-    plt.grid(axis="y", linestyle="--", alpha=0.7)
-
-    fig_to_png(fig, f"stacked_bar_v{str(version)}")
-
-
-def new_plot():
+def death_plot():
     df = csv_to_df("player_died")
     df["type"] = df["type"].fillna("Stalker")
 
-    # --- deaths per player ---
+    df["version_group"] = df.apply(get_version_group, axis=1)
+
+    # ---- deaths per player ----
     deaths_per_player = (
-        df.groupby(["level", "version", "userId", "type"])
+        df.groupby(["level", "version_group", "userId"])
         .size()
         .reset_index(name="deaths")
     )
 
-    # --- average deaths across players ---
+    # ---- average deaths per level/version ----
     avg_deaths = (
-        deaths_per_player.groupby(["level", "version", "type"])["deaths"]
+        deaths_per_player.groupby(["level", "version_group"])["deaths"]
         .mean()
-        .unstack(fill_value=0)
+        .reset_index()
     )
 
     levels = sorted(df["level"].unique())
 
-    # rows = versions, cols = levels
-    fig, axes = plt.subplots(
-        len(VERSIONS),
-        len(levels),
-        figsize=(3 * len(levels), 4 * len(VERSIONS)),
-        sharey=True,
-    )
+    x = np.arange(len(levels)) * 2.5
+    width = 0.3
 
-    if len(VERSIONS) == 1:
-        axes = [axes]
+    fig, ax = plt.subplots(figsize=(12, 6))
 
-    for i, version in enumerate(VERSIONS):
-        for j, level in enumerate(levels):
-            ax = axes[i][j]
+    ax.grid(axis="y", linestyle="--", alpha=0.6)
 
-            if (level, version) in avg_deaths.index:
-                row = avg_deaths.loc[(level, version)]
-                dog = row.get("Dog", 0)
-                stalker = row.get("Stalker", 0)
+    for i, (g, c) in enumerate(VERSION_GROUPS.items()):
+
+        vals = []
+
+        for lvl in levels:
+            row = avg_deaths[
+                (avg_deaths["level"] == lvl) & (avg_deaths["version_group"] == g)
+            ]
+
+            if not row.empty:
+                vals.append(row["deaths"].values[0])
             else:
-                dog = 0
-                stalker = 0
+                vals.append(np.nan)
 
-            ax.bar([0], stalker, color="red", label="Stalker")
-            ax.bar([0], dog, bottom=[stalker], color="orange", label="Dog")
+        ax.bar(x + i * width, vals, width, label=g, color=c)
 
-            ax.set_xticks([])
-            ax.set_title(f"Level {level} | v{version}")
-
-            if j == 0:
-                ax.set_ylabel("Avg Deaths per Player")
-
-    handles, labels = axes[0][0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper right")
-
-    plt.tight_layout()
-
-    fig_to_png(fig, "new_plot_both_versions")
-    plt.close(fig)
-
-
-def level_plots(version: float):
-    df = csv_to_df("level_complete")
-
-    df = df[df["version"] == version]  # filter for the version
-
-    # bar plot of user retention
-    total_users = df["userId"].nunique()
-    print(f"Total users: {total_users}")
-
-    users_per_level = df.groupby("level")["userId"].nunique().sort_index()
-
-    pct_per_level = (users_per_level / total_users) * 100
-    fig, ax = plt.subplots()
-    ax.plot(pct_per_level.index, pct_per_level.values, marker="o")
-
-    ax.set_title(f"User Retention across Levels - Version {str(version)}")
+    ax.set_xticks(x + 1.5 * width)
+    ax.set_xticklabels(levels)
 
     ax.set_xlabel("Level")
+    ax.set_ylabel("Average Deaths per Player")
+    ax.set_title("Average Player Deaths by Level and Version")
+    ax.legend(title="Version")
+
+    plt.tight_layout()
+    fig_to_png(fig, "death_plot")
+
+
+def sibling_hide():
+    sibling_hid_df = csv_to_df("sibling_hid")
+    sibling_found_df = csv_to_df("sibling_found")
+
+    def compute_differences():
+        diffs = []
+
+        # group by user + playthrough
+        for (user, playthrough), hide_group in sibling_hid_df.groupby(
+            ["userId", "playthrough"]
+        ):
+
+            found_group = sibling_found_df[
+                (sibling_found_df["userId"] == user)
+                & (sibling_found_df["playthrough"] == playthrough)
+            ].copy()
+
+            if found_group.empty:
+                continue
+
+            found_group = found_group.sort_values("unix_time")
+            hide_group = hide_group.sort_values("unix_time")
+
+            used_found = set()
+
+            for _, hide_row in hide_group.iterrows():
+
+                hide_time = hide_row["unix_time"]
+
+                # candidate found events that happen AFTER hide
+                candidates = found_group[found_group["unix_time"] > hide_time]
+
+                best_idx = None
+                best_time = None
+
+                for idx, found_row in candidates.iterrows():
+
+                    if idx in used_found:
+                        continue
+
+                    if best_time is None or found_row["unix_time"] < best_time:
+                        best_time = found_row["unix_time"]
+                        best_idx = idx
+
+                if best_idx is None:
+                    continue
+
+                used_found.add(best_idx)
+
+                diff = (best_time - hide_time) / 60
+
+                if diff <= THRESHOLD:
+                    diffs.append(
+                        {
+                            "level": hide_row["level"],
+                            "version_group": get_version_group(hide_row),
+                            "minutes": diff,
+                        }
+                    )
+
+        return pd.DataFrame(diffs)
+
+    diff_df = compute_differences()
+
+    # compute averages
+    avg_df = diff_df.groupby(["level", "version_group"])["minutes"].mean().reset_index()
+
+    # --------------------------------------------------
+    # plotting
+    # --------------------------------------------------
+
+    levels = sorted(avg_df["level"].unique())
+
+    x = np.arange(len(levels))
+    width = 0.2
+
+    fig, ax = plt.subplots()
+
+    for i, (g, c) in enumerate(VERSION_GROUPS.items()):
+
+        vals = []
+
+        for lvl in levels:
+            row = avg_df[(avg_df["level"] == lvl) & (avg_df["version_group"] == g)]
+
+            if not row.empty:
+                vals.append(row["minutes"].values[0])
+            else:
+                vals.append(np.nan)
+
+        ax.bar(x + i * width, vals, width, label=g, color=c)
+
+    ax.set_xticks(x + 1.5 * width)
+    ax.set_xticklabels(levels)
+
+    ax.set_xlabel("Level")
+    ax.set_ylabel("Average Time (min.)")
+    ax.set_title("Average Sibling Search Time by Level and Version")
+    ax.legend(title="Version")
+
+    plt.tight_layout()
+    fig_to_png(fig, "sibling_hide")
+
+
+def level_times():
+    df = csv_to_df("level_complete")
+    df = compute_level_times(df)
+
+    # add version_group column
+    df["version_group"] = df.apply(get_version_group, axis=1)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # loop through all version groups defined in VERSION_GROUPS
+    for version_group, color in VERSION_GROUPS.items():
+        df_vg = df[df["version_group"] == version_group]
+
+        if df_vg.empty:
+            continue
+
+        # average level_time per level
+        avg_times = df_vg.groupby("level")["level_time"].mean().sort_index()
+
+        ax.plot(
+            avg_times.index,
+            avg_times.values,
+            marker="o",
+            linestyle="-",  # can change to "--" if you want dashes
+            color=color,
+            label=version_group,
+        )
+
+    ax.set_xlabel("Level")
+    ax.set_ylabel("Average Time (minutes)")
+
+    # force integer ticks for levels
+    ax.set_xticks(sorted(df["level"].unique()))
+
+    ax.legend(title="Version")
+    ax.grid(True, linestyle="--", alpha=0.5)
+
+    ax.set_title("Average Maze Solve Time by Level and Version")
+
+    plt.tight_layout()
+    fig_to_png(fig, "level_times")
+
+
+def user_retention():
+    df = csv_to_df("level_complete")
+
+    # create a version_group column using your function
+    df["version_group"] = df.apply(get_version_group, axis=1)
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    for version_group, color in VERSION_GROUPS.items():
+
+        df_vg = df[df["version_group"] == version_group]
+
+        total_users = df_vg["userId"].nunique()
+        if total_users == 0:
+            continue
+
+        users_per_level = df_vg.groupby("level")["userId"].nunique().sort_index()
+        pct_per_level = (users_per_level / total_users) * 100
+
+        ax.plot(
+            pct_per_level.index,
+            pct_per_level.values,
+            marker="o",
+            color=color,
+            label=version_group,
+        )
+
+    ax.set_title("User Retention by Level and Version")
+    ax.set_xlabel("Level")
     ax.set_ylabel("% of User Base Completed")
+    ax.yaxis.set_major_formatter(PercentFormatter())
 
     ax.set_xticks(LEVELS)
-    ax.set_xticklabels(LEVELS + 1)
 
     ax.set_ylim(0, 100)
     ax.grid(True, linestyle="--", alpha=0.6)
 
-    fig_to_png(fig, f"level_completion_percentage_v{str(version)}")
-    plt.close(fig)
+    ax.legend(title="Version")
 
-    # --- violin plot: time spent per level ---
+    plt.tight_layout()
+    fig_to_png(fig, "user_retention")
+
+
+def violin_plot(version: float):
+    df = csv_to_df("level_complete")
+
+    df = df[df["version"] == version]  # filter for the version
+
     df["time_spent_minutes"] = df["time_spent"] / 60
     time_spent_by_level = []
 
@@ -268,164 +432,9 @@ def level_plots(version: float):
     ax.set_xticks(LEVELS)
     ax.set_xticklabels(LEVELS + 1)
     ax.grid(axis="y", linestyle="--", alpha=0.7)
+
+    plt.tight_layout()
     fig_to_png(fig, f"time_violin_v{str(version)}")
-    plt.close(fig)
-
-    # --- pie charts: flashlight on vs off per level ---
-    """
-    df["time_flashlight_on"] = df["flashlight_pct_on"] * df["time_spent_minutes"]
-    df["time_flashlight_off"] = df["time_spent_minutes"] - df["time_flashlight_on"]
-
-    n = len(LEVELS)
-
-    fig, axes = plt.subplots(2, 4)
-    axes = axes.flatten()
-
-    if n == 1:
-        axes = [axes]
-
-    colors = ["yellow", "darkblue"]
-
-    for ax, lvl in zip(axes, LEVELS):
-        level_df = df[df["level"] == lvl]
-        avg_on = level_df["time_flashlight_on"].mean()
-        avg_off = level_df["time_flashlight_off"].mean()
-        ax.pie(
-            [avg_on, avg_off],
-            colors=colors,
-            startangle=90,
-            wedgeprops={"edgecolor": "black"},  # <-- black border
-        )
-        ax.set_title(f"Level {lvl + 1}")
-
-    axes[-1].set_visible(False)
-
-    patches = [
-        mpatches.Patch(facecolor=c, edgecolor="black", label=l)
-        for c, l in zip(colors, ["On", "Off"])
-    ]
-
-    fig.legend(handles=patches, loc="lower right")
-    fig.suptitle(f"Flashlight Use by Level - Version {str(version)}")
-    fig_to_png(fig, f"flashlight_pie_v{str(version)}")
-    """
-
-
-def flashlight_plot(version: float):
-    events = ["flashlight_died"]
-    colors = ["black"]
-
-    dfs = [csv_to_df(event).assign(event=event) for event in events]
-    df: pd.DataFrame = pd.concat(dfs, ignore_index=True)
-    df = df[df["version"] == version]  # filter for the version
-
-    # count occurrences per user per level per event, then average across users
-    df = df.groupby(["level", "userId", "event"]).size().reset_index(name="count")
-    df = df.groupby(["level", "event"])["count"].mean().reset_index(name="mean")
-
-    n_events = len(events)
-    width = 0.8 / n_events
-
-    fig, ax = plt.subplots()
-    for i, (event, color) in enumerate(zip(events, colors)):
-        event_data = (
-            df[df["event"] == event].set_index("level").reindex(LEVELS, fill_value=0)
-        )
-        offsets = LEVELS + (i - n_events / 2 + 0.5) * width
-        ax.bar(
-            offsets,
-            event_data["mean"],
-            width=width,
-            color=color,
-            edgecolor="black",
-            label=make_title(event),
-        )
-
-    ax.set_title(f"Average Flashlight Events by Level - Version {str(version)}")
-    ax.set_ylabel("# of Occurences (average per user)")
-    ax.set_xlabel("Level")
-    ax.set_xticks(LEVELS)
-    ax.set_xticklabels(LEVELS + 1)
-    ax.legend()
-    ax.grid(axis="y", linestyle="--", alpha=0.7)
-
-    fig_to_png(fig, f"flashlight_bar_v{str(version)}")
-
-
-def death_plot(version: float):
-    events = ["player_died", "stalker_stunned"]
-    colors = ["red", "green"]
-
-    dfs = [csv_to_df(event).assign(event=event) for event in events]
-
-    df: pd.DataFrame = pd.concat(dfs, ignore_index=True)
-    df = df[df["version"] == version]  # filter for the version
-
-    df = df.groupby(["level", "userId", "event"]).size().reset_index(name="count")
-    df = df.groupby(["level", "event"])["count"].mean().reset_index(name="mean")
-
-    n_events = len(events)
-    width = 0.8 / n_events
-
-    fig, ax = plt.subplots()
-    for i, (event, color) in enumerate(zip(events, colors)):
-        event_data = (
-            df[df["event"] == event].set_index("level").reindex(LEVELS, fill_value=0)
-        )
-        offsets = LEVELS + (i - n_events / 2 + 0.5) * width
-        ax.bar(
-            offsets,
-            event_data["mean"],
-            width=width,
-            color=color,
-            edgecolor="black",
-            label=make_title(event),
-        )
-
-    ax.set_xlabel("Level")
-    ax.set_xticks(LEVELS)
-    ax.set_xticklabels(LEVELS + 1)
-    ax.set_ylabel("# of Occurences (average per user)")
-    ax.set_title(f"Player Death vs. Stuns by Level - Version {str(version)}")
-    ax.legend()
-    ax.grid(axis="y", linestyle="--", alpha=0.7)
-
-    fig_to_png(fig, f"death_bar_plot_v{str(version)}")
-
-def sibling_found_plot(version: float):
-    df_hid = csv_to_df("sibling_hid")
-    df_found = csv_to_df("sibling_found")
-    # Filter for version 1.1 and drop rows with missing unix_time or level
-    df_hid = df_hid[df_hid["version"] == version]
-    df_found = df_found[df_found["version"] == version]
-
-    # Merge on level, userId, and playthrough if possible
-    merge_cols = ["level", "userId"]
-    if "playthrough" in df_hid.columns and "playthrough" in df_found.columns:
-        merge_cols.append("playthrough")
-    merged = pd.merge(
-        df_hid,
-        df_found,
-        on=merge_cols,
-        suffixes=("_hid", "_found"),
-        how="inner",
-        validate="many_to_many",
-    )
-    print(f"Merged rows: {len(merged)}")
-    # Compute time to find
-    merged["time_to_find"] = merged["unix_time_found"] - merged["unix_time_hid"]
-
-    # Group by level and average
-    avg_time = merged.groupby("level")["time_to_find"].mean()
-
-    fig, ax = plt.subplots()
-    ax.bar(avg_time.index, avg_time.values)
-    ax.set_xlabel("Level")
-    ax.set_ylabel("Time Spend to Find Sibling (average minutes per user)")
-    ax.set_title(f"Average Time to Find Sibling by Level - Version {str(version)}")
-    ax.set_xticks(avg_time.index)
-    ax.grid(axis="y", linestyle="--", alpha=0.5)
-    fig_to_png(fig, f"sibling_found_plot_v{str(version)}")
 
 
 def print_num_users():
@@ -435,22 +444,18 @@ def print_num_users():
         filtered = df[df["version"] == version]
         unique_users = filtered["userId"].nunique()
 
-        print(unique_users)
+        n_audio = filtered[filtered["ab_group"] == 0]["userId"].nunique()
+        n_visual = filtered[filtered["ab_group"] == 1]["userId"].nunique()
+
+        print(f"{unique_users} Users. Audio: {n_audio}, Visual: {n_visual}")
 
 
 ############### Calling the plots functions ####################
 
-# pull_data() # this refreshes the csv files from firestore
-# print_num_users()
-# new_plot()
-# sibling_found_plot(1.1)
-# sibling_found_plot(1.0)
+# pull_data()  # this refreshes the csv files from firestore
+print_num_users()
 
-"""
-for version in VERSIONS:
-    stacked_bar(version)
-    level_plots(version)
-    flashlight_plot(version)
-    death_plot(version)
-    sibling_found_plot(version)
-"""
+user_retention()
+level_times()
+sibling_hide()
+death_plot()
