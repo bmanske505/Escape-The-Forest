@@ -112,6 +112,9 @@ def pull_data(
 
         df = pd.DataFrame(rows)
 
+        # remove ourselves
+        df = df[df["userId"] != "0ee2cd15-372c-463d-8986-35ebb91cf660"]
+
         output_path = os.path.join(CSV_PATH, f"{collection_name}.csv")
         df.to_csv(output_path, index=False)
 
@@ -149,7 +152,6 @@ def make_title(s: str) -> str:
 
 
 ############### Defining the actual plots functions ####################
-
 
 def death_plot():
     df = csv_to_df("player_died")
@@ -278,9 +280,7 @@ def sibling_hide():
     # plotting
     # --------------------------------------------------
 
-    levels = sorted(avg_df["level"].unique())
-
-    x = np.arange(len(levels))
+    x = np.arange(len(LEVELS))
     width = 0.2
 
     fig, ax = plt.subplots()
@@ -289,7 +289,7 @@ def sibling_hide():
 
         vals = []
 
-        for lvl in levels:
+        for lvl in LEVELS:
             row = avg_df[(avg_df["level"] == lvl) & (avg_df["version_group"] == g)]
 
             if not row.empty:
@@ -299,8 +299,9 @@ def sibling_hide():
 
         ax.bar(x + i * width, vals, width, label=g, color=c)
 
+    # label levels 1–7
     ax.set_xticks(x + 1.5 * width)
-    ax.set_xticklabels(levels)
+    ax.set_xticklabels([lvl + 1 for lvl in LEVELS])
 
     ax.set_xlabel("Level")
     ax.set_ylabel("Average Time (min.)")
@@ -342,8 +343,8 @@ def level_times():
     ax.set_xlabel("Level")
     ax.set_ylabel("Average Time (minutes)")
 
-    # force integer ticks for levels
-    ax.set_xticks(sorted(df["level"].unique()))
+    # label levels 1–7
+    ax.set_xticklabels([lvl + 1 for lvl in LEVELS])
 
     ax.legend(title="Version")
     ax.grid(True, linestyle="--", alpha=0.5)
@@ -363,14 +364,15 @@ def user_retention():
     fig, ax = plt.subplots(figsize=(12, 6))
 
     for version_group, color in VERSION_GROUPS.items():
-
         df_vg = df[df["version_group"] == version_group]
-
         total_users = df_vg["userId"].nunique()
         if total_users == 0:
             continue
 
         users_per_level = df_vg.groupby("level")["userId"].nunique().sort_index()
+        # restrict to levels 0–6
+        users_per_level = users_per_level.loc[users_per_level.index.isin(LEVELS)]
+
         pct_per_level = (users_per_level / total_users) * 100
 
         ax.plot(
@@ -386,7 +388,9 @@ def user_retention():
     ax.set_ylabel("% of User Base Completed")
     ax.yaxis.set_major_formatter(PercentFormatter())
 
-    ax.set_xticks(LEVELS)
+    # label levels 1–7
+    ax.set_xticks(LEVELS)  # positions
+    ax.set_xticklabels([lvl + 1 for lvl in LEVELS])
 
     ax.set_ylim(0, 100)
     ax.grid(True, linestyle="--", alpha=0.6)
@@ -395,45 +399,6 @@ def user_retention():
 
     plt.tight_layout()
     fig_to_png(fig, "user_retention")
-
-
-def violin_plot(version: float):
-    df = csv_to_df("level_complete")
-
-    df = df[df["version"] == version]  # filter for the version
-
-    df["time_spent_minutes"] = df["time_spent"] / 60
-    time_spent_by_level = []
-
-    # Only include levels that exist in the data
-    for lvl in LEVELS:
-        data = df["time_spent_minutes"].values
-        if data.size > 0:
-            time_spent_by_level.append(data)
-        else:
-            time_spent_by_level.append(np.array([0]))  # or skip this level entirely
-
-    # If you skip levels, make a matching positions array
-    positions = [lvl for lvl, data in zip(LEVELS, time_spent_by_level) if data.size > 0]
-
-    fig, ax = plt.subplots()
-    parts = ax.violinplot(
-        time_spent_by_level, positions=positions, showmeans=True, showmedians=False
-    )
-
-    for pc in parts["bodies"]:
-        pc.set_facecolor("blue")
-        pc.set_alpha(0.6)
-    ax.set_title(f"Time Spent Exploring by Level - Version {str(version)}")
-    ax.set_xlabel("Level")
-    ax.set_ylabel("Time (min. per user)")
-    ax.set_xticks(LEVELS)
-    ax.set_xticklabels(LEVELS + 1)
-    ax.grid(axis="y", linestyle="--", alpha=0.7)
-
-    plt.tight_layout()
-    fig_to_png(fig, f"time_violin_v{str(version)}")
-
 
 def print_num_users():
     df = csv_to_df("level_complete")
@@ -449,7 +414,7 @@ def print_num_users():
 
 ############### Calling the plots functions ####################
 
-# pull_data()  # this refreshes the csv files from firestore
+pull_data()  # this refreshes the csv files from firestore
 print_num_users()
 
 user_retention()
