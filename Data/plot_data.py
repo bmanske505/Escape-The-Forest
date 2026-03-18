@@ -414,10 +414,32 @@ def print_num_users():
 
 ############### Calling the plots functions ####################
 
-pull_data()  # this refreshes the csv files from firestore
-print_num_users()
+def main():
+  pull_data()  # this refreshes the csv files from firestore
+  print_num_users()
 
-user_retention()
-level_times()
-sibling_hide()
-death_plot()
+  user_retention()
+  level_times()
+  sibling_hide()
+  death_plot()
+
+# main()
+
+df = csv_to_df("level_complete")
+
+# Calculate unique users in version 1.0 and 1.2
+users_v1_0 = set(df[df["version"] == 1.0]["userId"])
+users_v1_2 = set(df[df["version"] == 1.2]["userId"])
+
+print(len(users_v1_0))
+print(len(users_v1_2))
+# Find users in both versions and only in version 1.0
+common_users = len(users_v1_0 & users_v1_2)
+print(common_users)
+unique_to_v1_0 = len(users_v1_0 - users_v1_2)
+print(unique_to_v1_0)
+# Create a DataFrame with the results
+df = pd.DataFrame(
+    {"Answer": [common_users, unique_to_v1_0]},
+    index=["In both versions", "Only in version 1.0"],
+)
